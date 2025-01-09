@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "c0DnTHQsSrJKR+/Tn5a8gHenlKeiXCAFmPU1cNco+VE=",
+  "Source": "Ucms.Stock.Api",
+  "BasePath": "_content/Ucms.Stock.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
