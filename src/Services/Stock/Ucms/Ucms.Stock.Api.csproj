@@ -6,8 +6,29 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="FluentValidation.AspNetCore" />
+		<PackageReference Include="AutoMapper" />
+		<PackageReference Include="MassTransit.RabbitMQ" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+		<PackageReference Include="Serilog.AspNetCore" />
+		<PackageReference Include="Serilog.Sinks.Seq" />
+		<PackageReference Include="Swashbuckle.AspNetCore" />
+	</ItemGroup>
+	
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Ucms.Stock.Contracts\Ucms.Stock.Contracts.csproj" />
+    <ProjectReference Include="..\Ucms.Stock.Domain\Ucms.Stock.Domain.csproj" />
+    <ProjectReference Include="..\Ucms.Stock.Infrastructure\Ucms.Stock.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

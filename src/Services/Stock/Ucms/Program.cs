@@ -1,25 +1,44 @@
+using Microsoft.EntityFrameworkCore;
+using Ucms.Common.Extensions;
+using Ucms.Stock.Api.Extensions;
+using Ucms.Stock.Api.Infrastructure;
+using Ucms.Stock.Infrastructure.EntityFramework;
+
+Console.Title = "Stock API";
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Host.ConfigureAppConfiguration(SetupConfiguration());
+builder.Host.UseApplicationSerilog();
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+var app = builder
+    .ConfigureServices()
+    .ConfigurePipeline();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.MigrateDbContext<StockDbContext>((context, services) =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    context.Database.Migrate();
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
+    var config = services.GetRequiredService<IConfiguration>();
+    if (config.GetValue<bool>("Database:EnabledDataSeeding"))
+    {
+        new StockDbContextSeed()
+            .SeedAsync(context, services)
+            .Wait();
+    }
+});
 app.Run();
+
+static Action<HostBuilderContext, IConfigurationBuilder> SetupConfiguration()
+{
+    return (hostingContext, config) =>
+    {
+        var env = hostingContext.HostingEnvironment;
+        config
+            .SetBasePath(env.ContentRootPath)
+            .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
+            .AddEnvironmentVariables();
+    };
+}
