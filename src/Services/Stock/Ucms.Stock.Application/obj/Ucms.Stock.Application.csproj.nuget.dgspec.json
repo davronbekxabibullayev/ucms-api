@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms\\Ucms.Stock.Api.csproj": {}
+    "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms.Stock.Application\\Ucms.Stock.Application.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms\\Ucms.Stock.Api.csproj": {
+    "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms.Stock.Application\\Ucms.Stock.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms\\Ucms.Stock.Api.csproj",
-        "projectName": "Ucms.Stock.Api",
-        "projectPath": "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms\\Ucms.Stock.Api.csproj",
+        "projectUniqueName": "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms.Stock.Application\\Ucms.Stock.Application.csproj",
+        "projectName": "Ucms.Stock.Application",
+        "projectPath": "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms.Stock.Application\\Ucms.Stock.Application.csproj",
         "packagesPath": "C:\\Users\\davronbek\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms\\obj\\",
+        "outputPath": "D:\\Projects\\MyProjects\\ucms-api\\src\\Services\\Stock\\Ucms.Stock.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -31,7 +31,6 @@
         },
         "frameworks": {
           "net8.0": {
-            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -45,19 +44,11 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "10.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
-          "framework": "net8.0",
           "targetAlias": "net8.0",
-          "dependencies": {
-            "Swashbuckle.AspNetCore": {
-              "target": "Package",
-              "version": "[6.4.0, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -70,14 +61,11 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

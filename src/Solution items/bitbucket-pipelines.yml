@@ -1,0 +1,41 @@
+# Prerequisites: $DEVHUB_REGISTRY, $DEVHUB_REGISTRY_USERNAME, $DEVHUB_REGISTRY_PASSWORD setup as deployment variables
+
+image: atlassian/default-image:3
+
+definitions:
+  services:
+    docker:
+      memory: 3072
+
+pipelines:
+
+  custom:
+
+    ravm.init.uz:
+      - step:
+          name: Build
+          script:
+            - DOCKERFILE_PATH=src/Services/Ravm/Ravm.Api/Dockerfile
+            - IMAGE_NAME=${DEVHUB_REGISTRY}/ravm-api
+            - VERSION="0.1.${BITBUCKET_BUILD_NUMBER}"
+            - docker build -f $DOCKERFILE_PATH -t ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${VERSION} .
+            - echo ${DEVHUB_REGISTRY_PASSWORD} | docker login --username $DEVHUB_REGISTRY_USERNAME --password-stdin $DEVHUB_REGISTRY
+            - docker push -a ${IMAGE_NAME}
+          services:
+            - docker
+
+      - step:
+          name: Deploy
+          deployment: test
+          script:
+            - STACKFILE_PATH=swarm/dev/stack.yml
+            - export DOCKER_HOST=${DOCKER_HOST_INIT}
+            - export APPLICATION_VERSION="0.1.${BITBUCKET_BUILD_NUMBER}"
+            - echo $DOCKER_HOST
+            - echo $APPLICATION_VERSION
+            - echo $DB_HOST
+            - docker info
+            - echo ${DEVHUB_REGISTRY_PASSWORD} | docker login --username $DEVHUB_REGISTRY_USERNAME --password-stdin $DEVHUB_REGISTRY
+            - docker stack deploy -c ${STACKFILE_PATH} ravm --with-registry-auth --resolve-image always
+          services:
+            - docker
