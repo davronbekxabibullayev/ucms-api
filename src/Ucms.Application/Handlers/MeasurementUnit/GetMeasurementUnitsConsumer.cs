@@ -5,7 +5,6 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.DTOs.Models;
 using Ucms.Application.Persistence;
-using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Mediator;
 
 public record GetMeasurementUnitsMessage : IRequest<List<MeasurementUnitModel>>;
@@ -14,21 +13,17 @@ public class GetMeasurementUnitsConsumer : RequestHandler<GetMeasurementUnitsMes
 {
     private readonly IAppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IWorkContext _workContext;
 
     public GetMeasurementUnitsConsumer(
         IAppDbContext dbContext,
-        IMapper mapper,
-        IWorkContext workContext)
+        IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _workContext = workContext;
     }
     protected override async Task<List<MeasurementUnitModel>> Handle(GetMeasurementUnitsMessage message, CancellationToken cancellationToken)
     {
         var measurementUnits = await _dbContext.MeasurementUnits
-            .Where(w => w.EmergencyType == _workContext.EmergencyType)
             .OrderBy(a => a.Name)
             .ToListAsync(cancellationToken);
 

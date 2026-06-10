@@ -94,7 +94,6 @@ public class GetAmbulanceStocksStatsConsumer : RequestHandler<GetAmbulanceStockS
 
     private IQueryable<Domain.Entities.StockSku> GetStockSkues()
     {
-        return _stockDbContext.StockSkus
-            .Where(x => x.Sku!.EmergencyType == EmergencyServiceType.Ambulance);
+        return _stockDbContext.StockSkus;
     }
 }

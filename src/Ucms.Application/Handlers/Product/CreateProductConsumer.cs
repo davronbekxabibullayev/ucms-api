@@ -5,7 +5,6 @@ using Ucms.Domain.Enums;
 using Ucms.Domain.Exceptions;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
-using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Mediator;
 
 public record CreateProductMessage(
@@ -22,12 +21,10 @@ public record CreateProductMessage(
 public class CreateProductConsumer : RequestHandler<CreateProductMessage, Guid>
 {
     private readonly IAppDbContext _dbContext;
-    private readonly IWorkContext _workContext;
 
-    public CreateProductConsumer(IAppDbContext dbContext, IWorkContext workContext)
+    public CreateProductConsumer(IAppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _workContext = workContext;
     }
 
     protected override async Task<Guid> Handle(CreateProductMessage message, CancellationToken cancellationToken)
@@ -48,8 +45,7 @@ public class CreateProductConsumer : RequestHandler<CreateProductMessage, Guid>
             InternationalCode = message.InternationalCode,
             InternationalName = message.InternationalName,
             AlternativeName = message.AlternativeName,
-            Type = message.Type,
-            EmergencyType = _workContext.EmergencyType
+            Type = message.Type
         };
 
         _dbContext.Products.Add(product);

@@ -33,7 +33,7 @@ public class GetFilteredSkusConsumer : RequestHandler<GetFilteredSkusMessage, Pa
             .Include(i => i.Sku!.Manufacturer)
             .Include(i => i.Sku!.MeasurementUnit)
             .Include(i => i.Sku!.Supplier)
-            .Where(w => w.Sku!.EmergencyType == _workContext.EmergencyType && w.OrganizationId == _workContext.TenantId)
+            .Where(w => w.OrganizationId == _workContext.TenantId)
             .Select(s => s.Sku!);
 
         if (!string.IsNullOrEmpty(message.Query))

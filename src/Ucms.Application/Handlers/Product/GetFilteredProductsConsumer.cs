@@ -7,7 +7,6 @@ using Ucms.Application.DTOs.Models;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 using QueryForge.Extensions;
-using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Mediator;
 
 public record GetFilteredProductsMessage(PagedRequest Filter) : IRequest<PagedResult<ProductModel>>;
@@ -16,20 +15,17 @@ public class GetFilteredProductsConsumer : RequestHandler<GetFilteredProductsMes
 {
     private readonly IAppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IWorkContext _workContext;
 
-    public GetFilteredProductsConsumer(IAppDbContext dbContext, IMapper mapper, IWorkContext workContext)
+    public GetFilteredProductsConsumer(IAppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _workContext = workContext;
     }
 
     protected override async Task<PagedResult<ProductModel>> Handle(GetFilteredProductsMessage message,
         CancellationToken cancellationToken)
     {
         return await _dbContext.Products
-            .Where(w => w.EmergencyType == _workContext.EmergencyType)
             .OrderBy(c => c.Name)
             .ToPagedResultAsync<Product, ProductModel>(message.Filter, _mapper, cancellationToken);
     }

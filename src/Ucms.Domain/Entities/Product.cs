@@ -38,10 +38,5 @@ public class Product : LocalizableEntity, IDeletable
     /// </summary>
     public ProductType Type { get; set; }
 
-    /// <summary>
-    /// Тип служба
-    /// </summary>
-    public EmergencyServiceType EmergencyType { get; set; } = EmergencyServiceType.Ambulance;
-
     public virtual ICollection<StockBalanceRegister> StockBalanceRegistery { get; set; } = [];
 }

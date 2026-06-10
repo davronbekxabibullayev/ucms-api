@@ -28,8 +28,4 @@ public class MeasurementUnit : LocalizableEntity, IDeletable
     /// </summary>
     public MeasurementUnitType Type { get; set; }
 
-    /// <summary>
-    /// Тип служба
-    /// </summary>
-    public EmergencyServiceType EmergencyType { get; set; } = EmergencyServiceType.Ambulance;
 }

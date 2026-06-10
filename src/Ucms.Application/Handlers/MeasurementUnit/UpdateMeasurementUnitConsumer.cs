@@ -6,7 +6,6 @@ using Ucms.Domain.Enums;
 using Ucms.Domain.Exceptions;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
-using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Mediator;
 
 public record UpdateMeasurementUnitMessage(
@@ -22,12 +21,10 @@ public record UpdateMeasurementUnitMessage(
 public class UpdateMeasurementUnitConsumer : RequestHandler<UpdateMeasurementUnitMessage, Guid>
 {
     private readonly IAppDbContext _dbContext;
-    private readonly IWorkContext _workContext;
 
-    public UpdateMeasurementUnitConsumer(IAppDbContext dbContext, IWorkContext workContext)
+    public UpdateMeasurementUnitConsumer(IAppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _workContext = workContext;
     }
     protected override async Task<Guid> Handle(UpdateMeasurementUnitMessage message, CancellationToken cancellationToken)
     {
@@ -50,7 +47,6 @@ public class UpdateMeasurementUnitConsumer : RequestHandler<UpdateMeasurementUni
         measurementUnit.NameEn = message.NameEn;
         measurementUnit.NameKa = message.NameKa;
         measurementUnit.NameRu = message.NameRu;
-        measurementUnit.EmergencyType = _workContext.EmergencyType;
     }
 
     private async Task<MeasurementUnit> GetEntityOrThrowAsync(UpdateMeasurementUnitMessage message, CancellationToken cancellationToken)

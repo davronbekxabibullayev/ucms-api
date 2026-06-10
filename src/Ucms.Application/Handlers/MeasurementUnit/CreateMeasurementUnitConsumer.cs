@@ -6,7 +6,6 @@ using Ucms.Domain.Enums;
 using Ucms.Domain.Exceptions;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
-using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Mediator;
 
 public record CreateMeasurementUnitMessage(
@@ -21,14 +20,11 @@ public record CreateMeasurementUnitMessage(
 public class CreateMeasurementUnitConsumer : RequestHandler<CreateMeasurementUnitMessage, Guid>
 {
     private readonly IAppDbContext _dbContext;
-    private readonly IWorkContext _workContext;
 
     public CreateMeasurementUnitConsumer(
-        IAppDbContext dbContext,
-        IWorkContext workContext)
+        IAppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _workContext = workContext;
     }
 
     protected override async Task<Guid> Handle(CreateMeasurementUnitMessage message, CancellationToken cancellationToken)
@@ -53,8 +49,7 @@ public class CreateMeasurementUnitConsumer : RequestHandler<CreateMeasurementUni
             Name = message.Name,
             NameEn = message.NameEn,
             NameKa = message.NameKa,
-            NameRu = message.NameRu,
-            EmergencyType = _workContext.EmergencyType
+            NameRu = message.NameRu
         };
     }
 

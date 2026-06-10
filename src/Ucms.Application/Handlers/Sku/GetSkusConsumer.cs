@@ -25,7 +25,7 @@ public class GetSkusConsumer : RequestHandler<GetSkusMessage, List<SkuModel>>
     protected override async Task<List<SkuModel>> Handle(GetSkusMessage message, CancellationToken cancellationToken)
     {
         var skus = await _dbContext.OrganizationSkus
-            .Where(w => w.Sku!.EmergencyType == _workContext.EmergencyType && w.OrganizationId == _workContext.TenantId)
+            .Where(w => w.OrganizationId == _workContext.TenantId)
             .OrderBy(a => a.Sku!.Name)
             .Select(s => s.Sku)
             .ToListAsync(cancellationToken);

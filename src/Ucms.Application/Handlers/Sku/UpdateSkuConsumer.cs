@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Ucms.Domain.Enums;
 using Ucms.Domain.Exceptions;
 using Ucms.Application.Persistence;
-using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Mediator;
 
 public record UpdateSkuMessage(
@@ -28,12 +27,10 @@ public record UpdateSkuMessage(
 public class UpdateSkuConsumer : RequestHandler<UpdateSkuMessage, Guid>
 {
     private readonly IAppDbContext _dbContext;
-    private readonly IWorkContext _workContext;
 
-    public UpdateSkuConsumer(IAppDbContext dbContext, IWorkContext workContext)
+    public UpdateSkuConsumer(IAppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _workContext = workContext;
     }
     protected override async Task<Guid> Handle(UpdateSkuMessage message, CancellationToken cancellationToken)
     {
@@ -53,7 +50,6 @@ public class UpdateSkuConsumer : RequestHandler<UpdateSkuMessage, Guid>
         sku.ManufacturerId = message.ManufacturerId;
         sku.MeasurementUnitId = message.MeasurementUnitId;
         sku.SupplierId = message.SupplierId;
-        sku.EmergencyType = _workContext.EmergencyType;
         sku.Status = message.Status;
 
         _dbContext.Skus.Update(sku);

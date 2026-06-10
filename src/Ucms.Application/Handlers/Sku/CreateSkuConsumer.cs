@@ -60,7 +60,6 @@ public class CreateSkuConsumer : RequestHandler<CreateSkuMessage, Guid>
                 ManufacturerId = message.ManufacturerId,
                 MeasurementUnitId = message.MeasurementUnitId,
                 SupplierId = message.SupplierId,
-                EmergencyType = _workContext.EmergencyType,
                 Status = message.Status
             }
         };

@@ -54,11 +54,6 @@ public class Sku : LocalizableEntity, IDeletable
     public decimal Price { get; set; }
 
     /// <summary>
-    /// Тип служба
-    /// </summary>
-    public EmergencyServiceType EmergencyType { get; set; } = EmergencyServiceType.Ambulance;
-
-    /// <summary>
     /// Статус
     /// </summary>
     public SkuStatus Status { get; set; } = SkuStatus.Default;
