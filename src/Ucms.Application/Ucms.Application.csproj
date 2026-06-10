@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Ucms.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.AspNetCore" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.Abstractions" />
+    <PackageReference Include="QueryForge" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ucms.Domain\Ucms.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
