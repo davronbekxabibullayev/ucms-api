@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ucms.Stock.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+970e3a3d800893eeebce5639920864b7b8bc4fbe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+226ec2e7716f23807cc9dac84d8e0a62606b0f14")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ucms.Stock.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ucms.Stock.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
