@@ -14,6 +14,7 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(e => e.Address).HasMaxLength(1024);
         builder.Property(e => e.Phone).HasMaxLength(64);
         builder.Property(e => e.Email).HasMaxLength(256);
+        builder.Property(e => e.Type).HasDefaultValue(Ucms.Domain.Enums.OrganizationType.Tenant);
 
         builder.HasQueryFilter(x => !x.IsDeleted);
 

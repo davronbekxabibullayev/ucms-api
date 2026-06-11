@@ -1,12 +1,18 @@
 namespace Ucms.Domain.Entities;
 
 using Ucms.Domain.Common;
+using Ucms.Domain.Enums;
 
 /// <summary>
-/// Tashkilot (bizning kompaniya yoki ish beruvchi)
+/// Tashkilot — tizim egasi (Owner) yoki foydalanuvchi kompaniya (Tenant)
 /// </summary>
 public class Organization : AuditableEntity, IDeletable
 {
+    /// <summary>
+    /// Tashkilot turi: Owner = tizim egasi, Tenant = foydalanuvchi
+    /// </summary>
+    public OrganizationType Type { get; set; } = OrganizationType.Tenant;
+
     /// <summary>
     /// Tashkilot nomi
     /// </summary>

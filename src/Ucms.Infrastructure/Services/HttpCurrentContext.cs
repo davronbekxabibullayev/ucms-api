@@ -35,6 +35,16 @@ public class HttpCurrentContext(IHttpContextAccessor httpContextAccessor) : ICur
 
     public bool IsAdmin => User?.IsInRole("Admin") ?? false;
 
+    /// <summary>
+    /// JWT dagi "org_type" claim "Owner" bo'lsa true qaytaradi.
+    /// Owner foydalanuvchilar barcha tashkilotlar ma'lumotlarini boshqara oladi.
+    /// </summary>
+    public bool IsOwner =>
+        string.Equals(
+            User?.FindFirstValue("org_type"),
+            "Owner",
+            StringComparison.OrdinalIgnoreCase);
+
     public IReadOnlyList<string> Roles =>
         User?.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList()
         ?? (IReadOnlyList<string>)[];

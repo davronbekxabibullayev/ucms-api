@@ -17,7 +17,7 @@ public class TokenService(IConfiguration config) : ITokenService
     private readonly int    _accessMin = int.Parse(config["Jwt:AccessTokenExpirationMinutes"] ?? "60");
     private readonly int    _refreshDays = int.Parse(config["Jwt:RefreshTokenExpirationDays"] ?? "7");
 
-    public string GenerateAccessToken(User user, IList<string> roles)
+    public string GenerateAccessToken(User user, IList<string> roles, string? orgType = null)
     {
         var claims = new List<Claim>
         {
@@ -30,6 +30,10 @@ public class TokenService(IConfiguration config) : ITokenService
 
         if (user.OrganizationId.HasValue)
             claims.Add(new Claim("organization_id", user.OrganizationId.Value.ToString()));
+
+        // Tashkilot turi — Owner yoki Tenant
+        if (!string.IsNullOrWhiteSpace(orgType))
+            claims.Add(new Claim("org_type", orgType));
 
         if (!string.IsNullOrWhiteSpace(user.FullName))
             claims.Add(new Claim("full_name", user.FullName));

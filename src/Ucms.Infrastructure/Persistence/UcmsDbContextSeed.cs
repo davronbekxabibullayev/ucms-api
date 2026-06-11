@@ -17,17 +17,79 @@ using Ucms.Domain.Enums;
 /// </summary>
 public class UcmsDbContextSeed
 {
-    // ── Fixed GUIDs for repeatable seeding ─────────────────────────────────────
-    private static readonly Guid AdminUserId    = new("00000000-0000-0000-0000-000000000001");
-    private static readonly Guid AdminRoleId    = new("00000000-0000-0000-0000-000000000010");
-    private static readonly Guid ManagerRoleId  = new("00000000-0000-0000-0000-000000000011");
-    private static readonly Guid BrigadirRoleId = new("00000000-0000-0000-0000-000000000012");
+    // ══════════════════════════════════════════════════════════════════════════
+    // Fixed GUIDs (idempotent seeding uchun)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    // ── Rollar ────────────────────────────────────────────────────────────────
+    private static readonly Guid AdminRoleId      = new("00000000-0000-0000-0000-000000000010");
+    private static readonly Guid ManagerRoleId    = new("00000000-0000-0000-0000-000000000011");
+    private static readonly Guid BrigadirRoleId   = new("00000000-0000-0000-0000-000000000012");
     private static readonly Guid AccountantRoleId = new("00000000-0000-0000-0000-000000000013");
-    private static readonly Guid OrgId          = new("00000000-0000-0000-0001-000000000001");
-    private static readonly Guid ProjectId      = new("00000000-0000-0000-0002-000000000001");
-    private static readonly Guid BrigadeId      = new("00000000-0000-0000-0003-000000000001");
-    private static readonly Guid Section1Id     = new("00000000-0000-0000-0004-000000000001");
-    private static readonly Guid Section2Id     = new("00000000-0000-0000-0004-000000000002");
+
+    // ── OWNER tashkilot (tizim egasi — UCMS) ─────────────────────────────────
+    private static readonly Guid OwnerOrgId     = new("00000000-0000-0000-0001-000000000000");
+    private static readonly Guid SysAdminId     = new("00000000-0000-0000-0000-000000000001");
+
+    // ── TENANT 1 — "Ihtiyor Qurilish Kompaniyasi" ────────────────────────────────
+    private static readonly Guid T1OrgId        = new("00000000-0000-0000-0001-000000000001");
+    private static readonly Guid T1AdminId      = new("00000000-0000-0000-0000-000000000101");
+    private static readonly Guid T1ManagerId    = new("00000000-0000-0000-0000-000000000102");
+    private static readonly Guid T1BrigadirId   = new("00000000-0000-0000-0000-000000000103");
+    private static readonly Guid T1AccountantId = new("00000000-0000-0000-0000-000000000104");
+
+    private static readonly Guid T1Project1Id   = new("00000000-0000-0000-0002-000000000101");
+    private static readonly Guid T1Project2Id   = new("00000000-0000-0000-0002-000000000102");
+
+    private static readonly Guid T1Brigade1Id   = new("00000000-0000-0000-0003-000000000101");
+    private static readonly Guid T1Brigade2Id   = new("00000000-0000-0000-0003-000000000102");
+
+    // Project 1 estimate
+    private static readonly Guid T1P1Sec1Id     = new("00000000-0000-0000-0004-000000000101");
+    private static readonly Guid T1P1Sec2Id     = new("00000000-0000-0000-0004-000000000102");
+    private static readonly Guid T1P1Item1Id    = new("00000000-0000-0000-0005-000000000101");
+    private static readonly Guid T1P1Item2Id    = new("00000000-0000-0000-0005-000000000102");
+    private static readonly Guid T1P1Item3Id    = new("00000000-0000-0000-0005-000000000103");
+    private static readonly Guid T1P1Item4Id    = new("00000000-0000-0000-0005-000000000104");
+    private static readonly Guid T1P1Item5Id    = new("00000000-0000-0000-0005-000000000105");
+
+    // Project 2 estimate
+    private static readonly Guid T1P2Sec1Id     = new("00000000-0000-0000-0004-000000000201");
+    private static readonly Guid T1P2Item1Id    = new("00000000-0000-0000-0005-000000000201");
+    private static readonly Guid T1P2Item2Id    = new("00000000-0000-0000-0005-000000000202");
+
+    // WorkLogs
+    private static readonly Guid T1WL1Id        = new("00000000-0000-0000-0006-000000000101");
+    private static readonly Guid T1WL2Id        = new("00000000-0000-0000-0006-000000000102");
+    private static readonly Guid T1WL3Id        = new("00000000-0000-0000-0006-000000000103");
+    private static readonly Guid T1WL4Id        = new("00000000-0000-0000-0006-000000000104");
+    private static readonly Guid T1WL5Id        = new("00000000-0000-0000-0006-000000000105");
+
+    // BrigadePayment
+    private static readonly Guid T1BP1Id        = new("00000000-0000-0000-0007-000000000101");
+
+    // ClientAct
+    private static readonly Guid T1Act1Id       = new("00000000-0000-0000-0008-000000000101");
+
+    // ClientPayment
+    private static readonly Guid T1CP1Id        = new("00000000-0000-0000-0009-000000000101");
+
+    // ── TENANT 2 — "Johongir Qurilish Xizmati" ─────────────────────────────────
+    private static readonly Guid T2OrgId        = new("00000000-0000-0000-0001-000000000002");
+    private static readonly Guid T2AdminId      = new("00000000-0000-0000-0000-000000000201");
+    private static readonly Guid T2ManagerId    = new("00000000-0000-0000-0000-000000000202");
+
+    private static readonly Guid T2Project1Id   = new("00000000-0000-0000-0002-000000000201");
+    private static readonly Guid T2Brigade1Id   = new("00000000-0000-0000-0003-000000000201");
+
+    private static readonly Guid T2P1Sec1Id     = new("00000000-0000-0000-0004-000000000301");
+    private static readonly Guid T2P1Item1Id    = new("00000000-0000-0000-0005-000000000301");
+    private static readonly Guid T2P1Item2Id    = new("00000000-0000-0000-0005-000000000302");
+
+    private static readonly Guid T2WL1Id        = new("00000000-0000-0000-0006-000000000201");
+    private static readonly Guid T2WL2Id        = new("00000000-0000-0000-0006-000000000202");
+
+    // ══════════════════════════════════════════════════════════════════════════
 
     public async Task SeedAsync(IServiceProvider services)
     {
@@ -40,16 +102,34 @@ public class UcmsDbContextSeed
             var userManager = services.GetRequiredService<UserManager<User>>();
             var roleManager = services.GetRequiredService<RoleManager<Role>>();
 
+            // 1. Asosiy spravochniklar
             await SeedRolesAsync(roleManager, logger);
             await SeedMeasurementUnitsAsync(db, logger);
-            await SeedOrganizationAsync(db, logger);
-            await SeedAdminUserAsync(db, userManager, logger);
-            await SeedSampleProjectAsync(db, logger);
-            await SeedSampleBrigadeAsync(db, logger);
+
+            // 2. OWNER tashkilot va foydalanuvchisi
+            await SeedOwnerOrgAsync(db, logger);
+            await SeedOwnerUsersAsync(userManager, logger);
+
+            // 3. TENANT 1 — to'liq ma'lumotlar bilan
+            await SeedTenant1OrgAsync(db, logger);
+            await SeedTenant1UsersAsync(userManager, logger);
+            await SeedTenant1ProjectsAsync(db, logger);
+            await SeedTenant1BrigadesAsync(db, logger);
+            await SeedTenant1WorkLogsAsync(db, logger);
+            await SeedTenant1FinanceAsync(db, logger);
+
+            // 4. TENANT 2 — alohida kompaniya
+            await SeedTenant2OrgAsync(db, logger);
+            await SeedTenant2UsersAsync(userManager, logger);
+            await SeedTenant2ProjectsAsync(db, logger);
+            await SeedTenant2BrigadesAsync(db, logger);
+            await SeedTenant2WorkLogsAsync(db, logger);
         });
     }
 
-    // ── Roles ──────────────────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // ROLLAR
+    // ══════════════════════════════════════════════════════════════════════════
 
     private static async Task SeedRolesAsync(RoleManager<Role> roleManager, ILogger? logger)
     {
@@ -71,299 +151,643 @@ public class UcmsDbContextSeed
             {
                 var result = await roleManager.CreateAsync(role);
                 if (result.Succeeded)
-                    logger?.LogInformation("[Seed] Rol yaratildi: {Role}", role.Name);
+                    logger?.LogInformation("[Seed] Rol: {Role}", role.Name);
                 else
-                    logger?.LogError("[Seed] Rol yaratishda xato ({Role}): {Errors}",
+                    logger?.LogError("[Seed] Rol xato ({Role}): {Errors}",
                         role.Name, string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
     }
 
-    // ── Measurement units ──────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // O'LCHOV BIRLIKLARI
+    // ══════════════════════════════════════════════════════════════════════════
 
     private static async Task SeedMeasurementUnitsAsync(UcmsDbContext db, ILogger? logger)
     {
         if (await db.MeasurementUnits.AnyAsync())
             return;
 
-        var now = DateTimeOffset.UtcNow;
-
         var units = new List<MeasurementUnit>
         {
-            // Maydon
-            new() { Id = NewId(), Code = "M2",   Name = "m²",      NameRu = "м²",    NameEn = "m²",
-                    Multiplier = 1, Type = MeasurementUnitType.Volume,   IsDeleted = false },
-            // Hajm
-            new() { Id = NewId(), Code = "M3",   Name = "m³",      NameRu = "м³",    NameEn = "m³",
-                    Multiplier = 1, Type = MeasurementUnitType.Volume,   IsDeleted = false },
-            // Uzunlik
-            new() { Id = NewId(), Code = "M",    Name = "m",       NameRu = "м",     NameEn = "m",
-                    Multiplier = 1, Type = MeasurementUnitType.Length,   IsDeleted = false },
-            // Metr pogonn
-            new() { Id = NewId(), Code = "MP",   Name = "m.p.",    NameRu = "м.п.",  NameEn = "lm",
-                    Multiplier = 1, Type = MeasurementUnitType.Length,   IsDeleted = false },
-            // Dona
-            new() { Id = NewId(), Code = "DONA", Name = "dona",    NameRu = "шт.",   NameEn = "pcs",
-                    Multiplier = 1, Type = MeasurementUnitType.Quantity, IsDeleted = false },
-            // Kilogram
-            new() { Id = NewId(), Code = "KG",   Name = "kg",      NameRu = "кг",    NameEn = "kg",
-                    Multiplier = 1, Type = MeasurementUnitType.Weight,   IsDeleted = false },
-            // Tonna
-            new() { Id = NewId(), Code = "TON",  Name = "tonna",   NameRu = "тонн",  NameEn = "ton",
-                    Multiplier = 1000, Type = MeasurementUnitType.Weight, IsDeleted = false },
+            new() { Id = NewId(), Code = "M2",   Name = "m²",    NameRu = "м²",   NameEn = "m²",
+                    Multiplier = 1,    Type = MeasurementUnitType.Volume,   IsDeleted = false },
+            new() { Id = NewId(), Code = "M3",   Name = "m³",    NameRu = "м³",   NameEn = "m³",
+                    Multiplier = 1,    Type = MeasurementUnitType.Volume,   IsDeleted = false },
+            new() { Id = NewId(), Code = "M",    Name = "m",     NameRu = "м",    NameEn = "m",
+                    Multiplier = 1,    Type = MeasurementUnitType.Length,   IsDeleted = false },
+            new() { Id = NewId(), Code = "MP",   Name = "m.p.",  NameRu = "м.п.", NameEn = "lm",
+                    Multiplier = 1,    Type = MeasurementUnitType.Length,   IsDeleted = false },
+            new() { Id = NewId(), Code = "DONA", Name = "dona",  NameRu = "шт.",  NameEn = "pcs",
+                    Multiplier = 1,    Type = MeasurementUnitType.Quantity, IsDeleted = false },
+            new() { Id = NewId(), Code = "KG",   Name = "kg",    NameRu = "кг",   NameEn = "kg",
+                    Multiplier = 1,    Type = MeasurementUnitType.Weight,   IsDeleted = false },
+            new() { Id = NewId(), Code = "TON",  Name = "tonna", NameRu = "тонн", NameEn = "ton",
+                    Multiplier = 1000, Type = MeasurementUnitType.Weight,   IsDeleted = false },
         };
 
         await db.MeasurementUnits.AddRangeAsync(units);
         await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] {Count} ta o'lchov birligi yaratildi", units.Count);
+        logger?.LogInformation("[Seed] {N} ta o'lchov birligi", units.Count);
     }
 
-    // ── Organization ───────────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // OWNER TASHKILOT
+    // ══════════════════════════════════════════════════════════════════════════
 
-    private static async Task SeedOrganizationAsync(UcmsDbContext db, ILogger? logger)
+    private static async Task SeedOwnerOrgAsync(UcmsDbContext db, ILogger? logger)
     {
-        if (await db.Organizations.AnyAsync(o => o.Id == OrgId))
+        if (await db.Organizations.AnyAsync(o => o.Id == OwnerOrgId))
             return;
 
-        var now = DateTimeOffset.UtcNow;
-
-        var org = new Organization
+        var now = Now();
+        await db.Organizations.AddAsync(new Organization
         {
-            Id         = OrgId,
-            Name       = "Demo Qurilish Kompaniyasi",
-            TaxId      = "1234567890",
-            Address    = "Toshkent shahri, Chilonzor tumani",
-            Phone      = "+998712345678",
-            Email      = "info@demo-qurilish.uz",
-            IsDeleted  = false,
-            CreatedAt  = now,
-            UpdatedAt  = now,
-            CreatedBy  = AdminUserId,
-            UpdatedBy  = AdminUserId,
-        };
-
-        await db.Organizations.AddAsync(org);
+            Id        = OwnerOrgId,
+            Name      = "UCMS — Tizim Egasi",
+            TaxId     = "0000000000",
+            Address   = "Toshkent shahri, Mirzo Ulug'bek tumani",
+            Phone     = "+998712345600",
+            Email     = "system@ucms.uz",
+            Type      = OrganizationType.Owner,
+            IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now,
+            CreatedBy = SysAdminId, UpdatedBy = SysAdminId,
+        });
         await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] Tashkilot yaratildi: {Org}", org.Name);
+        logger?.LogInformation("[Seed] OWNER tashkilot yaratildi");
     }
 
-    // ── Admin user ─────────────────────────────────────────────────────────────
-
-    private static async Task SeedAdminUserAsync(
-        UcmsDbContext db,
-        UserManager<User> userManager,
-        ILogger? logger)
+    private static async Task SeedOwnerUsersAsync(UserManager<User> um, ILogger? logger)
     {
-        if (await userManager.FindByNameAsync("admin") is not null)
-            return;
-
-        var now = DateTimeOffset.UtcNow;
-
-        var admin = new User
+        // sysadmin — barcha tashkilotlarga to'liq kirish (Owner org + Admin rol)
+        await CreateUserAsync(um, logger, new User
         {
-            Id             = AdminUserId,
-            UserName       = "admin",
-            NormalizedUserName = "ADMIN",
-            Email          = "admin@ucms.uz",
-            NormalizedEmail = "ADMIN@UCMS.UZ",
-            EmailConfirmed = true,
-            FullName       = "Tizim Administratori",
-            OrganizationId = OrgId,
-            IsDeleted      = false,
-            CreatedAt      = now,
-            UpdatedAt      = now,
-            CreatedBy      = AdminUserId,
-            UpdatedBy      = AdminUserId,
-        };
-
-        var result = await userManager.CreateAsync(admin, "Admin123!");
-        if (!result.Succeeded)
-        {
-            logger?.LogError("[Seed] Admin foydalanuvchi yaratishda xato: {Errors}",
-                string.Join(", ", result.Errors.Select(e => e.Description)));
-            return;
-        }
-
-        await userManager.AddToRoleAsync(admin, "Admin");
-        logger?.LogInformation("[Seed] Admin foydalanuvchi yaratildi: admin / Admin123!");
+            Id                 = SysAdminId,
+            UserName           = "sysadmin",
+            NormalizedUserName = "SYSADMIN",
+            Email              = "sysadmin@ucms.uz",
+            NormalizedEmail    = "SYSADMIN@UCMS.UZ",
+            EmailConfirmed     = true,
+            FullName           = "Tizim Super Admini",
+            OrganizationId     = OwnerOrgId,
+            IsDeleted          = false,
+            CreatedAt          = Now(), UpdatedAt = Now(),
+            CreatedBy          = SysAdminId, UpdatedBy = SysAdminId,
+        }, "SysAdmin123!", "Admin");
     }
 
-    // ── Sample project ─────────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // TENANT 1 — Ihtiyor Qurilish Kompaniyasi
+    // ══════════════════════════════════════════════════════════════════════════
 
-    private static async Task SeedSampleProjectAsync(UcmsDbContext db, ILogger? logger)
+    private static async Task SeedTenant1OrgAsync(UcmsDbContext db, ILogger? logger)
     {
-        if (await db.Projects.AnyAsync(p => p.Id == ProjectId))
+        if (await db.Organizations.AnyAsync(o => o.Id == T1OrgId))
             return;
 
-        var now = DateTimeOffset.UtcNow;
-
-        var project = new Project
+        var now = Now();
+        await db.Organizations.AddAsync(new Organization
         {
-            Id             = ProjectId,
-            OrganizationId = OrgId,
-            Name           = "ИКС — 2-sektsiya ta'mirlash",
-            Address        = "Toshkent shahri, Yunusobod tumani, 14-mavze, 3-uy",
+            Id        = T1OrgId,
+            Name      = "Ihtiyor Qurilish Kompaniyasi",
+            TaxId     = "1234567890",
+            Address   = "Toshkent shahri, Chilonzor tumani, 9-mavze",
+            Phone     = "+998712345678",
+            Email     = "info@demo-qurilish.uz",
+            Type      = OrganizationType.Tenant,
+            IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now,
+            CreatedBy = T1AdminId, UpdatedBy = T1AdminId,
+        });
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-1 tashkilot yaratildi");
+    }
+
+    private static async Task SeedTenant1UsersAsync(UserManager<User> um, ILogger? logger)
+    {
+        var now = Now();
+
+        // admin — T1 tashkiloti administratori
+        await CreateUserAsync(um, logger, new User
+        {
+            Id = T1AdminId, UserName = "admin", NormalizedUserName = "ADMIN",
+            Email = "admin@demo-qurilish.uz", NormalizedEmail = "ADMIN@DEMO-QURILISH.UZ",
+            EmailConfirmed = true, FullName = "Ahmadov Bahodir Umarovich",
+            OrganizationId = T1OrgId, IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T1AdminId, UpdatedBy = T1AdminId,
+        }, "Admin123!", "Admin");
+
+        // manager — loyiha menejeri
+        await CreateUserAsync(um, logger, new User
+        {
+            Id = T1ManagerId, UserName = "manager", NormalizedUserName = "MANAGER",
+            Email = "manager@demo-qurilish.uz", NormalizedEmail = "MANAGER@DEMO-QURILISH.UZ",
+            EmailConfirmed = true, FullName = "Ergashev Jahongir Saidovich",
+            OrganizationId = T1OrgId, IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T1AdminId, UpdatedBy = T1AdminId,
+        }, "Manager123!", "Manager");
+
+        // brigadir — ish jurnaliga yozadi
+        await CreateUserAsync(um, logger, new User
+        {
+            Id = T1BrigadirId, UserName = "brigadir", NormalizedUserName = "BRIGADIR",
+            Email = "brigadir@demo-qurilish.uz", NormalizedEmail = "BRIGADIR@DEMO-QURILISH.UZ",
+            EmailConfirmed = true, FullName = "Toshmatov Sherzod Hasanovich",
+            OrganizationId = T1OrgId, IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T1AdminId, UpdatedBy = T1AdminId,
+        }, "Brigadir123!", "Brigadir");
+
+        // accountant — to'lov va aktlar
+        await CreateUserAsync(um, logger, new User
+        {
+            Id = T1AccountantId, UserName = "accountant", NormalizedUserName = "ACCOUNTANT",
+            Email = "accountant@demo-qurilish.uz", NormalizedEmail = "ACCOUNTANT@DEMO-QURILISH.UZ",
+            EmailConfirmed = true, FullName = "Nazarova Gulnora Alijonovna",
+            OrganizationId = T1OrgId, IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T1AdminId, UpdatedBy = T1AdminId,
+        }, "Accountant123!", "Accountant");
+    }
+
+    private static async Task SeedTenant1ProjectsAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.Projects.AnyAsync(p => p.Id == T1Project1Id))
+            return;
+
+        var now = Now();
+
+        // ── Loyiha 1: Faol, to'liq smeta bilan ──────────────────────────────
+        var p1 = new Project
+        {
+            Id             = T1Project1Id,
+            OrganizationId = T1OrgId,
+            Name           = "Yunusobod-14 — 2-sektsiya ta'mirlash",
+            Address        = "Toshkent, Yunusobod tumani, 14-mavze, 3-uy",
+            Description    = "Ko'p qavatli turar-joy binosi ichki bezak ishlari",
             ContractNumber = "2024/001",
-            ContractDate   = new DateTimeOffset(2024, 1, 15, 0, 0, 0, TimeSpan.Zero),
-            StartDate      = new DateTimeOffset(2024, 2,  1, 0, 0, 0, TimeSpan.Zero),
-            EndDate        = new DateTimeOffset(2024, 8, 31, 0, 0, 0, TimeSpan.Zero),
+            ContractDate   = D(2024, 1, 15),
+            StartDate      = D(2024, 2,  1),
+            EndDate        = D(2024, 9, 30),
             Status         = ProjectStatus.InProgress,
             IsDeleted      = false,
-            CreatedAt      = now,
-            UpdatedAt      = now,
-            CreatedBy      = AdminUserId,
-            UpdatedBy      = AdminUserId,
+            CreatedAt      = now, UpdatedAt = now,
+            CreatedBy      = T1AdminId, UpdatedBy = T1AdminId,
         };
 
-        // EstimateSections
-        var sec1 = new EstimateSection
+        // Smeta — bo'lim 1: Pol ishlari
+        var s1 = Sec(T1P1Sec1Id, T1Project1Id, "Pol ishlari", 1);
+        var s2 = Sec(T1P1Sec2Id, T1Project1Id, "Devor va shift ishlari", 2);
+
+        var items1 = new[]
         {
-            Id        = Section1Id,
-            ProjectId = ProjectId,
-            Name      = "Pol ishlari",
-            Order     = 1,
+            Item(T1P1Item1Id, T1P1Sec1Id, "Pol shtukaturkasi (M-200 beton stяjka)", "m²",
+                 450m, 85_000m, 55_000m, 1),
+            Item(T1P1Item2Id, T1P1Sec1Id, "Keramik plitka qo'yish", "m²",
+                 450m, 120_000m, 80_000m, 2),
+            Item(T1P1Item3Id, T1P1Sec2Id, "Gips shtukaturka (devorlar)", "m²",
+                 1_200m, 48_000m, 30_000m, 1),
+            Item(T1P1Item4Id, T1P1Sec2Id, "Bo'yoq (2 qavat)", "m²",
+                 1_200m, 22_000m, 14_000m, 2),
+            Item(T1P1Item5Id, T1P1Sec2Id, "Gips karton (GKL) montaj", "m²",
+                 320m, 75_000m, 50_000m, 3),
         };
 
-        var sec2 = new EstimateSection
+        // ── Loyiha 2: Rejalashtirish bosqichi ──────────────────────────────
+        var p2 = new Project
         {
-            Id        = Section2Id,
-            ProjectId = ProjectId,
-            Name      = "Devor ishlari",
-            Order     = 2,
+            Id             = T1Project2Id,
+            OrganizationId = T1OrgId,
+            Name           = "Sergeli — ofis binosi ta'mirlash",
+            Address        = "Toshkent, Sergeli tumani, 7-mavze",
+            Description    = "Ofis binosi to'liq ta'mirlash va jihozlash",
+            ContractNumber = "2025/003",
+            ContractDate   = D(2025, 3, 1),
+            StartDate      = D(2025, 4, 1),
+            EndDate        = D(2025, 10, 31),
+            Status         = ProjectStatus.Planning,
+            IsDeleted      = false,
+            CreatedAt      = now, UpdatedAt = now,
+            CreatedBy      = T1AdminId, UpdatedBy = T1AdminId,
         };
 
-        // EstimateItems — pol
-        var items1 = new List<EstimateItem>
+        var s3    = Sec(T1P2Sec1Id, T1Project2Id, "Umumiy ta'mirlash ishlari", 1);
+        var items2 = new[]
         {
-            new()
-            {
-                Id               = NewId(),
-                SectionId        = Section1Id,
-                Name             = "Pol stяjkasi (M-200 beton)",
-                Unit             = "m²",
-                Volume           = 450m,
-                ClientUnitPrice  = 85_000m,
-                BrigadeUnitPrice = 55_000m,
-                Order            = 1,
-            },
-            new()
-            {
-                Id               = NewId(),
-                SectionId        = Section1Id,
-                Name             = "Keramik plitka qo'yish",
-                Unit             = "m²",
-                Volume           = 450m,
-                ClientUnitPrice  = 120_000m,
-                BrigadeUnitPrice = 80_000m,
-                Order            = 2,
-            },
-            new()
-            {
-                Id               = NewId(),
-                SectionId        = Section1Id,
-                Name             = "Taxta podval (OSB)",
-                Unit             = "m²",
-                Volume           = 120m,
-                ClientUnitPrice  = 95_000m,
-                BrigadeUnitPrice = 65_000m,
-                Order            = 3,
-            },
+            Item(T1P2Item1Id, T1P2Sec1Id, "Derazalar almashtirish", "dona",
+                 24m, 850_000m, 600_000m, 1),
+            Item(T1P2Item2Id, T1P2Sec1Id, "Eshiklar o'rnatish", "dona",
+                 12m, 1_200_000m, 900_000m, 2),
         };
 
-        // EstimateItems — devor
-        var items2 = new List<EstimateItem>
-        {
-            new()
-            {
-                Id               = NewId(),
-                SectionId        = Section2Id,
-                Name             = "Gips shtukaturka",
-                Unit             = "m²",
-                Volume           = 1_200m,
-                ClientUnitPrice  = 48_000m,
-                BrigadeUnitPrice = 30_000m,
-                Order            = 1,
-            },
-            new()
-            {
-                Id               = NewId(),
-                SectionId        = Section2Id,
-                Name             = "Bo'yoq (2 qavat)",
-                Unit             = "m²",
-                Volume           = 1_200m,
-                ClientUnitPrice  = 22_000m,
-                BrigadeUnitPrice = 14_000m,
-                Order            = 2,
-            },
-            new()
-            {
-                Id               = NewId(),
-                SectionId        = Section2Id,
-                Name             = "Gips kartón (GKL) montaj",
-                Unit             = "m²",
-                Volume           = 320m,
-                ClientUnitPrice  = 75_000m,
-                BrigadeUnitPrice = 50_000m,
-                Order            = 3,
-            },
-        };
-
-        await db.Projects.AddAsync(project);
-        await db.EstimateSections.AddRangeAsync(sec1, sec2);
+        await db.Projects.AddRangeAsync(p1, p2);
+        await db.EstimateSections.AddRangeAsync(s1, s2, s3);
         await db.EstimateItems.AddRangeAsync(items1);
         await db.EstimateItems.AddRangeAsync(items2);
         await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] Namunaviy loyiha yaratildi: {Name}", project.Name);
+        logger?.LogInformation("[Seed] TENANT-1: 2 ta loyiha va smeta yaratildi");
     }
 
-    // ── Sample brigade ─────────────────────────────────────────────────────────
-
-    private static async Task SeedSampleBrigadeAsync(UcmsDbContext db, ILogger? logger)
+    private static async Task SeedTenant1BrigadesAsync(UcmsDbContext db, ILogger? logger)
     {
-        if (await db.Brigades.AnyAsync(b => b.Id == BrigadeId))
+        if (await db.Brigades.AnyAsync(b => b.Id == T1Brigade1Id))
             return;
 
-        var now = DateTimeOffset.UtcNow;
+        var now = Now();
 
-        var brigades = new List<Brigade>
-        {
-            new()
+        await db.Brigades.AddRangeAsync(
+            new Brigade
             {
-                Id             = BrigadeId,
-                OrganizationId = OrgId,
-                Name           = "Abdullayev brigada",
+                Id             = T1Brigade1Id,
+                OrganizationId = T1OrgId,
+                Name           = "Abdullayev brigada (Pol ishlari)",
                 ForemanName    = "Abdullayev Jamshid Shodiyevich",
                 Phone          = "+998901234568",
-                IsActive       = true,
-                IsDeleted      = false,
-                CreatedAt      = now,
-                UpdatedAt      = now,
-                CreatedBy      = AdminUserId,
-                UpdatedBy      = AdminUserId,
+                IsActive       = true, IsDeleted = false,
+                CreatedAt      = now, UpdatedAt = now,
+                CreatedBy      = T1AdminId, UpdatedBy = T1AdminId,
             },
-            new()
+            new Brigade
             {
-                Id             = NewId(),
-                OrganizationId = OrgId,
-                Name           = "Karimov brigada",
+                Id             = T1Brigade2Id,
+                OrganizationId = T1OrgId,
+                Name           = "Karimov brigada (Devor ishlari)",
                 ForemanName    = "Karimov Sherzod Aliyevich",
                 Phone          = "+998901234569",
-                IsActive       = true,
-                IsDeleted      = false,
-                CreatedAt      = now,
-                UpdatedAt      = now,
-                CreatedBy      = AdminUserId,
-                UpdatedBy      = AdminUserId,
-            },
-        };
-
-        await db.Brigades.AddRangeAsync(brigades);
+                IsActive       = true, IsDeleted = false,
+                CreatedAt      = now, UpdatedAt = now,
+                CreatedBy      = T1AdminId, UpdatedBy = T1AdminId,
+            }
+        );
         await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] {Count} ta brigada yaratildi", brigades.Count);
+        logger?.LogInformation("[Seed] TENANT-1: 2 ta brigada yaratildi");
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
+    private static async Task SeedTenant1WorkLogsAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.WorkLogs.AnyAsync(w => w.Id == T1WL1Id))
+            return;
 
+        var now = Now();
+        var uid = T1ManagerId;
+
+        // WL1 — Brigade1, pol shtukaturka, Confirmed
+        var wl1 = new WorkLog
+        {
+            Id               = T1WL1Id,
+            ProjectId        = T1Project1Id,
+            BrigadeId        = T1Brigade1Id,
+            EstimateItemId   = T1P1Item1Id,
+            Date             = D(2024, 3, 10),
+            Volume           = 120m,
+            BrigadeUnitPrice = 55_000m,
+            TotalAmount      = 120m * 55_000m,   // 6,600,000
+            Status           = WorkLogStatus.Confirmed,
+            Note             = null,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+        };
+
+        // WL2 — Brigade1, plitka, Confirmed
+        var wl2 = new WorkLog
+        {
+            Id               = T1WL2Id,
+            ProjectId        = T1Project1Id,
+            BrigadeId        = T1Brigade1Id,
+            EstimateItemId   = T1P1Item2Id,
+            Date             = D(2024, 3, 25),
+            Volume           = 80m,
+            BrigadeUnitPrice = 80_000m,
+            TotalAmount      = 80m * 80_000m,    // 6,400,000
+            Status           = WorkLogStatus.Confirmed,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+        };
+
+        // WL3 — Brigade2, gips shtukaturka, Paid (brigade payment bilan)
+        var wl3 = new WorkLog
+        {
+            Id               = T1WL3Id,
+            ProjectId        = T1Project1Id,
+            BrigadeId        = T1Brigade2Id,
+            EstimateItemId   = T1P1Item3Id,
+            Date             = D(2024, 4, 5),
+            Volume           = 300m,
+            BrigadeUnitPrice = 30_000m,
+            TotalAmount      = 300m * 30_000m,   // 9,000,000
+            Status           = WorkLogStatus.Paid,
+            BrigadePaymentId = T1BP1Id,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+        };
+
+        // WL4 — Brigade2, bo'yoq, Draft
+        var wl4 = new WorkLog
+        {
+            Id               = T1WL4Id,
+            ProjectId        = T1Project1Id,
+            BrigadeId        = T1Brigade2Id,
+            EstimateItemId   = T1P1Item4Id,
+            Date             = D(2024, 4, 20),
+            Volume           = 400m,
+            BrigadeUnitPrice = 14_000m,
+            TotalAmount      = 400m * 14_000m,   // 5,600,000
+            Status           = WorkLogStatus.Draft,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T1BrigadirId, UpdatedBy = T1BrigadirId,
+        };
+
+        // WL5 — Brigade1, GKL, Rejected
+        var wl5 = new WorkLog
+        {
+            Id               = T1WL5Id,
+            ProjectId        = T1Project1Id,
+            BrigadeId        = T1Brigade1Id,
+            EstimateItemId   = T1P1Item5Id,
+            Date             = D(2024, 4, 15),
+            Volume           = 50m,
+            BrigadeUnitPrice = 50_000m,
+            TotalAmount      = 50m * 50_000m,    // 2,500,000
+            Status           = WorkLogStatus.Rejected,
+            Note             = "Sifat talablariga javob bermaydi — qayta bajarish kerak",
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T1BrigadirId, UpdatedBy = uid,
+        };
+
+        await db.WorkLogs.AddRangeAsync(wl1, wl2, wl3, wl4, wl5);
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-1: 5 ta work log yaratildi");
+    }
+
+    private static async Task SeedTenant1FinanceAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.BrigadePayments.AnyAsync(b => b.Id == T1BP1Id))
+            return;
+
+        var now = Now();
+        var uid = T1AccountantId;
+
+        // ── BrigadePayment: Brigade2 ga to'lov (WL3 uchun) ──────────────────
+        var bp1 = new BrigadePayment
+        {
+            Id            = T1BP1Id,
+            ProjectId     = T1Project1Id,
+            BrigadeId     = T1Brigade2Id,
+            Date          = D(2024, 4, 10),
+            Amount        = 9_000_000m,
+            PaymentMethod = PaymentMethod.BankTransfer,
+            Note          = "2024-yil mart oyi ish haqi",
+            CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+        };
+
+        // ── ClientAct ────────────────────────────────────────────────────────
+        // Pol shtukaturka + plitka (120m² + 80m²) uchun akt
+        var act1 = new ClientAct
+        {
+            Id          = T1Act1Id,
+            ProjectId   = T1Project1Id,
+            ActNumber   = "AKT-2024/001",
+            ActDate     = D(2024, 4, 1),
+            TotalAmount = 120m * 85_000m + 80m * 120_000m,   // 10,200,000 + 9,600,000 = 19,800,000
+            Status      = ActStatus.PaidPartially,
+            Note        = "1-oylik ish natijalari bo'yicha akt",
+            CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+        };
+
+        var actItem1 = new ClientActItem
+        {
+            Id             = NewId(),
+            ActId          = T1Act1Id,
+            EstimateItemId = T1P1Item1Id,
+            Volume         = 120m,
+            UnitPrice      = 85_000m,
+            TotalAmount    = 120m * 85_000m,     // 10,200,000
+        };
+
+        var actItem2 = new ClientActItem
+        {
+            Id             = NewId(),
+            ActId          = T1Act1Id,
+            EstimateItemId = T1P1Item2Id,
+            Volume         = 80m,
+            UnitPrice      = 120_000m,
+            TotalAmount    = 80m * 120_000m,     // 9,600,000
+        };
+
+        // ── ClientPayment: qisman to'lov ────────────────────────────────────
+        var cp1 = new ClientPayment
+        {
+            Id            = T1CP1Id,
+            ProjectId     = T1Project1Id,
+            ActId         = T1Act1Id,
+            Date          = D(2024, 4, 15),
+            Amount        = 10_000_000m,         // 19.8m dan 10m to'langan → PaidPartially
+            PaymentMethod = PaymentMethod.BankTransfer,
+            Note          = "Avans to'lov (50%)",
+            CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+        };
+
+        await db.BrigadePayments.AddAsync(bp1);
+        await db.ClientActs.AddAsync(act1);
+        await db.ClientActItems.AddRangeAsync(actItem1, actItem2);
+        await db.ClientPayments.AddAsync(cp1);
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-1: moliyaviy ma'lumotlar yaratildi (akt + to'lovlar)");
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // TENANT 2 — Johongir Qurilish Xizmati
+    // ══════════════════════════════════════════════════════════════════════════
+
+    private static async Task SeedTenant2OrgAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.Organizations.AnyAsync(o => o.Id == T2OrgId))
+            return;
+
+        var now = Now();
+        await db.Organizations.AddAsync(new Organization
+        {
+            Id        = T2OrgId,
+            Name      = "Johongir Qurilish Xizmati",
+            TaxId     = "9876543210",
+            Address   = "Samarqand shahri, Registon ko'chasi, 45",
+            Phone     = "+998662345678",
+            Email     = "info@yulduz-qurilish.uz",
+            Type      = OrganizationType.Tenant,
+            IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now,
+            CreatedBy = T2AdminId, UpdatedBy = T2AdminId,
+        });
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-2 tashkilot yaratildi");
+    }
+
+    private static async Task SeedTenant2UsersAsync(UserManager<User> um, ILogger? logger)
+    {
+        var now = Now();
+
+        await CreateUserAsync(um, logger, new User
+        {
+            Id = T2AdminId, UserName = "admin2", NormalizedUserName = "ADMIN2",
+            Email = "admin@yulduz-qurilish.uz", NormalizedEmail = "ADMIN@YULDUZ-QURILISH.UZ",
+            EmailConfirmed = true, FullName = "Rahimov Nodir Baxtiyorovich",
+            OrganizationId = T2OrgId, IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T2AdminId, UpdatedBy = T2AdminId,
+        }, "Admin123!", "Admin");
+
+        await CreateUserAsync(um, logger, new User
+        {
+            Id = T2ManagerId, UserName = "manager2", NormalizedUserName = "MANAGER2",
+            Email = "manager@yulduz-qurilish.uz", NormalizedEmail = "MANAGER@YULDUZ-QURILISH.UZ",
+            EmailConfirmed = true, FullName = "Usmonova Dilnoza Hamidovna",
+            OrganizationId = T2OrgId, IsDeleted = false,
+            CreatedAt = now, UpdatedAt = now, CreatedBy = T2AdminId, UpdatedBy = T2AdminId,
+        }, "Manager123!", "Manager");
+    }
+
+    private static async Task SeedTenant2ProjectsAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.Projects.AnyAsync(p => p.Id == T2Project1Id))
+            return;
+
+        var now = Now();
+
+        var p1 = new Project
+        {
+            Id             = T2Project1Id,
+            OrganizationId = T2OrgId,
+            Name           = "Samarqand — Mehmonxona ta'mirlash",
+            Address        = "Samarqand, Registon ko'chasi, 12",
+            Description    = "Mehmonxona binosi ta'mirlash va yangilash",
+            ContractNumber = "2025/SM-001",
+            ContractDate   = D(2025, 1, 10),
+            StartDate      = D(2025, 2,  1),
+            EndDate        = D(2025, 7, 31),
+            Status         = ProjectStatus.InProgress,
+            IsDeleted      = false,
+            CreatedAt      = now, UpdatedAt = now,
+            CreatedBy      = T2AdminId, UpdatedBy = T2AdminId,
+        };
+
+        var s1     = Sec(T2P1Sec1Id, T2Project1Id, "Bezak ishlari", 1);
+        var items1 = new[]
+        {
+            Item(T2P1Item1Id, T2P1Sec1Id, "Marmar plitka qo'yish", "m²",
+                 600m, 250_000m, 180_000m, 1),
+            Item(T2P1Item2Id, T2P1Sec1Id, "Tabiiy tosh qoplama", "m²",
+                 200m, 380_000m, 280_000m, 2),
+        };
+
+        await db.Projects.AddAsync(p1);
+        await db.EstimateSections.AddAsync(s1);
+        await db.EstimateItems.AddRangeAsync(items1);
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-2: 1 ta loyiha va smeta yaratildi");
+    }
+
+    private static async Task SeedTenant2BrigadesAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.Brigades.AnyAsync(b => b.Id == T2Brigade1Id))
+            return;
+
+        var now = Now();
+        await db.Brigades.AddAsync(new Brigade
+        {
+            Id             = T2Brigade1Id,
+            OrganizationId = T2OrgId,
+            Name           = "Mirzayev brigada (Bezak ishlari)",
+            ForemanName    = "Mirzayev Ulugbek Toxirovich",
+            Phone          = "+998662345679",
+            IsActive       = true, IsDeleted = false,
+            CreatedAt      = now, UpdatedAt = now,
+            CreatedBy      = T2AdminId, UpdatedBy = T2AdminId,
+        });
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-2: 1 ta brigada yaratildi");
+    }
+
+    private static async Task SeedTenant2WorkLogsAsync(UcmsDbContext db, ILogger? logger)
+    {
+        if (await db.WorkLogs.AnyAsync(w => w.Id == T2WL1Id))
+            return;
+
+        var now = Now();
+        var uid = T2ManagerId;
+
+        await db.WorkLogs.AddRangeAsync(
+            new WorkLog
+            {
+                Id               = T2WL1Id,
+                ProjectId        = T2Project1Id,
+                BrigadeId        = T2Brigade1Id,
+                EstimateItemId   = T2P1Item1Id,
+                Date             = D(2025, 2, 15),
+                Volume           = 150m,
+                BrigadeUnitPrice = 180_000m,
+                TotalAmount      = 150m * 180_000m,  // 27,000,000
+                Status           = WorkLogStatus.Confirmed,
+                CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+            },
+            new WorkLog
+            {
+                Id               = T2WL2Id,
+                ProjectId        = T2Project1Id,
+                BrigadeId        = T2Brigade1Id,
+                EstimateItemId   = T2P1Item2Id,
+                Date             = D(2025, 3, 5),
+                Volume           = 80m,
+                BrigadeUnitPrice = 280_000m,
+                TotalAmount      = 80m * 280_000m,   // 22,400,000
+                Status           = WorkLogStatus.Draft,
+                CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
+            }
+        );
+        await db.SaveChangesAsync();
+        logger?.LogInformation("[Seed] TENANT-2: 2 ta work log yaratildi");
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ══════════════════════════════════════════════════════════════════════════
+
+    private static async Task CreateUserAsync(
+        UserManager<User> um,
+        ILogger? logger,
+        User user,
+        string password,
+        string role)
+    {
+        if (await um.FindByNameAsync(user.UserName!) is not null)
+            return;
+
+        var result = await um.CreateAsync(user, password);
+        if (!result.Succeeded)
+        {
+            logger?.LogError("[Seed] Foydalanuvchi yaratishda xato ({User}): {Errors}",
+                user.UserName, string.Join(", ", result.Errors.Select(e => e.Description)));
+            return;
+        }
+
+        await um.AddToRoleAsync(user, role);
+        logger?.LogInformation("[Seed] User: {User} / {Pwd} [{Role}]", user.UserName, password, role);
+    }
+
+    private static EstimateSection Sec(Guid id, Guid projectId, string name, int order) =>
+        new() { Id = id, ProjectId = projectId, Name = name, Order = order };
+
+    private static EstimateItem Item(
+        Guid id, Guid sectionId, string name, string unit,
+        decimal volume, decimal clientPrice, decimal brigadePrice, int order) =>
+        new()
+        {
+            Id               = id,
+            SectionId        = sectionId,
+            Name             = name,
+            Unit             = unit,
+            Volume           = volume,
+            ClientUnitPrice  = clientPrice,
+            BrigadeUnitPrice = brigadePrice,
+            Order            = order,
+        };
+
+    private static DateTimeOffset D(int y, int m, int d) =>
+        new(y, m, d, 0, 0, 0, TimeSpan.Zero);
+
+    private static DateTimeOffset Now() => DateTimeOffset.UtcNow;
     private static Guid NewId() => Guid.NewGuid();
 
     private static AsyncRetryPolicy CreatePolicy(ILogger<UcmsDbContextSeed> logger, string prefix, int retries = 3)

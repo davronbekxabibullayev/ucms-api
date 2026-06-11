@@ -52,7 +52,7 @@ public class EstimateController(
             .FirstOrDefaultAsync(ct);
 
         if (orgId is null) return false;
-        return ctx.IsAdmin || ctx.OrganizationId == orgId;
+        return ctx.IsOwner || ctx.OrganizationId == orgId;
     }
 
     // ══════════════════════════════════════════════════════════════════════════

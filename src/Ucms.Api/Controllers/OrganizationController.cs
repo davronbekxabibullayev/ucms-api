@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
+using Ucms.Domain.Enums;
 
 [ApiController]
 [Route("api/organizations")]
@@ -22,7 +23,8 @@ public class OrganizationController(
         string? TaxId,
         string? Address,
         string? Phone,
-        string? Email);
+        string? Email,
+        OrganizationType Type = OrganizationType.Tenant);
 
     public record UpdateOrganizationRequest(
         string Name,
@@ -41,7 +43,8 @@ public class OrganizationController(
     {
         var query = db.Organizations.Where(o => !o.IsDeleted);
 
-        if (!ctx.IsAdmin && ctx.OrganizationId.HasValue)
+        // Owner foydalanuvchilar barcha tashkilotlarni ko'radi; Tenant — faqat o'ziniki
+        if (!ctx.IsOwner && ctx.OrganizationId.HasValue)
             query = query.Where(o => o.Id == ctx.OrganizationId.Value);
 
         var list = await query
@@ -49,7 +52,7 @@ public class OrganizationController(
             .Select(o => new
             {
                 o.Id, o.Name, o.TaxId, o.Address, o.Phone, o.Email,
-                o.CreatedAt
+                o.Type, o.CreatedAt
             })
             .ToListAsync(ct);
 
@@ -72,7 +75,7 @@ public class OrganizationController(
             .Select(o => new
             {
                 o.Id, o.Name, o.TaxId, o.Address, o.Phone, o.Email,
-                o.CreatedAt, o.UpdatedAt,
+                o.Type, o.CreatedAt, o.UpdatedAt,
                 ProjectCount = o.Projects.Count(p => !p.IsDeleted),
                 BrigadeCount = o.Brigades.Count(b => !b.IsDeleted),
             })
@@ -101,6 +104,7 @@ public class OrganizationController(
             Address   = req.Address,
             Phone     = req.Phone,
             Email     = req.Email,
+            Type      = req.Type,
             IsDeleted = false,
             CreatedAt = now, UpdatedAt = now,
             CreatedBy = userId, UpdatedBy = userId,
@@ -168,5 +172,5 @@ public class OrganizationController(
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private bool CanAccess(Guid orgId) =>
-        ctx.IsAdmin || ctx.OrganizationId == orgId;
+        ctx.IsOwner || ctx.OrganizationId == orgId;
 }

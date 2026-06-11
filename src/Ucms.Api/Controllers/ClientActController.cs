@@ -37,7 +37,7 @@ public class ClientActController(
             .FirstOrDefaultAsync(ct);
 
     private bool CanAccess(Guid orgId) =>
-        ctx.IsAdmin || ctx.OrganizationId == orgId;
+        ctx.IsOwner || ctx.OrganizationId == orgId;
 
     // ── GET /api/projects/{projectId}/acts ─────────────────────────────────────
 

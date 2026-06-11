@@ -26,9 +26,15 @@ public interface ICurrentContext
     public string? OrganizationName { get; }
 
     /// <summary>
-    /// Tizim admini ekanligini tekshirish
+    /// Tizim admini ekanligini tekshirish (o'z tashkilotida Admin roli bor)
     /// </summary>
     public bool IsAdmin { get; }
+
+    /// <summary>
+    /// Tizim egasi tashkilotiga mansub foydalanuvchi.
+    /// Owner foydalanuvchilar barcha tashkilotlar ma'lumotlarini ko'radi va boshqaradi.
+    /// </summary>
+    public bool IsOwner { get; }
 
     /// <summary>
     /// Foydalanuvchi rollari

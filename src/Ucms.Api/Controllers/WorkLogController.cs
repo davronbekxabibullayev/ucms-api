@@ -33,6 +33,7 @@ public class WorkLogController(
         string? Note);
 
     public record ConfirmWorkLogRequest(Guid[] WorkLogIds);
+    public record RejectWorkLogRequest(Guid[] WorkLogIds, string? Reason);
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -43,7 +44,39 @@ public class WorkLogController(
             .FirstOrDefaultAsync(ct);
 
     private bool CanAccess(Guid orgId) =>
-        ctx.IsAdmin || ctx.OrganizationId == orgId;
+        ctx.IsOwner || ctx.OrganizationId == orgId;
+
+    // ── GET /api/projects/{projectId}/worklogs/{id} ───────────────────────────
+
+    /// <summary>
+    /// Bitta ish jurnali yozuvi
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid projectId, Guid id, CancellationToken ct)
+    {
+        var orgId = await GetProjectOrgAsync(projectId, ct);
+        if (orgId is null) return NotFound();
+        if (!CanAccess(orgId.Value)) return Forbid();
+
+        var workLog = await db.WorkLogs
+            .Where(w => w.Id == id && w.ProjectId == projectId)
+            .Select(w => new
+            {
+                w.Id, w.Date, w.Volume, w.BrigadeUnitPrice, w.TotalAmount,
+                w.Status, w.Note, w.BrigadePaymentId,
+                w.CreatedAt, w.UpdatedAt,
+                Brigade = new { w.Brigade!.Id, w.Brigade.Name },
+                EstimateItem = new
+                {
+                    w.EstimateItem!.Id,
+                    w.EstimateItem.Name,
+                    w.EstimateItem.Unit,
+                },
+            })
+            .FirstOrDefaultAsync(ct);
+
+        return workLog is null ? NotFound() : Ok(workLog);
+    }
 
     // ── GET /api/projects/{projectId}/worklogs ─────────────────────────────────
 
@@ -245,6 +278,45 @@ public class WorkLogController(
         await db.SaveChangesAsync(ct);
 
         return Ok(new { confirmed = workLogs.Count });
+    }
+
+    // ── POST /api/projects/{projectId}/worklogs/reject ───────────────────────
+
+    /// <summary>
+    /// Ish jurnali yozuvlarini rad etish (Draft/Confirmed → Rejected)
+    /// </summary>
+    [HttpPost("reject")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> Reject(
+        Guid projectId,
+        [FromBody] RejectWorkLogRequest req,
+        CancellationToken ct)
+    {
+        var orgId = await GetProjectOrgAsync(projectId, ct);
+        if (orgId is null) return NotFound();
+        if (!CanAccess(orgId.Value)) return Forbid();
+
+        var workLogs = await db.WorkLogs
+            .Where(w => req.WorkLogIds.Contains(w.Id)
+                     && w.ProjectId == projectId
+                     && (w.Status == WorkLogStatus.Draft || w.Status == WorkLogStatus.Confirmed))
+            .ToListAsync(ct);
+
+        var now    = DateTimeOffset.UtcNow;
+        var userId = ctx.UserId ?? Guid.Empty;
+
+        foreach (var wl in workLogs)
+        {
+            wl.Status    = WorkLogStatus.Rejected;
+            wl.Note      = req.Reason ?? wl.Note;
+            wl.UpdatedAt = now;
+            wl.UpdatedBy = userId;
+            db.WorkLogs.Update(wl);
+        }
+
+        await db.SaveChangesAsync(ct);
+
+        return Ok(new { rejected = workLogs.Count });
     }
 
     // ── DELETE /api/projects/{projectId}/worklogs/{id} ────────────────────────

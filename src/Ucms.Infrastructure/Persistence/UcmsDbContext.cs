@@ -150,9 +150,12 @@ public class UcmsDbContext(
     private void SetOrgAndDeleteFilter<T>(ModelBuilder modelBuilder)
         where T : class, IDeletable, IHasOrganization
     {
+        // Owner foydalanuvchilar barcha tashkilotlar ma'lumotlarini ko'radi
         modelBuilder.Entity<T>().HasQueryFilter(e =>
                 !e.IsDeleted &&
-                (context.OrganizationId == null || e.OrganizationId == context.OrganizationId));
+                (context.IsOwner ||
+                 context.OrganizationId == null ||
+                 e.OrganizationId == context.OrganizationId));
     }
 
     private static void SetSoftDeleteFilter<T>(ModelBuilder modelBuilder)

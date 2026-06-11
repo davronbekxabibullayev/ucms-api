@@ -8,6 +8,7 @@ using Ucms.Application.Abstractions.Auth;
 using Ucms.Application.DTOs.Auth;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities.Identity;
+using Ucms.Domain.Enums;
 
 [ApiController]
 [Route("api/auth")]
@@ -117,8 +118,21 @@ public class AuthController(
 
     private async Task<AuthResponse> BuildAuthResponseAsync(User user, CancellationToken ct)
     {
-        var roles        = await userManager.GetRolesAsync(user);
-        var accessToken  = tokenService.GenerateAccessToken(user, roles);
+        var roles = await userManager.GetRolesAsync(user);
+
+        // Tashkilot turini aniqlash — JWT ga org_type claim qo'shish uchun
+        string? orgType = null;
+        if (user.OrganizationId.HasValue)
+        {
+            var type = await db.Organizations
+                .Where(o => o.Id == user.OrganizationId.Value)
+                .Select(o => (OrganizationType?)o.Type)
+                .FirstOrDefaultAsync(ct);
+
+            orgType = type?.ToString(); // "Owner" yoki "Tenant"
+        }
+
+        var accessToken  = tokenService.GenerateAccessToken(user, roles, orgType);
         var refreshToken = tokenService.GenerateRefreshToken();
 
         var storedToken = new RefreshToken

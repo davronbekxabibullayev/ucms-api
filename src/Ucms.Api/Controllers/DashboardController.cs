@@ -136,7 +136,7 @@ public class DashboardController(
 
         if (project is null) return NotFound();
 
-        if (!ctx.IsAdmin && ctx.OrganizationId != project.OrganizationId)
+        if (!ctx.IsOwner && ctx.OrganizationId != project.OrganizationId)
             return Forbid();
 
         // Smeta jami

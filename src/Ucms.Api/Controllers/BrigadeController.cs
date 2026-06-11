@@ -40,7 +40,7 @@ public class BrigadeController(
     {
         var query = db.Brigades.Where(b => !b.IsDeleted);
 
-        if (!ctx.IsAdmin && ctx.OrganizationId.HasValue)
+        if (!ctx.IsOwner && ctx.OrganizationId.HasValue)
             query = query.Where(b => b.OrganizationId == ctx.OrganizationId.Value);
 
         if (isActive.HasValue)
@@ -169,5 +169,5 @@ public class BrigadeController(
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private bool CanAccess(Guid orgId) =>
-        ctx.IsAdmin || ctx.OrganizationId == orgId;
+        ctx.IsOwner || ctx.OrganizationId == orgId;
 }

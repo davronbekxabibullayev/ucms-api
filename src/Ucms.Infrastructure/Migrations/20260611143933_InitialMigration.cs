@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ucms.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -56,6 +56,7 @@ namespace Ucms.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false, defaultValue: 2),
                     Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     TaxId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Address = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),

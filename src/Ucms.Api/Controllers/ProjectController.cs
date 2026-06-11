@@ -50,7 +50,7 @@ public class ProjectController(
         CancellationToken ct = default)
     {
         var orgId = GetOrgId();
-        if (orgId is null && !ctx.IsAdmin)
+        if (orgId is null && !ctx.IsOwner)
             return Forbid();
 
         var query = db.Projects.Where(p => !p.IsDeleted);
@@ -214,9 +214,10 @@ public class ProjectController(
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
+    // Owner foydalanuvchilar barcha tashkilotlar loyihalarini ko'radi va boshqaradi
     private Guid? GetOrgId() =>
-        ctx.IsAdmin ? null : ctx.OrganizationId;
+        ctx.IsOwner ? null : ctx.OrganizationId;
 
     private bool CanAccess(Guid orgId) =>
-        ctx.IsAdmin || ctx.OrganizationId == orgId;
+        ctx.IsOwner || ctx.OrganizationId == orgId;
 }

@@ -12,8 +12,8 @@ using Ucms.Infrastructure.Persistence;
 namespace Ucms.Infrastructure.Migrations
 {
     [DbContext(typeof(UcmsDbContext))]
-    [Migration("20260611104146_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260611143933_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -821,6 +821,11 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<string>("TaxId")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
