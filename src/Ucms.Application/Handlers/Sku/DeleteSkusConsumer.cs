@@ -11,9 +11,9 @@ public record DeleteSkusMessage(Guid[] Ids): IRequest<bool>;
 
 public class DeleteSkusConsumer : RequestHandler<DeleteSkusMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteSkusConsumer(IAppDbContext dbContext)
+    public DeleteSkusConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

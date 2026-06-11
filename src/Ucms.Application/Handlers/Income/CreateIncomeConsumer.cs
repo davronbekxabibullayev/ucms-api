@@ -24,7 +24,7 @@ public record CreateIncomeMessage(
     IEnumerable<CreateIncomeItemModel> IncomeItems) : IRequest<Guid>;
 
 public class CreateIncomeConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IIncomeService incomeService,
     IWorkContext workContext,
     IOrganizationService organizationService,

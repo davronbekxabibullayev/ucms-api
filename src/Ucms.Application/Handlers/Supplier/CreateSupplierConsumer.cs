@@ -15,9 +15,9 @@ public record CreateSupplierMessage(
 
 public class CreateSupplierConsumer : RequestHandler<CreateSupplierMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public CreateSupplierConsumer(IAppDbContext dbContext)
+    public CreateSupplierConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

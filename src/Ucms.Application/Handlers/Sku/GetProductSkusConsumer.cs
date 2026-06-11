@@ -12,11 +12,11 @@ public record GetProductSkusMessage(Guid ProductId) : IRequest<List<SkuModel>>;
 
 public class GetProductSkusConsumer : RequestHandler<GetProductSkusMessage, List<SkuModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
 
-    public GetProductSkusConsumer(IAppDbContext dbContext, IMapper mapper, IWorkContext workContext)
+    public GetProductSkusConsumer(IUcmsDbContext dbContext, IMapper mapper, IWorkContext workContext)
     {
         _dbContext = dbContext;
         _mapper = mapper;

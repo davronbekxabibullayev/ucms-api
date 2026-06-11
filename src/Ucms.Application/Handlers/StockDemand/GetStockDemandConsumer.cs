@@ -11,10 +11,10 @@ using Ucms.Application.Abstractions.Mediator;
 public record GetStockDemandMessage(Guid Id) : IRequest<StockDemandModel>;
 public class GetStockDemandConsumer : RequestHandler<GetStockDemandMessage, StockDemandModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetStockDemandConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetStockDemandConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

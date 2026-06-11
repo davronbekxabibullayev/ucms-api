@@ -7,7 +7,7 @@ using Ucms.Application.Abstractions.Mediator;
 
 public record CheckSkuForUsedMessage(Guid Id) : IRequest<bool>;
 
-public class CheckSkuForUsedConsumer(IAppDbContext dbContext) : RequestHandler<CheckSkuForUsedMessage, bool>
+public class CheckSkuForUsedConsumer(IUcmsDbContext dbContext) : RequestHandler<CheckSkuForUsedMessage, bool>
 {
     protected override async Task<bool> Handle(CheckSkuForUsedMessage message, CancellationToken cancellationToken)
     {

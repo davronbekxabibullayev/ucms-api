@@ -15,9 +15,9 @@ public record UploadOutcomeFileMessage(Guid OutcomeId, IFormFile File) : IReques
 public class UploadOutcomeFileConsumer : RequestHandler<UploadOutcomeFileMessage, FileEntryModel?>
 {
     private readonly IFileStorageClient _storageClient;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UploadOutcomeFileConsumer(IFileStorageClient storageClient, IAppDbContext dbContext)
+    public UploadOutcomeFileConsumer(IFileStorageClient storageClient, IUcmsDbContext dbContext)
     {
         _storageClient = storageClient;
         _dbContext = dbContext;

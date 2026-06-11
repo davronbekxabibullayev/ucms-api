@@ -1,30 +1,64 @@
 namespace Ucms.Api.Extensions;
 
 using MassTransit;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Ucms.Application.Services;
+using Ucms.Application.Abstractions.Auth;
 using Ucms.Application.Handlers;
 using Ucms.Application.Persistence;
+using Ucms.Domain.Entities.Identity;
 using Ucms.Infrastructure.Persistence;
+using Ucms.Infrastructure.Services;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAppDbContext(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddUcmsDbContext(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContext<UcmsDbContext>(options =>
         {
             options.UseNpgsql(connectionString,
                     optionsBuilder =>
                     {
-                        optionsBuilder.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name);
+                        optionsBuilder.MigrationsAssembly(typeof(UcmsDbContext).Assembly.GetName().Name);
                         optionsBuilder.EnableRetryOnFailure(maxRetryCount: 3,
                             maxRetryDelay: TimeSpan.FromSeconds(30), errorCodesToAdd: null);
                     })
-                .EnableSensitiveDataLogging();
+                .EnableSensitiveDataLogging()
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }, ServiceLifetime.Scoped);
 
-        services.AddScoped<IAppDbContext, AppDbContext>();
+        services.AddScoped<IUcmsDbContext, UcmsDbContext>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddAppIdentity(this IServiceCollection services)
+    {
+        services
+            .AddIdentity<User, Role>(options =>
+            {
+                // Parol talablari
+                options.Password.RequireDigit           = true;
+                options.Password.RequiredLength         = 8;
+                options.Password.RequireUppercase       = false;
+                options.Password.RequireNonAlphanumeric = false;
+
+                // Login bloklash
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan  = TimeSpan.FromMinutes(15);
+
+                // Foydalanuvchi sozlamalari
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<UcmsDbContext>()
+            .AddDefaultTokenProviders();
+
+        return services;
+    }
+
+    public static IServiceCollection AddUcmsTokenService(this IServiceCollection services)
+    {
+        services.AddScoped<ITokenService, TokenService>();
         return services;
     }
 
@@ -34,14 +68,6 @@ public static class ServiceCollectionExtensions
         {
             cfg.AddConsumers(typeof(IApplicationAssemblyMarker).Assembly);
         });
-        return services;
-    }
-
-    public static IServiceCollection AddUcmsServices(this IServiceCollection services)
-    {
-        services.AddScoped<IIncomeService, IncomeService>();
-        services.AddScoped<IOutcomeService, OutcomeService>();
-
         return services;
     }
 

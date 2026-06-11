@@ -19,10 +19,10 @@ public record CreateMeasurementUnitMessage(
 
 public class CreateMeasurementUnitConsumer : RequestHandler<CreateMeasurementUnitMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
     public CreateMeasurementUnitConsumer(
-        IAppDbContext dbContext)
+        IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

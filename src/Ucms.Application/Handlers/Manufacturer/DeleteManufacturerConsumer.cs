@@ -9,9 +9,9 @@ using Ucms.Application.Abstractions.Mediator;
 public record DeleteManufacturerMessage(Guid Id) : IRequest<bool>;
 public class DeleteManufacturerConsumer : RequestHandler<DeleteManufacturerMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteManufacturerConsumer(IAppDbContext dbContext)
+    public DeleteManufacturerConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

@@ -10,9 +10,9 @@ public record DeleteMeasurementUnitMessage(Guid Id) : IRequest<bool>;
 
 public class DeleteMeasurementUnitConsumer : RequestHandler<DeleteMeasurementUnitMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteMeasurementUnitConsumer(IAppDbContext dbContext)
+    public DeleteMeasurementUnitConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -23,16 +23,8 @@ public class DeleteMeasurementUnitConsumer : RequestHandler<DeleteMeasurementUni
             .FirstOrDefaultAsync(a => a.Id == message.Id, cancellationToken)
             ?? throw new NotFoundException();
 
-        var existInSku = _dbContext.Skus.Any(a => a.MeasurementUnitId == message.Id);
-        var existInDemand = _dbContext.StockDemandItems.Any(a => a.MeasurementUnitId == message.Id);
-
-        if (!existInSku && !existInDemand)
-        {
-            measurementUnit.IsDeleted = true;
-            var result = await _dbContext.SaveChangesAsync(cancellationToken);
-            return result > 0;
-        }
-        else
-            throw new AppException("Единица измерения используется в других таблицах");
+        measurementUnit.IsDeleted = true;
+        var result = await _dbContext.SaveChangesAsync(cancellationToken);
+        return result > 0;
     }
 }

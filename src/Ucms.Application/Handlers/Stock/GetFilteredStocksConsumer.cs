@@ -17,13 +17,13 @@ public record GetFilteredStocksMessage(PagedRequest Paging) : IRequest<PagedResu
 public class GetFilteredStocksConsumer : RequestHandler<GetFilteredStocksMessage, PagedResult<StockModel>>
 {
     private readonly IMapper _mapper;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IPermissionProvider _permissionProvider;
 
     public GetFilteredStocksConsumer(
         IMapper mapper,
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext,
         IPermissionProvider permissionProvider)
     {

@@ -24,9 +24,9 @@ public record UpdateStockMessage(
 
 public class UpdateStockConsumer : RequestHandler<UpdateStockMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateStockConsumer(IAppDbContext dbContext)
+    public UpdateStockConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

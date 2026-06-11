@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UCMS — Kirish / Ro'yxatdan o'tish</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      width: 420px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .logo h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: 1px;
+    }
+    .logo p { color: #666; font-size: 13px; margin-top: 4px; }
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #eee;
+      margin-bottom: 24px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #999;
+      font-size: 14px;
+      transition: color .2s;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab.active { color: #0f3460; border-bottom-color: #0f3460; }
+    .form { display: none; }
+    .form.active { display: block; }
+    .field { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus { border-color: #0f3460; }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #0f3460;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background .2s;
+    }
+    .btn:hover { background: #1a4a8a; }
+    .btn:disabled { background: #aaa; cursor: not-allowed; }
+    .error {
+      background: #fff0f0;
+      color: #c0392b;
+      border: 1px solid #f5c6cb;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .success-box {
+      display: none;
+      background: #f0fff4;
+      border: 1px solid #9ae6b4;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .success-box h3 {
+      color: #276749;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+    .token-area {
+      background: #eee;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 11px;
+      font-family: monospace;
+      word-break: break-all;
+      color: #333;
+      max-height: 80px;
+      overflow: auto;
+      margin-bottom: 12px;
+    }
+    .btn-copy {
+      background: #276749;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .btn-copy:hover { background: #2f855a; }
+    .btn-close {
+      background: #e2e8f0;
+      color: #2d3748;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .info {
+      font-size: 12px;
+      color: #555;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <h1>🏗️ UCMS API</h1>
+    <p>Unified Construction Management System</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login')">Kirish</div>
+    <div class="tab" onclick="switchTab('register')">Ro'yxatdan o'tish</div>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="login-form" class="form active">
+    <div id="login-error" class="error"></div>
+    <div id="login-success" class="success-box">
+      <h3>✅ Muvaffaqiyatli kirdingiz!</h3>
+      <div class="token-area" id="login-token"></div>
+      <button class="btn-copy" onclick="copyToken('login-token')">📋 Tokenni nusxalash</button>
+      <button class="btn-close" onclick="closeAndApply()">✔ Swagger'ga qo'llash va yopish</button>
+      <p class="info">
+        Yoki tokenni nusxalab, Swagger'dagi <b>Authorize</b> tugmasini bosing va<br>
+        <code>Bearer &lt;token&gt;</code> formatida kiriting.
+      </p>
+    </div>
+    <div id="login-fields">
+      <div class="field">
+        <label>Login yoki Email</label>
+        <input id="login-username" type="text" placeholder="username yoki email@example.com" />
+      </div>
+      <div class="field">
+        <label>Parol</label>
+        <input id="login-password" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="btn" id="login-btn" onclick="doLogin()">Kirish</button>
+    </div>
+  </div>
+
+  <!-- REGISTER FORM -->
+  <div id="register-form" class="form">
+    <div id="register-error" class="error"></div>
+    <div id="register-success" class="success-box">
+      <h3>✅ Ro'yxatdan o'tdingiz!</h3>
+      <div class="token-area" id="register-token"></div>
+      <button class="btn-copy" onclick="copyToken('register-token')">📋 Tokenni nusxalash</button>
+      <button class="btn-close" onclick="closeAndApply()">✔ Swagger'ga qo'llash va yopish</button>
+    </div>
+    <div id="register-fields">
+      <div class="field">
+        <label>Username</label>
+        <input id="reg-username" type="text" placeholder="username" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="reg-email" type="email" placeholder="email@example.com" />
+      </div>
+      <div class="field">
+        <label>To'liq ism (ixtiyoriy)</label>
+        <input id="reg-fullname" type="text" placeholder="Ism Familiya" />
+      </div>
+      <div class="field">
+        <label>Parol</label>
+        <input id="reg-password" type="password" placeholder="Min. 8 ta belgi, 1 raqam" />
+      </div>
+      <button class="btn" id="register-btn" onclick="doRegister()">Ro'yxatdan o'tish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = window.location.origin;
+  let _token = null;
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0) === (tab === 'login'));
+    });
+    document.getElementById('login-form').classList.toggle('active', tab === 'login');
+    document.getElementById('register-form').classList.toggle('active', tab === 'register');
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function showSuccess(prefix, token) {
+    _token = token;
+    document.getElementById(prefix + '-success').style.display = 'block';
+    document.getElementById(prefix + '-fields').style.display = 'none';
+    document.getElementById(prefix + '-token').textContent = token;
+    // Save to localStorage so Swagger can pick it up
+    localStorage.setItem('ucms_access_token', token);
+    // If popup, notify opener
+    if (window.opener && !window.opener.closed) {
+      try { window.opener.postMessage({ ucmsToken: token }, '*'); } catch(e) {}
+    }
+  }
+
+  async function doLogin() {
+    hideError('login-error');
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!username || !password) return showError('login-error', 'Barcha maydonlarni to\'ldiring');
+
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true; btn.textContent = 'Kirilmoqda...';
+
+    try {
+      const res = await fetch(API + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Xatolik yuz berdi');
+      showSuccess('login', data.accessToken);
+    } catch (e) {
+      showError('login-error', e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Kirish';
+    }
+  }
+
+  async function doRegister() {
+    hideError('register-error');
+    const username = document.getElementById('reg-username').value.trim();
+    const email    = document.getElementById('reg-email').value.trim();
+    const fullName = document.getElementById('reg-fullname').value.trim();
+    const password = document.getElementById('reg-password').value;
+    if (!username || !email || !password) return showError('register-error', 'Majburiy maydonlarni to\'ldiring');
+
+    const btn = document.getElementById('register-btn');
+    btn.disabled = true; btn.textContent = 'Saqlanmoqda...';
+
+    try {
+      const res = await fetch(API + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: username, email, password, fullName: fullName || null })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error((data.errors || [data.message]).join('; '));
+      showSuccess('register', data.accessToken);
+    } catch (e) {
+      showError('register-error', e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Ro\'yxatdan o\'tish';
+    }
+  }
+
+  function copyToken(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => alert('✅ Token nusxalandi!'));
+  }
+
+  function closeAndApply() {
+    if (window.opener && !window.opener.closed) {
+      window.close();
+    } else {
+      window.history.back();
+    }
+  }
+</script>
+</body>
+</html>

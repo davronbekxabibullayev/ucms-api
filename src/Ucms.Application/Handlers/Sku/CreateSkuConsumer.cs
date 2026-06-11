@@ -27,10 +27,10 @@ public record CreateSkuMessage(
 
 public class CreateSkuConsumer : RequestHandler<CreateSkuMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
 
-    public CreateSkuConsumer(IAppDbContext dbContext, IWorkContext workContext)
+    public CreateSkuConsumer(IUcmsDbContext dbContext, IWorkContext workContext)
     {
         _dbContext = dbContext;
         _workContext = workContext;

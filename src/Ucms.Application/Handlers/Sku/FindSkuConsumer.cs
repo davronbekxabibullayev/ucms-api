@@ -12,10 +12,10 @@ public record FindSkuMessage(string SerialNumber) : IRequest<SkuModel>;
 
 public class FindSkuConsumer : RequestHandler<FindSkuMessage, SkuModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindSkuConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindSkuConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

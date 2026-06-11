@@ -20,9 +20,9 @@ public record UpdateMeasurementUnitMessage(
 
 public class UpdateMeasurementUnitConsumer : RequestHandler<UpdateMeasurementUnitMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateMeasurementUnitConsumer(IAppDbContext dbContext)
+    public UpdateMeasurementUnitConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

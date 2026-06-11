@@ -12,11 +12,11 @@ public record UpsertOrganizationMeasurementUnitMessage(MeasurementUnitType Type,
 
 public class UpsertOrganizationMeasurementUnitConsumer : RequestHandler<UpsertOrganizationMeasurementUnitMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
 
     public UpsertOrganizationMeasurementUnitConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext
     )
     {

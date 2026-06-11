@@ -14,10 +14,10 @@ public record GetFilteredStockSkusMessage(PagedRequest Paging) : IRequest<PagedR
 
 public class GetFilteredStockSkusConsumer : RequestHandler<GetFilteredStockSkusMessage, PagedResult<StockSkuModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetFilteredStockSkusConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetFilteredStockSkusConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

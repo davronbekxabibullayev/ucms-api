@@ -12,10 +12,10 @@ public record GetExecutionOutcomeMessage(Guid ExecutionId) : IRequest<OutcomeMod
 
 public class GetExecutionOutcomeConsumer : RequestHandler<GetExecutionOutcomeMessage, OutcomeModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetExecutionOutcomeConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetExecutionOutcomeConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

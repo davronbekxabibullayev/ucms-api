@@ -11,9 +11,9 @@ public record DeleteSuppliersMessage(Guid[] Ids) : IRequest<bool>;
 
 public class DeleteSuppliersConsumer : RequestHandler<DeleteSuppliersMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteSuppliersConsumer(IAppDbContext dbContext)
+    public DeleteSuppliersConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

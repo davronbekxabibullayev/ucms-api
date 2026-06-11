@@ -22,13 +22,13 @@ public record GetFilteredIncomesMessage(
 
 public class GetFilteredIncomesConsumer : RequestHandler<GetFilteredIncomesMessage, PagedResult<IncomeModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IMapper _mapper;
     private readonly IPermissionProvider _permissionProvider;
 
     public GetFilteredIncomesConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext,
         IMapper mapper,
         IPermissionProvider permissionProvider)

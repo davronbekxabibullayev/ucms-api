@@ -16,7 +16,7 @@ public record UpdateIncomeStatusMessage(
 ) : IRequest<Guid>;
 
 public class UpdateIncomeStatusConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IIncomeService incomeService,
     IOutcomeService outcomeService,
     ILogger<UpdateIncomeStatusConsumer> logger) : RequestHandler<UpdateIncomeStatusMessage, Guid>

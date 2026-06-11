@@ -14,9 +14,9 @@ public record CheckForSkuAmountMessage(
 
 public class CheckForSkuAmountConsumer : RequestHandler<CheckForSkuAmountMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public CheckForSkuAmountConsumer(IAppDbContext dbContext)
+    public CheckForSkuAmountConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

@@ -20,9 +20,9 @@ public record CreateProductMessage(
 
 public class CreateProductConsumer : RequestHandler<CreateProductMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public CreateProductConsumer(IAppDbContext dbContext)
+    public CreateProductConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

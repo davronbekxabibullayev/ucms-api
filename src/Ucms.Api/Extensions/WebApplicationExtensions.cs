@@ -1,13 +1,11 @@
 namespace Ucms.Api.Extensions;
 
 using System.Text.Json;
-using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ucms.Application.MappingProfiles;
 using Ucms.Api.Middlewares;
-using Ucms.Application.Validators.Skus;
 
 public static class WebApplicationExtensions
 {
@@ -25,15 +23,16 @@ public static class WebApplicationExtensions
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-        builder.Services.AddAppDbContext(connectionString);
+        builder.Services.AddUcmsDbContext(connectionString);
+        builder.Services.AddAppIdentity();
+        builder.Services.AddUcmsTokenService();
         builder.Services.AddUcmsMediator();
         builder.Services.AddUcmsCors("StockCors");
-        builder.Services.AddUcmsServices();
-        builder.Services.AddApplicationAuth();
-        builder.Services
-            .AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true)
-            .AddValidatorsFromAssemblyContaining<CreateSkuRequestValidator>();
-        builder.Services.AddAutoMapper(a => a.AddProfile<IncomeProfile>());
+        builder.Services.AddApplicationAuth(builder.Configuration);
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<Application.Abstractions.ICurrentContext, Infrastructure.Services.HttpCurrentContext>();
+        builder.Services.AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true);
+        builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MeasurementUnitProfile).Assembly));
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -53,14 +52,15 @@ public static class WebApplicationExtensions
     {
         app.UseSerilogRequestLogging();
         app.UseMiddleware<GlobalMiddlewareErrorHander>();
+        app.UseStaticFiles();
         app.UseRouting();
         app.UseCors("StockCors");
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ucms.Api v1");
-            c.OAuthClientId("Ucms_swaggerui");
-            c.OAuthAppName("Gateway Swagger UI");
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "UCMS API v1");
+            c.DocumentTitle = "UCMS API";
+            c.InjectJavascript("/swagger-custom.js");
         });
 
         app.UseAuthentication();
@@ -68,6 +68,13 @@ public static class WebApplicationExtensions
 
         app.MapApplicationHealthChecks();
         app.MapControllers();
+
+        // Swagger uchun custom login sahifasi
+        app.MapGet("/auth/login", (IWebHostEnvironment env) =>
+            Results.File(
+                Path.Combine(env.WebRootPath, "auth", "login.html"),
+                "text/html"))
+            .ExcludeFromDescription();
 
         return app;
     }

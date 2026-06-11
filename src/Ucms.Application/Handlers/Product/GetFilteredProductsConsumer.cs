@@ -13,10 +13,10 @@ public record GetFilteredProductsMessage(PagedRequest Filter) : IRequest<PagedRe
 
 public class GetFilteredProductsConsumer : RequestHandler<GetFilteredProductsMessage, PagedResult<ProductModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetFilteredProductsConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetFilteredProductsConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

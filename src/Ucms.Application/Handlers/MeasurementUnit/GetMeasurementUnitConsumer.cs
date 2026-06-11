@@ -12,10 +12,10 @@ public record GetMeasurementUnitMessage(Guid Id) : IRequest<MeasurementUnitModel
 
 public class GetMeasurementUnitConsumer : RequestHandler<GetMeasurementUnitMessage, MeasurementUnitModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetMeasurementUnitConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetMeasurementUnitConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

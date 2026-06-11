@@ -11,10 +11,10 @@ public record FindCodeProductMessage(string Code) : IRequest<ProductModel>;
 
 public class FindCodeProductConsumer : RequestHandler<FindCodeProductMessage, ProductModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindCodeProductConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindCodeProductConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

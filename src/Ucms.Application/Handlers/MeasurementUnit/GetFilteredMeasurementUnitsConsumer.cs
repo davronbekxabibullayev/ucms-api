@@ -15,11 +15,11 @@ public class
     GetFilteredMeasurementUnitsConsumer : RequestHandler<GetFilteredMeasurementUnitsMessage,
         PagedResult<MeasurementUnitModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
     public GetFilteredMeasurementUnitsConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IMapper mapper)
     {
         _dbContext = dbContext;

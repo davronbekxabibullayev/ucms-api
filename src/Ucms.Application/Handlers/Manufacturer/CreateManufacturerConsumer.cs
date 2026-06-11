@@ -14,9 +14,9 @@ public record CreateManufacturerMessage(string Name,
 
 public class CreateManufacturerConsumer : RequestHandler<CreateManufacturerMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public CreateManufacturerConsumer(IAppDbContext dbContext)
+    public CreateManufacturerConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

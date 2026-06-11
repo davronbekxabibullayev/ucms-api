@@ -16,9 +16,9 @@ public record UpdateSupplierMessage
     string Code) : IRequest<Guid>;
 public class UpdateSupplierConsumer : RequestHandler<UpdateSupplierMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateSupplierConsumer(IAppDbContext dbContext)
+    public UpdateSupplierConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

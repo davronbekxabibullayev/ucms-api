@@ -13,12 +13,12 @@ public record GetOrganizationMeasurementUnitMessage(Guid Id) : IRequest<Organiza
 
 public class GetOrganizationMeasurementUnitConsumer : RequestHandler<GetOrganizationMeasurementUnitMessage, OrganizationMeasurementUnitModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IMapper _mapper;
 
     public GetOrganizationMeasurementUnitConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext,
         IMapper mapper)
     {

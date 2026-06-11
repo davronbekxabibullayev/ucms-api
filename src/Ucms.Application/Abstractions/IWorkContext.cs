@@ -1,11 +1,14 @@
 namespace Ucms.Application.Abstractions;
 
-public interface IWorkContext
+/// <summary>
+/// ICurrentContext dan meros — orqaga moslik uchun saqlanmoqda
+/// </summary>
+public interface IWorkContext : ICurrentContext
 {
-    public Guid? TenantId { get; }
-    public Guid? EmployeeId { get; }
-    public string? UserId { get; }
-    public string? UserName { get; }
-    public string? OrganizationName { get; }
-    public bool IsAdmin { get; }
+    /// <summary>
+    /// Tenant ID (ICurrentContext.OrganizationId bilan bir xil)
+    /// </summary>
+    Guid? TenantId { get; }
+
+    Guid? EmployeeId { get; }
 }

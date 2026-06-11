@@ -11,10 +11,10 @@ public record FindCodeSupplierMessage(string Code) : IRequest<SupplierModel>;
 
 public class FindCodeSupplierConsumer : RequestHandler<FindCodeSupplierMessage, SupplierModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindCodeSupplierConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindCodeSupplierConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

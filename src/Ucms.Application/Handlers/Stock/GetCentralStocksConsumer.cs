@@ -13,9 +13,9 @@ public record GetCentralStocksMessage(Guid OrganizationId) : IRequest<List<Stock
 public class GetCentralStocksConsumer : RequestHandler<GetCentralStocksMessage, List<StockModel>>
 {
     private readonly IMapper _mapper;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public GetCentralStocksConsumer(IMapper mapper, IAppDbContext dbContext)
+    public GetCentralStocksConsumer(IMapper mapper, IUcmsDbContext dbContext)
     {
         _mapper = mapper;
         _dbContext = dbContext;

@@ -24,13 +24,13 @@ public record GetStockSkusMessage(
 
 public class GetStockSkusConsumer : RequestHandler<GetStockSkusMessage, PagedResult<StockSkuModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
     private readonly IPermissionProvider _permissionProvider;
 
     public GetStockSkusConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IMapper mapper,
         IWorkContext workContext,
         IPermissionProvider permissionProvider)

@@ -25,7 +25,7 @@ public record CreateOutcomeMessage(
     IEnumerable<CreateOutcomeItemModel> OutcomeItems) : IRequest<Guid>;
 
 public class CreateOutcomeConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IOutcomeService outcomeService,
     IWorkContext workContext,
     IOrganizationService organizationService) : RequestHandler<CreateOutcomeMessage, Guid>

@@ -12,10 +12,10 @@ public record FindIncomesMessage(string Query) : IRequest<List<IncomeModel>>;
 
 public class FindIncomesConsumer : RequestHandler<FindIncomesMessage, List<IncomeModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindIncomesConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindIncomesConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

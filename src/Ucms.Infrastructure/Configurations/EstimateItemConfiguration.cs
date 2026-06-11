@@ -1,0 +1,27 @@
+namespace Ucms.Infrastructure.Configurations;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Ucms.Domain.Entities;
+
+public class EstimateItemConfiguration : IEntityTypeConfiguration<EstimateItem>
+{
+    public void Configure(EntityTypeBuilder<EstimateItem> builder)
+    {
+        builder.HasIndex(e => e.Id);
+        builder.HasIndex(e => e.SectionId);
+        builder.Property(e => e.Name).HasMaxLength(512).IsRequired();
+        builder.Property(e => e.Unit).HasMaxLength(64).IsRequired();
+        builder.Property(e => e.Volume).HasPrecision(18, 4);
+        builder.Property(e => e.ClientUnitPrice).HasPrecision(18, 2);
+        builder.Property(e => e.BrigadeUnitPrice).HasPrecision(18, 2);
+
+        builder.HasMany(e => e.WorkLogs)
+            .WithOne(e => e.EstimateItem)
+            .HasForeignKey(e => e.EstimateItemId);
+
+        builder.HasMany(e => e.ClientActItems)
+            .WithOne(e => e.EstimateItem)
+            .HasForeignKey(e => e.EstimateItemId);
+    }
+}

@@ -2,106 +2,93 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QueryForge.Models;
-using Ucms.Application.Handlers.MeasurementUnit;
-using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.MeasurementUnits;
-using Ucms.Application.Abstractions.Mediator;
+using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Persistence;
+using Ucms.Domain.Entities;
+using Ucms.Domain.Enums;
 
-[Route("api/measurement-unit")]
+/// <summary>
+/// O'lchov birliklari — spravochnik (barcha foydalanuvchilar o'qiydi, Admin yozadi)
+/// </summary>
 [ApiController]
+[Route("api/measurement-units")]
+[Tags("Lookup")]
 [Authorize]
-public class MeasurementUnitController : ControllerBase
+public class MeasurementUnitController(IUcmsDbContext db) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediatorWrapper;
+    public record CreateUnitRequest(
+        string Code,
+        string Name,
+        string NameRu,
+        string? NameEn,
+        MeasurementUnitType Type,
+        decimal Multiplier = 1);
 
-    public MeasurementUnitController(IMediatorWrapper mediatorWrapper)
-    {
-        _mediatorWrapper = mediatorWrapper;
-    }
+    // ── GET /api/measurement-units ─────────────────────────────────────────────
 
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MeasurementUnitModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetMeasurementUnit(Guid id)
-    {
-        var response = await _mediatorWrapper.Send(new GetMeasurementUnitMessage(id));
-        return Ok(response);
-    }
-
+    /// <summary>
+    /// Barcha o'lchov birliklari
+    /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(MeasurementUnitModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetMeasurementUnits()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] MeasurementUnitType? type,
+        CancellationToken ct)
     {
-        var response = await _mediatorWrapper.Send(new GetMeasurementUnitsMessage());
-        return Ok(response);
+        var query = db.MeasurementUnits.Where(u => !u.IsDeleted);
+        if (type.HasValue) query = query.Where(u => u.Type == type.Value);
+
+        var list = await query
+            .OrderBy(u => u.Name)
+            .Select(u => new { u.Id, u.Code, u.Name, u.NameRu, u.NameEn, u.Type, u.Multiplier })
+            .ToListAsync(ct);
+
+        return Ok(list);
     }
 
-    [HttpPost("table-list")]
-    [ProducesResponseType(typeof(PagedResult<MeasurementUnitModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetFilteredMeasurementUnits([FromBody] GetMeasurementUnitsRequest request)
-    {
-        var response = await _mediatorWrapper.Send(new GetFilteredMeasurementUnitsMessage(request, request.Query));
-        return Ok(response);
-    }
+    // ── POST /api/measurement-units ────────────────────────────────────────────
 
-    [HttpGet("code/{code}")]
-    [ProducesResponseType(typeof(MeasurementUnitModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetMeasurementUnitByCode(string code)
-    {
-        var response = await _mediatorWrapper.Send(new FindMeasurementUnitMessage(code));
-        return Ok(response);
-    }
-
+    /// <summary>
+    /// Yangi o'lchov birligi qo'shish (faqat Admin)
+    /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    // [HasPermissions(AddGlobalDirectories)]
-    public async Task<IActionResult> CreateMeasurementUnit(CreateMeasurementUnitRequest request)
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Create([FromBody] CreateUnitRequest req, CancellationToken ct)
     {
-        var response = await _mediatorWrapper.Send(new CreateMeasurementUnitMessage(
-            request.Name,
-            request.NameRu,
-            request.NameEn,
-            request.NameKa,
-            request.Code,
-            request.Multiplier,
-            request.Type));
+        if (await db.MeasurementUnits.AnyAsync(u => u.Code == req.Code && !u.IsDeleted, ct))
+            return BadRequest(new { message = $"'{req.Code}' kodi allaqachon mavjud" });
 
-        return Ok(response);
+        var unit = new MeasurementUnit
+        {
+            Id         = Guid.NewGuid(),
+            Code       = req.Code,
+            Name       = req.Name,
+            NameRu     = req.NameRu,
+            NameEn     = req.NameEn,
+            Type       = req.Type,
+            Multiplier = req.Multiplier,
+            IsDeleted  = false,
+        };
+
+        await db.MeasurementUnits.AddAsync(unit, ct);
+        await db.SaveChangesAsync(ct);
+        return Ok(new { unit.Id, unit.Code, unit.Name });
     }
 
-    [HttpPut("{id}")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    // [HasPermissions(EditGlobalDirectories)]
-    public async Task<IActionResult> UpdateMeasurementUnit(Guid id, UpdateMeasurementUnitRequest request)
-    {
-        var response = await _mediatorWrapper.Send(new UpdateMeasurementUnitMessage(
-            id,
-            request.Name,
-            request.NameRu,
-            request.NameEn,
-            request.NameKa,
-            request.Code,
-            request.Type,
-            request.Multiplier));
+    // ── DELETE /api/measurement-units/{id} ─────────────────────────────────────
 
-        return Ok(response);
-    }
-
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status204NoContent)]
-    // [HasPermissions(DeleteGlobalDirectories)]
-    public async Task<IActionResult> DeleteMeasurementUnit(Guid id)
+    /// <summary>
+    /// O'lchov birligini o'chirish — soft delete (faqat Admin)
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        var response = await _mediatorWrapper.Send(new DeleteMeasurementUnitMessage(id));
-        return Ok(response);
-    }
+        var unit = await db.MeasurementUnits.FindAsync([id], ct);
+        if (unit is null || unit.IsDeleted) return NotFound();
 
-    [HttpPost("delete-range")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status204NoContent)]
-    // [HasPermissions(DeleteGlobalDirectories)]
-    public async Task<IActionResult> DeleteMeasurementUnits(Guid[] ids)
-    {
-        var response = await _mediatorWrapper.Send(new DeleteMeasurementUnitsMessage(ids));
-        return Ok(response);
+        unit.IsDeleted = true;
+        db.MeasurementUnits.Update(unit);
+        await db.SaveChangesAsync(ct);
+        return NoContent();
     }
 }

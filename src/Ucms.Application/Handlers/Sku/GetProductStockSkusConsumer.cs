@@ -21,12 +21,12 @@ public record GetProductStockSkusMessage(
 
 public class GetProductStockSkusConsumer : RequestHandler<GetProductStockSkusMessage, List<SkuModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
 
     public GetProductStockSkusConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IMapper mapper,
         IWorkContext workContext)
     {

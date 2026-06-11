@@ -12,10 +12,10 @@ public record GetOutcomeMessage(Guid Id) : IRequest<OutcomeModel>;
 
 public class GetOutcomeConsumer : RequestHandler<GetOutcomeMessage, OutcomeModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetOutcomeConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetOutcomeConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

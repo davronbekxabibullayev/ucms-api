@@ -13,11 +13,11 @@ public record GetIncomesMessage : IRequest<List<IncomeModel>>;
 
 public class GetIncomesConsumer : RequestHandler<GetIncomesMessage, List<IncomeModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IMapper _mapper;
 
-    public GetIncomesConsumer(IAppDbContext dbContext, IWorkContext workContext, IMapper mapper)
+    public GetIncomesConsumer(IUcmsDbContext dbContext, IWorkContext workContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _workContext = workContext;

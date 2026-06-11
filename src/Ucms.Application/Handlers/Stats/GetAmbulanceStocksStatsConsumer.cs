@@ -18,12 +18,12 @@ public record GetAmbulanceStockStatsMessage(
 public class GetAmbulanceStocksStatsConsumer : RequestHandler<GetAmbulanceStockStatsMessage, DashboardWidgetModel>
 {
     private readonly IWorkContext _workContext;
-    private readonly IAppDbContext _stockDbContext;
+    private readonly IUcmsDbContext _stockDbContext;
     private readonly IOrganizationClient _organizationClient;
 
     public GetAmbulanceStocksStatsConsumer(
         IWorkContext workContext,
-        IAppDbContext stockDbContext,
+        IUcmsDbContext stockDbContext,
         IOrganizationClient organizationClient)
     {
         _workContext = workContext;

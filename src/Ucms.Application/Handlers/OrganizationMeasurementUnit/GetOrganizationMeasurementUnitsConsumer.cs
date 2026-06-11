@@ -12,12 +12,12 @@ public record GetOrganizationMeasurementUnitsMessage : IRequest<List<Organizatio
 
 public class GetOrganizationMeasurementUnitsConsumer : RequestHandler<GetOrganizationMeasurementUnitsMessage, List<OrganizationMeasurementUnitModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IMapper _mapper;
 
     public GetOrganizationMeasurementUnitsConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext,
         IMapper mapper)
     {

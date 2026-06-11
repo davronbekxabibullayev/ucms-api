@@ -4,6 +4,76 @@
     <RootNamespace>Ucms.Application</RootNamespace>
   </PropertyGroup>
 
+  <!-- Exclude old handlers that belong to the previous medical stock management system -->
+  <ItemGroup>
+    <Compile Remove="Handlers\Income\**\*.cs" />
+    <Compile Remove="Handlers\Outcome\**\*.cs" />
+    <Compile Remove="Handlers\Stock\**\*.cs" />
+    <Compile Remove="Handlers\StockSku\**\*.cs" />
+    <Compile Remove="Handlers\StockDemand\**\*.cs" />
+    <Compile Remove="Handlers\Manufacturer\**\*.cs" />
+    <Compile Remove="Handlers\Supplier\**\*.cs" />
+    <Compile Remove="Handlers\OrganizationMeasurementUnit\**\*.cs" />
+    <Compile Remove="Handlers\Report\**\*.cs" />
+    <Compile Remove="Handlers\Stats\**\*.cs" />
+    <Compile Remove="Handlers\Product\**\*.cs" />
+    <Compile Remove="Handlers\Sku\**\*.cs" />
+    <Compile Remove="Validators\**\*.cs" />
+    <Compile Remove="Services\IIncomeService.cs" />
+    <Compile Remove="Services\IOutcomeService.cs" />
+    <Compile Remove="Services\IncomeService.cs" />
+    <Compile Remove="Services\OutcomeService.cs" />
+    <Compile Remove="Services\IProductBalanceReportService.cs" />
+    <Compile Remove="MappingProfiles\IncomeItemProfile.cs" />
+    <Compile Remove="MappingProfiles\IncomeProfile.cs" />
+    <Compile Remove="MappingProfiles\ManufacturerProfile.cs" />
+    <Compile Remove="MappingProfiles\OrganizationMeasurementUnitProfile.cs" />
+    <Compile Remove="MappingProfiles\OutcomeItemProfile.cs" />
+    <Compile Remove="MappingProfiles\OutcomeProfile.cs" />
+    <Compile Remove="MappingProfiles\ProductProfile.cs" />
+    <Compile Remove="MappingProfiles\SkuProfile.cs" />
+    <Compile Remove="MappingProfiles\StockDemandItemProfile.cs" />
+    <Compile Remove="MappingProfiles\StockDemandProfile.cs" />
+    <Compile Remove="MappingProfiles\StockProfile.cs" />
+    <Compile Remove="MappingProfiles\StockSkuProfile.cs" />
+    <Compile Remove="MappingProfiles\SupplierProfile.cs" />
+    <!-- Old DTOs -->
+    <Compile Remove="DTOs\Models\CreateIncomeItemModel.cs" />
+    <Compile Remove="DTOs\Models\CreateOutcomeItemModel.cs" />
+    <Compile Remove="DTOs\Models\IncomeItemModel.cs" />
+    <Compile Remove="DTOs\Models\IncomeModel.cs" />
+    <Compile Remove="DTOs\Models\ManufacturerModel.cs" />
+    <Compile Remove="DTOs\Models\OrganizationMeasurementUnitModel.cs" />
+    <Compile Remove="DTOs\Models\OutcomeItemModel.cs" />
+    <Compile Remove="DTOs\Models\OutcomeModel.cs" />
+    <Compile Remove="DTOs\Models\OutcomeStatsModel.cs" />
+    <Compile Remove="DTOs\Models\ProductBalanceReportModel.cs" />
+    <Compile Remove="DTOs\Models\ProductModel.cs" />
+    <Compile Remove="DTOs\Models\ReceivedDemandModel.cs" />
+    <Compile Remove="DTOs\Models\RequestedDemandModel.cs" />
+    <Compile Remove="DTOs\Models\SkuModel.cs" />
+    <Compile Remove="DTOs\Models\StockDemandItemModel.cs" />
+    <Compile Remove="DTOs\Models\StockDemandModel.cs" />
+    <Compile Remove="DTOs\Models\StockInventoryModel.cs" />
+    <Compile Remove="DTOs\Models\StockModel.cs" />
+    <Compile Remove="DTOs\Models\StockSkuModel.cs" />
+    <Compile Remove="DTOs\Models\StockSkuStatModel.cs" />
+    <Compile Remove="DTOs\Models\SupplierModel.cs" />
+    <!-- Old Request DTOs (keep MeasurementUnits) -->
+    <Compile Remove="DTOs\Requests\Incomes\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Manufacturers\**\*.cs" />
+    <Compile Remove="DTOs\Requests\OrganizationMeasurementUnits\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Outcomes\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Products\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Reports\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Skus\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Stats\**\*.cs" />
+    <Compile Remove="DTOs\Requests\StockDemands\**\*.cs" />
+    <Compile Remove="DTOs\Requests\StockSkus\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Stocks\**\*.cs" />
+    <Compile Remove="DTOs\Requests\Suppliers\**\*.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="AutoMapper" />

@@ -14,7 +14,7 @@ public record UpdateOutcomeStatusMessage(
     OutcomeStatus Status
 ) : IRequest<Guid>;
 
-public class UpdateOutcomeStatusConsumer(IAppDbContext dbContext, IOutcomeService outcomeService) : RequestHandler<UpdateOutcomeStatusMessage, Guid>
+public class UpdateOutcomeStatusConsumer(IUcmsDbContext dbContext, IOutcomeService outcomeService) : RequestHandler<UpdateOutcomeStatusMessage, Guid>
 {
     protected override async Task<Guid> Handle(UpdateOutcomeStatusMessage message, CancellationToken cancellationToken)
     {

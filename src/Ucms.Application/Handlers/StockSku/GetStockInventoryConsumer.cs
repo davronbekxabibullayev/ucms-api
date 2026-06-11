@@ -16,7 +16,7 @@ public record GetStockInventoryMessage(
     Guid? OrganizationId) : IRequest<PagedResult<StockInventoryModel>>;
 
 public class GetStockInventoryConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IWorkContext workContext) : RequestHandler<GetStockInventoryMessage, PagedResult<StockInventoryModel>>
 {
 

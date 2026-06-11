@@ -22,13 +22,13 @@ public record GetFilteredOutcomesMessage(
 
 public class GetFilteredOutcomesConsumer : RequestHandler<GetFilteredOutcomesMessage, PagedResult<OutcomeModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IMapper _mapper;
     private readonly IPermissionProvider _permissionProvider;
 
     public GetFilteredOutcomesConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext,
         IMapper mapper,
         IPermissionProvider permissionProvider)

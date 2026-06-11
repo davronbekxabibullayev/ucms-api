@@ -12,10 +12,10 @@ public record FindStockDemandMessage(string Name) : IRequest<StockDemandModel>;
 
 public class FindStockDemandConsumer : RequestHandler<FindStockDemandMessage, StockDemandModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindStockDemandConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindStockDemandConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

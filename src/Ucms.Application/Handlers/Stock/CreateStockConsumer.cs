@@ -22,9 +22,9 @@ public record CreateStockMessage(
 
 public class CreateStockConsumer : RequestHandler<CreateStockMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public CreateStockConsumer(IAppDbContext dbContext)
+    public CreateStockConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

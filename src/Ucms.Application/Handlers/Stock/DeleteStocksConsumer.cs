@@ -12,10 +12,10 @@ public record DeleteStocksMessage(Guid[] Ids) : IRequest<bool>;
 
 public class DeleteStocksConsumer : RequestHandler<DeleteStocksMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
 
-    public DeleteStocksConsumer(IAppDbContext dbContext, IWorkContext workContext)
+    public DeleteStocksConsumer(IUcmsDbContext dbContext, IWorkContext workContext)
     {
         _dbContext = dbContext;
         _workContext = workContext;

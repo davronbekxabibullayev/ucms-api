@@ -14,15 +14,15 @@ var app = builder
     .ConfigureServices()
     .ConfigurePipeline();
 
-app.MigrateDbContext<AppDbContext>((context, services) =>
+app.MigrateDbContext<UcmsDbContext>((context, services) =>
 {
     context.Database.Migrate();
 
     var config = services.GetRequiredService<IConfiguration>();
     if (config.GetValue<bool>("Database:EnabledDataSeeding"))
     {
-        new AppDbContextSeed()
-            .SeedAsync(context, services)
+        new UcmsDbContextSeed()
+            .SeedAsync(services)
             .Wait();
     }
 });

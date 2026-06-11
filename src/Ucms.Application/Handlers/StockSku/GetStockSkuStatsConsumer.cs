@@ -10,10 +10,10 @@ public record GetStockSkuStatsMessage(Guid OrganizationId) : IRequest<StockSkuSt
 
 public class GetStockSkuStatsConsumer : RequestHandler<GetStockSkuStatsMessage, StockSkuStatModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IOrganizationClient _organizationClient;
 
-    public GetStockSkuStatsConsumer(IAppDbContext dbContext, IOrganizationClient organizationClient)
+    public GetStockSkuStatsConsumer(IUcmsDbContext dbContext, IOrganizationClient organizationClient)
     {
         _dbContext = dbContext;
         _organizationClient = organizationClient;

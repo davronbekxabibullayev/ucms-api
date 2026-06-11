@@ -26,7 +26,7 @@ public record UpdateIncomeMessage(
 ) : IRequest<Guid>;
 
 public class UpdateIncomeConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IIncomeService incomeService,
     IOutcomeService outcomeService,
     IWorkContext workContext,

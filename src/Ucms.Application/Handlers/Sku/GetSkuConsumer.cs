@@ -12,10 +12,10 @@ public record GetSkuMessage(Guid Id): IRequest<SkuModel>;
 
 public class GetSkuConsumer : RequestHandler<GetSkuMessage, SkuModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetSkuConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetSkuConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

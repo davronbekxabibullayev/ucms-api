@@ -14,10 +14,10 @@ public record GetProductsMessage(string? Query, List<ProductType>? Type, PagedRe
 
 public class GetProductsConsumer : RequestHandler<GetProductsMessage, PagedResult<ProductModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetProductsConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetProductsConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

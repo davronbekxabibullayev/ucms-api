@@ -12,10 +12,10 @@ public record FindSkusMessage(string Query) : IRequest<List<SkuModel>>;
 
 public class FindSkusConsumer : RequestHandler<FindSkusMessage, List<SkuModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindSkusConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindSkusConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

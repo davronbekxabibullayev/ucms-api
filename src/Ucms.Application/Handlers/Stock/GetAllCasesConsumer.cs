@@ -15,12 +15,12 @@ public class GetAllCasesConsumer : RequestHandler<GetAllCasesMessage, List<Stock
 {
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
     public GetAllCasesConsumer(
         IMapper mapper,
         IWorkContext workContext,
-        IAppDbContext dbContext)
+        IUcmsDbContext dbContext)
     {
         _mapper = mapper;
         _dbContext = dbContext;

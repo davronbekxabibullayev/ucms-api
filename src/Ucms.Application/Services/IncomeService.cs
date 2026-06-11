@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
 
-public class IncomeService(IAppDbContext dbContext) : IIncomeService
+public class IncomeService(IUcmsDbContext dbContext) : IIncomeService
 {
     public async Task UpdateBalanceAsync(Income income, CancellationToken cancellationToken)
     {

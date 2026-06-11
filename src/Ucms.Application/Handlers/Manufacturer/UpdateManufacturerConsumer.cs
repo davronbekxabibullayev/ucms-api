@@ -16,9 +16,9 @@ public record UpdateManufacturerMessage(
 
 public class UpdateManufacturerConsumer : RequestHandler<UpdateManufacturerMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateManufacturerConsumer(IAppDbContext dbContext)
+    public UpdateManufacturerConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

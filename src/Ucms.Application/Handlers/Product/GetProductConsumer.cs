@@ -12,10 +12,10 @@ public record GetProductMessage(Guid Id) : IRequest<ProductModel>;
 
 public class GetProductConsumer : RequestHandler<GetProductMessage, ProductModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetProductConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetProductConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

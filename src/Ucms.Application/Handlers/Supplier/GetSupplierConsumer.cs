@@ -12,10 +12,10 @@ public record GetSupplierMessage(Guid Id) : IRequest<SupplierModel>;
 
 public class GetSupplierConsumer : RequestHandler<GetSupplierMessage, SupplierModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetSupplierConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetSupplierConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

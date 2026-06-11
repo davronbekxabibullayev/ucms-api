@@ -22,7 +22,7 @@ public record UpdateStockDemandMessage(
     IEnumerable<StockDemandItemModel> Items) : IRequest<Guid>;
 
 public class UpdateStockDemandConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IWorkContext workContext,
     IOrganizationService organizationService) : RequestHandler<UpdateStockDemandMessage, Guid>
 {

@@ -15,9 +15,9 @@ public record UploadIncomeFileMessage(Guid IncomeId, IFormFile File) : IRequest<
 public class UploadIncomeFileConsumer : RequestHandler<UploadIncomeFileMessage, FileEntryModel?>
 {
     private readonly IFileStorageClient _storageClient;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UploadIncomeFileConsumer(IFileStorageClient storageClient, IAppDbContext dbContext)
+    public UploadIncomeFileConsumer(IFileStorageClient storageClient, IUcmsDbContext dbContext)
     {
         _storageClient = storageClient;
         _dbContext = dbContext;

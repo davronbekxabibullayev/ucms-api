@@ -24,14 +24,14 @@ public class GetStocksConsumer : RequestHandler<GetStocksMessage, List<StockMode
 {
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IPermissionProvider _permissionProvider;
     private readonly IOrganizationClient _organizationClient;
 
     public GetStocksConsumer(
         IMapper mapper,
         IWorkContext workContext,
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IPermissionProvider permissionProvider,
         IOrganizationClient organizationClient)
     {

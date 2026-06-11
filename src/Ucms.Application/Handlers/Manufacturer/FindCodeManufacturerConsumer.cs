@@ -12,10 +12,10 @@ public record FindCodeManufacturerMessage(string Code) : IRequest<ManufacturerMo
 
 public class FindCodeManufacturerConsumer : RequestHandler<FindCodeManufacturerMessage, ManufacturerModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public FindCodeManufacturerConsumer(IAppDbContext dbContext, IMapper mapper)
+    public FindCodeManufacturerConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

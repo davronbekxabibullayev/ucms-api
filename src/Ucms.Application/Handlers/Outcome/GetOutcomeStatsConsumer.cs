@@ -16,11 +16,11 @@ public record GetOutcomeStatsMessage(
 
 public class GetOutcomeStatsConsumer : RequestHandler<GetOutcomeStatsMessage, OutcomeStatsModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IOrganizationClient _organizationClient;
     private readonly IMapper _mapper;
 
-    public GetOutcomeStatsConsumer(IAppDbContext dbContext, IOrganizationClient organizationClient, IMapper mapper)
+    public GetOutcomeStatsConsumer(IUcmsDbContext dbContext, IOrganizationClient organizationClient, IMapper mapper)
     {
         _dbContext = dbContext;
         _organizationClient = organizationClient;

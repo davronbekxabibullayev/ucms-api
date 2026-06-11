@@ -11,10 +11,10 @@ public record GetManufacturerMessage(Guid Id) : IRequest<ManufacturerModel>;
 
 public class GetManufacturerConsumer : RequestHandler<GetManufacturerMessage, ManufacturerModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetManufacturerConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetManufacturerConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

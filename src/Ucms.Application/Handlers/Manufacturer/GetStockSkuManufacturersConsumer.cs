@@ -14,10 +14,10 @@ public record GetStockSkuManufacturersMessage(string? Query, Guid? OrganizationI
 
 public class GetStockSkuManufacturersConsumer : RequestHandler<GetStockSkuManufacturersMessage, PagedResult<ManufacturerModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetStockSkuManufacturersConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetStockSkuManufacturersConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

@@ -12,9 +12,9 @@ public record UpdateStockDemandStatusMessage(Guid Id, StockDemandStatus Status) 
 
 public class UpdateStockDemandStatusConsumer : RequestHandler<UpdateStockDemandStatusMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateStockDemandStatusConsumer(IAppDbContext dbContext)
+    public UpdateStockDemandStatusConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

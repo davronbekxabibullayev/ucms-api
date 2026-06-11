@@ -21,9 +21,9 @@ public record UpdateProductMessage
     ProductType Type) : IRequest<Guid>;
 public class UpdateProductConsumer : RequestHandler<UpdateProductMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateProductConsumer(IAppDbContext dbContext)
+    public UpdateProductConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

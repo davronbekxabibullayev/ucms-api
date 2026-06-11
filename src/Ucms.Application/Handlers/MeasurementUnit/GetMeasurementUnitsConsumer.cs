@@ -11,11 +11,11 @@ public record GetMeasurementUnitsMessage : IRequest<List<MeasurementUnitModel>>;
 
 public class GetMeasurementUnitsConsumer : RequestHandler<GetMeasurementUnitsMessage, List<MeasurementUnitModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
     public GetMeasurementUnitsConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IMapper mapper)
     {
         _dbContext = dbContext;

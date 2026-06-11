@@ -27,7 +27,7 @@ public record UpdateOutcomeMessage(
 ) : IRequest<Guid>;
 
 public class UpdateOutcomeConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IOutcomeService outcomeService,
     IWorkContext workContext,
     IOrganizationService organizationService) : RequestHandler<UpdateOutcomeMessage, Guid>

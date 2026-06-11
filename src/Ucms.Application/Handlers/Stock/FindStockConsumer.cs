@@ -16,9 +16,9 @@ public class FindStockConsumer : RequestHandler<FindStockMessage, StockModel>
 {
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public FindStockConsumer(IAppDbContext dbContext, IMapper mapper, IWorkContext workContext)
+    public FindStockConsumer(IUcmsDbContext dbContext, IMapper mapper, IWorkContext workContext)
     {
         _mapper = mapper;
         _dbContext = dbContext;

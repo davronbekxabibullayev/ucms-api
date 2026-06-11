@@ -20,10 +20,10 @@ public record GetCaseSkusMessage(
 
 public class GetCaseSkusConsumer : RequestHandler<GetCaseSkusMessage, PagedResult<StockSkuModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetCaseSkusConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetCaseSkusConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

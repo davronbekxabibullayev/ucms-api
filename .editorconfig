@@ -525,6 +525,9 @@ dotnet_diagnostic.CA1311.severity = none
 # CA1862: Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
 dotnet_diagnostic.CA1862.severity = none
 
+# IDE0055: Fix formatting — alignment spaces (e.g. multi-property initializers) are intentional
+dotnet_diagnostic.IDE0055.severity = none
+
 # Ignore paths
 [**/Migrations/*]
 generated_code = true

@@ -14,10 +14,10 @@ public record GetManufacturersMessage(string? Query, PagedRequest Request) : IRe
 
 public class GetManufacturersConsumer : RequestHandler<GetManufacturersMessage, PagedResult<ManufacturerModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetManufacturersConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetManufacturersConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

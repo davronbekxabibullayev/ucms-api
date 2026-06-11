@@ -17,11 +17,11 @@ public record GetProductBalanceReportMessage(
 
 public class GetProductBalanceReportConsumer : RequestHandler<GetProductBalanceReportMessage, ProductBalanceReportModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
 
     public GetProductBalanceReportConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext)
     {
         _dbContext = dbContext;

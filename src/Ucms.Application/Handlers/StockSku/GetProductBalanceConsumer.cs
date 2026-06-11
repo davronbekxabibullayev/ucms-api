@@ -13,9 +13,9 @@ public record GetProductBalanceMessage(
 
 public class GetProductBalanceConsumer : RequestHandler<GetProductBalanceMessage, decimal>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public GetProductBalanceConsumer(IAppDbContext dbContext)
+    public GetProductBalanceConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

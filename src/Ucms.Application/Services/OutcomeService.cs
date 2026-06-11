@@ -8,7 +8,7 @@ using Ucms.Application.DTOs.Models;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
 
-public class OutcomeService(IAppDbContext dbContext, IMapper mapper) : IOutcomeService
+public class OutcomeService(IUcmsDbContext dbContext, IMapper mapper) : IOutcomeService
 {
     public async Task UpdateBalanceAsync(Outcome outcome, CancellationToken cancellationToken)
     {

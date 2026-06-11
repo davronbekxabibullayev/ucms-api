@@ -26,9 +26,9 @@ public record UpdateSkuMessage(
 
 public class UpdateSkuConsumer : RequestHandler<UpdateSkuMessage, Guid>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public UpdateSkuConsumer(IAppDbContext dbContext)
+    public UpdateSkuConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

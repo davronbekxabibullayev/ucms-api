@@ -16,12 +16,12 @@ public record GetFilteredOrganizationMeasurementUnitsMessage(PagedRequest Paging
 public class GetFilteredOrganizationMeasurementUnitsConsumer : RequestHandler<GetFilteredOrganizationMeasurementUnitsMessage,
         PagedResult<OrganizationMeasurementUnitModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IWorkContext _workContext;
     private readonly IMapper _mapper;
 
     public GetFilteredOrganizationMeasurementUnitsConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IWorkContext workContext,
         IMapper mapper)
     {

@@ -10,9 +10,9 @@ public record DeleteProductsMessage(Guid[] Ids) : IRequest<bool>;
 
 public class DeleteProductsConsumer : RequestHandler<DeleteProductsMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteProductsConsumer(IAppDbContext dbContext)
+    public DeleteProductsConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

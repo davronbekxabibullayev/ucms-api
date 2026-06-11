@@ -9,9 +9,9 @@ public record DeleteProductMessage(Guid Id) : IRequest<bool>;
 
 public class DeleteProductConsumer : RequestHandler<DeleteProductMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteProductConsumer(IAppDbContext dbContext)
+    public DeleteProductConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

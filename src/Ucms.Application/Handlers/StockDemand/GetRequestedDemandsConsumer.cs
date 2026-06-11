@@ -21,13 +21,13 @@ public record GetRequestedDemandsMessage(
 
 public class GetRequestedDemandsConsumer : RequestHandler<GetRequestedDemandsMessage, PagedResult<RequestedDemandModel>>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IWorkContext _workContext;
     private readonly IPermissionProvider _permissionProvider;
 
     public GetRequestedDemandsConsumer(
-        IAppDbContext dbContext,
+        IUcmsDbContext dbContext,
         IMapper mapper,
         IWorkContext workContext,
         IPermissionProvider permissionProvider)

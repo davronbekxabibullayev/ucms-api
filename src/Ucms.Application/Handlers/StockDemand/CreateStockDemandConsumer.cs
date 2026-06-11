@@ -21,7 +21,7 @@ public record CreateStockDemandMessage(
     IEnumerable<StockDemandItemModel> Items) : IRequest<Guid>;
 
 public class CreateStockDemandConsumer(
-    IAppDbContext dbContext,
+    IUcmsDbContext dbContext,
     IWorkContext workContext,
     IOrganizationService organizationService) : RequestHandler<CreateStockDemandMessage, Guid>
 {

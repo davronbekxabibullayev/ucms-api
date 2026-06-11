@@ -1,0 +1,146 @@
+namespace Ucms.Api.Controllers;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Abstractions.Auth;
+using Ucms.Application.DTOs.Auth;
+using Ucms.Application.Persistence;
+using Ucms.Domain.Entities.Identity;
+
+[ApiController]
+[Route("api/auth")]
+[Tags("Auth")]
+public class AuthController(
+    UserManager<User>  userManager,
+    ITokenService         tokenService,
+    IUcmsDbContext         db) : ControllerBase
+{
+    /// <summary>
+    /// Tizimga kirish (login)
+    /// </summary>
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login([FromBody] LoginRequest req, CancellationToken ct)
+    {
+        var user = await userManager.FindByNameAsync(req.UserName)
+                ?? await userManager.FindByEmailAsync(req.UserName);
+
+        if (user is null || !await userManager.CheckPasswordAsync(user, req.Password))
+            return Unauthorized(new { message = "Login yoki parol noto'g'ri" });
+
+        if (await userManager.IsLockedOutAsync(user))
+            return Unauthorized(new { message = "Hisob vaqtincha bloklangan. Keyinroq urinib ko'ring." });
+
+        return Ok(await BuildAuthResponseAsync(user, ct));
+    }
+
+    /// <summary>
+    /// Yangi foydalanuvchi ro'yxatdan o'tkazish
+    /// </summary>
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest req, CancellationToken ct)
+    {
+        var user = new User
+        {
+            UserName       = req.UserName,
+            Email          = req.Email,
+            FullName       = req.FullName,
+            OrganizationId = req.OrganizationId,
+        };
+
+        var result = await userManager.CreateAsync(user, req.Password);
+        if (!result.Succeeded)
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+
+        return Ok(await BuildAuthResponseAsync(user, ct));
+    }
+
+    /// <summary>
+    /// Access tokenni yangilash (refresh)
+    /// </summary>
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest req, CancellationToken ct)
+    {
+        var principal = tokenService.GetPrincipalFromExpiredToken(req.AccessToken);
+        if (principal is null)
+            return BadRequest(new { message = "Access token noto'g'ri" });
+
+        var userId = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userId, out var uid))
+            return BadRequest(new { message = "Token ichida foydalanuvchi topilmadi" });
+
+        var storedToken = await db.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.UserId == uid && rt.Token == req.RefreshToken, ct);
+
+        if (storedToken is null || !storedToken.IsActive)
+            return Unauthorized(new { message = "Refresh token yaroqsiz yoki muddati o'tgan" });
+
+        var user = await userManager.FindByIdAsync(uid.ToString());
+        if (user is null)
+            return Unauthorized(new { message = "Foydalanuvchi topilmadi" });
+
+        // Eski tokenni bekor qilish
+        storedToken.IsRevoked = true;
+        db.RefreshTokens.Update(storedToken);
+        await db.SaveChangesAsync(ct);
+
+        return Ok(await BuildAuthResponseAsync(user, ct));
+    }
+
+    /// <summary>
+    /// Refresh tokenni bekor qilish (logout)
+    /// </summary>
+    [HttpPost("revoke")]
+    [Authorize]
+    public async Task<IActionResult> Revoke(CancellationToken ct)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userId, out var uid))
+            return BadRequest(new { message = "Foydalanuvchi aniqlanmadi" });
+
+        var tokens = await db.RefreshTokens
+            .Where(rt => rt.UserId == uid && !rt.IsRevoked)
+            .ToListAsync(ct);
+
+        foreach (var t in tokens)
+            t.IsRevoked = true;
+
+        await db.SaveChangesAsync(ct);
+        return NoContent();
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────
+
+    private async Task<AuthResponse> BuildAuthResponseAsync(User user, CancellationToken ct)
+    {
+        var roles        = await userManager.GetRolesAsync(user);
+        var accessToken  = tokenService.GenerateAccessToken(user, roles);
+        var refreshToken = tokenService.GenerateRefreshToken();
+
+        var storedToken = new RefreshToken
+        {
+            UserId     = user.Id,
+            Token      = refreshToken,
+            ExpiresAt  = tokenService.GetRefreshTokenExpiry(),
+            CreatedAt  = DateTimeOffset.UtcNow,
+            DeviceInfo = HttpContext.Request.Headers.UserAgent.ToString(),
+        };
+
+        await db.RefreshTokens.AddAsync(storedToken, ct);
+        await db.SaveChangesAsync(ct);
+
+        return new AuthResponse(
+            AccessToken:  accessToken,
+            RefreshToken: refreshToken,
+            ExpiresAt:    tokenService.GetAccessTokenExpiry(),
+            UserId:       user.Id,
+            UserName:     user.UserName!,
+            FullName:     user.FullName,
+            Roles:        roles.ToList()
+        );
+    }
+}

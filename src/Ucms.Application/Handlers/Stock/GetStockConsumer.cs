@@ -12,10 +12,10 @@ public record GetStockMessage(Guid Id) : IRequest<StockModel>;
 
 public class GetStockConsumer : RequestHandler<GetStockMessage, StockModel>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetStockConsumer(IAppDbContext dbContext, IMapper mapper)
+    public GetStockConsumer(IUcmsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;

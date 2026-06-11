@@ -10,9 +10,9 @@ using Ucms.Application.Abstractions.Mediator;
 public record DeleteOutcomeMessage(Guid Id) : IRequest<bool>;
 public class DeleteOutcomeConsumer : RequestHandler<DeleteOutcomeMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteOutcomeConsumer(IAppDbContext dbContext)
+    public DeleteOutcomeConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }

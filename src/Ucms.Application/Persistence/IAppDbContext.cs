@@ -5,29 +5,45 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Ucms.Domain.Entities;
+using Ucms.Domain.Entities.Identity;
 
-public interface IAppDbContext
+public interface IUcmsDbContext
 {
-    DbSet<Income> Incomes { get; set; }
-    DbSet<IncomeItem> IncomeItems { get; set; }
+    // Tashkilot
+    DbSet<Organization> Organizations { get; set; }
+
+    // Loyiha va smeta
+    DbSet<Project> Projects { get; set; }
+    DbSet<EstimateSection> EstimateSections { get; set; }
+    DbSet<EstimateItem> EstimateItems { get; set; }
+
+    // Brigadalar
+    DbSet<Brigade> Brigades { get; set; }
+
+    // Bajarilgan ishlar
+    DbSet<WorkLog> WorkLogs { get; set; }
+
+    // Zakazchik akti va to'lovlar
+    DbSet<ClientAct> ClientActs { get; set; }
+    DbSet<ClientActItem> ClientActItems { get; set; }
+    DbSet<ClientPayment> ClientPayments { get; set; }
+
+    // Brigada to'lovlari
+    DbSet<BrigadePayment> BrigadePayments { get; set; }
+
+    // O'lchov birliklari (spravochnik)
     DbSet<MeasurementUnit> MeasurementUnits { get; set; }
-    DbSet<Outcome> Outcomes { get; set; }
-    DbSet<OutcomeItem> OutcomeItems { get; set; }
-    DbSet<Sku> Skus { get; set; }
-    DbSet<Stock> Stocks { get; set; }
-    DbSet<StockDemand> StockDemands { get; set; }
-    DbSet<StockDemandItem> StockDemandItems { get; set; }
-    DbSet<StockSku> StockSkus { get; set; }
-    DbSet<Manufacturer> Manufacturers { get; set; }
-    DbSet<Product> Products { get; set; }
-    DbSet<Supplier> Suppliers { get; set; }
-    DbSet<IncomeOutcome> IncomeOutcomes { get; set; }
-    DbSet<OrganizationSku> OrganizationSkus { get; set; }
-    DbSet<StockBalanceRegister> StockBalanceRegistry { get; set; }
-    DbSet<OrganizationMeasurementUnit> OrganizationMeasurementUnits { get; set; }
+
+    // Identity
+    DbSet<User>      Users         { get; set; }
+    DbSet<Role>      Roles         { get; set; }
+    DbSet<UserRole>  UserRoles     { get; set; }
+    DbSet<RefreshToken> RefreshTokens { get; set; }
+
     int SaveChanges();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     IExecutionStrategy CreateExecutionStrategy();
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
     DatabaseFacade Database { get; }
 }

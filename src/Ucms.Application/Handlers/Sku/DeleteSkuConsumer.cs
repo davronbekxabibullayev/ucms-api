@@ -10,9 +10,9 @@ public record DeleteSkuMessage(Guid Id) : IRequest<bool>;
 
 public class DeleteSkuConsumer : RequestHandler<DeleteSkuMessage, bool>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUcmsDbContext _dbContext;
 
-    public DeleteSkuConsumer(IAppDbContext dbContext)
+    public DeleteSkuConsumer(IUcmsDbContext dbContext)
     {
         _dbContext = dbContext;
     }
