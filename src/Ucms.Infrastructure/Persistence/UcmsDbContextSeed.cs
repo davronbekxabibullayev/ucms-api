@@ -74,20 +74,6 @@ public class UcmsDbContextSeed
     // ClientPayment
     private static readonly Guid T1CP1Id        = new("00000000-0000-0000-0009-000000000101");
 
-    // ── TENANT 2 — "Johongir Qurilish Xizmati" ─────────────────────────────────
-    private static readonly Guid T2OrgId        = new("00000000-0000-0000-0001-000000000002");
-    private static readonly Guid T2AdminId      = new("00000000-0000-0000-0000-000000000201");
-    private static readonly Guid T2ManagerId    = new("00000000-0000-0000-0000-000000000202");
-
-    private static readonly Guid T2Project1Id   = new("00000000-0000-0000-0002-000000000201");
-    private static readonly Guid T2Brigade1Id   = new("00000000-0000-0000-0003-000000000201");
-
-    private static readonly Guid T2P1Sec1Id     = new("00000000-0000-0000-0004-000000000301");
-    private static readonly Guid T2P1Item1Id    = new("00000000-0000-0000-0005-000000000301");
-    private static readonly Guid T2P1Item2Id    = new("00000000-0000-0000-0005-000000000302");
-
-    private static readonly Guid T2WL1Id        = new("00000000-0000-0000-0006-000000000201");
-    private static readonly Guid T2WL2Id        = new("00000000-0000-0000-0006-000000000202");
 
     // ══════════════════════════════════════════════════════════════════════════
 
@@ -118,12 +104,6 @@ public class UcmsDbContextSeed
             await SeedTenant1WorkLogsAsync(db, logger);
             await SeedTenant1FinanceAsync(db, logger);
 
-            // 4. TENANT 2 — alohida kompaniya
-            await SeedTenant2OrgAsync(db, logger);
-            await SeedTenant2UsersAsync(userManager, logger);
-            await SeedTenant2ProjectsAsync(db, logger);
-            await SeedTenant2BrigadesAsync(db, logger);
-            await SeedTenant2WorkLogsAsync(db, logger);
         });
     }
 
@@ -256,6 +236,7 @@ public class UcmsDbContextSeed
             Phone     = "+998712345678",
             Email     = "info@demo-qurilish.uz",
             Type      = OrganizationType.Tenant,
+            IsTest    = true,
             IsDeleted = false,
             CreatedAt = now, UpdatedAt = now,
             CreatedBy = T1AdminId, UpdatedBy = T1AdminId,
@@ -461,7 +442,7 @@ public class UcmsDbContextSeed
             CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
         };
 
-        // WL3 — Brigade2, gips shtukaturka, Paid (brigade payment bilan)
+        // WL3 — Brigade2, gips shtukaturka, Paid (BrigadePaymentId keyinroq SeedTenant1FinanceAsync da o'rnatiladi)
         var wl3 = new WorkLog
         {
             Id               = T1WL3Id,
@@ -473,7 +454,6 @@ public class UcmsDbContextSeed
             BrigadeUnitPrice = 30_000m,
             TotalAmount      = 300m * 30_000m,   // 9,000,000
             Status           = WorkLogStatus.Paid,
-            BrigadePaymentId = T1BP1Id,
             CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
         };
 
@@ -582,162 +562,21 @@ public class UcmsDbContextSeed
         };
 
         await db.BrigadePayments.AddAsync(bp1);
+        await db.SaveChangesAsync();
+
+        // WL3 ni BrigadePayment ga bog'lash (FK tartib muammosi sababli bu yerda qilinadi)
+        var wl3 = await db.WorkLogs.FindAsync(T1WL3Id);
+        if (wl3 is not null)
+        {
+            wl3.BrigadePaymentId = T1BP1Id;
+            await db.SaveChangesAsync();
+        }
+
         await db.ClientActs.AddAsync(act1);
         await db.ClientActItems.AddRangeAsync(actItem1, actItem2);
         await db.ClientPayments.AddAsync(cp1);
         await db.SaveChangesAsync();
         logger?.LogInformation("[Seed] TENANT-1: moliyaviy ma'lumotlar yaratildi (akt + to'lovlar)");
-    }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // TENANT 2 — Johongir Qurilish Xizmati
-    // ══════════════════════════════════════════════════════════════════════════
-
-    private static async Task SeedTenant2OrgAsync(UcmsDbContext db, ILogger? logger)
-    {
-        if (await db.Organizations.AnyAsync(o => o.Id == T2OrgId))
-            return;
-
-        var now = Now();
-        await db.Organizations.AddAsync(new Organization
-        {
-            Id        = T2OrgId,
-            Name      = "Johongir Qurilish Xizmati",
-            TaxId     = "9876543210",
-            Address   = "Samarqand shahri, Registon ko'chasi, 45",
-            Phone     = "+998662345678",
-            Email     = "info@yulduz-qurilish.uz",
-            Type      = OrganizationType.Tenant,
-            IsDeleted = false,
-            CreatedAt = now, UpdatedAt = now,
-            CreatedBy = T2AdminId, UpdatedBy = T2AdminId,
-        });
-        await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] TENANT-2 tashkilot yaratildi");
-    }
-
-    private static async Task SeedTenant2UsersAsync(UserManager<User> um, ILogger? logger)
-    {
-        var now = Now();
-
-        await CreateUserAsync(um, logger, new User
-        {
-            Id = T2AdminId, UserName = "admin2", NormalizedUserName = "ADMIN2",
-            Email = "admin@yulduz-qurilish.uz", NormalizedEmail = "ADMIN@YULDUZ-QURILISH.UZ",
-            EmailConfirmed = true, FullName = "Rahimov Nodir Baxtiyorovich",
-            OrganizationId = T2OrgId, IsDeleted = false,
-            CreatedAt = now, UpdatedAt = now, CreatedBy = T2AdminId, UpdatedBy = T2AdminId,
-        }, "Admin123!", "Admin");
-
-        await CreateUserAsync(um, logger, new User
-        {
-            Id = T2ManagerId, UserName = "manager2", NormalizedUserName = "MANAGER2",
-            Email = "manager@yulduz-qurilish.uz", NormalizedEmail = "MANAGER@YULDUZ-QURILISH.UZ",
-            EmailConfirmed = true, FullName = "Usmonova Dilnoza Hamidovna",
-            OrganizationId = T2OrgId, IsDeleted = false,
-            CreatedAt = now, UpdatedAt = now, CreatedBy = T2AdminId, UpdatedBy = T2AdminId,
-        }, "Manager123!", "Manager");
-    }
-
-    private static async Task SeedTenant2ProjectsAsync(UcmsDbContext db, ILogger? logger)
-    {
-        if (await db.Projects.AnyAsync(p => p.Id == T2Project1Id))
-            return;
-
-        var now = Now();
-
-        var p1 = new Project
-        {
-            Id             = T2Project1Id,
-            OrganizationId = T2OrgId,
-            Name           = "Samarqand — Mehmonxona ta'mirlash",
-            Address        = "Samarqand, Registon ko'chasi, 12",
-            Description    = "Mehmonxona binosi ta'mirlash va yangilash",
-            ContractNumber = "2025/SM-001",
-            ContractDate   = D(2025, 1, 10),
-            StartDate      = D(2025, 2,  1),
-            EndDate        = D(2025, 7, 31),
-            Status         = ProjectStatus.InProgress,
-            IsDeleted      = false,
-            CreatedAt      = now, UpdatedAt = now,
-            CreatedBy      = T2AdminId, UpdatedBy = T2AdminId,
-        };
-
-        var s1     = Sec(T2P1Sec1Id, T2Project1Id, "Bezak ishlari", 1);
-        var items1 = new[]
-        {
-            Item(T2P1Item1Id, T2P1Sec1Id, "Marmar plitka qo'yish", "m²",
-                 600m, 250_000m, 180_000m, 1),
-            Item(T2P1Item2Id, T2P1Sec1Id, "Tabiiy tosh qoplama", "m²",
-                 200m, 380_000m, 280_000m, 2),
-        };
-
-        await db.Projects.AddAsync(p1);
-        await db.EstimateSections.AddAsync(s1);
-        await db.EstimateItems.AddRangeAsync(items1);
-        await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] TENANT-2: 1 ta loyiha va smeta yaratildi");
-    }
-
-    private static async Task SeedTenant2BrigadesAsync(UcmsDbContext db, ILogger? logger)
-    {
-        if (await db.Brigades.AnyAsync(b => b.Id == T2Brigade1Id))
-            return;
-
-        var now = Now();
-        await db.Brigades.AddAsync(new Brigade
-        {
-            Id             = T2Brigade1Id,
-            OrganizationId = T2OrgId,
-            Name           = "Mirzayev brigada (Bezak ishlari)",
-            ForemanName    = "Mirzayev Ulugbek Toxirovich",
-            Phone          = "+998662345679",
-            IsActive       = true, IsDeleted = false,
-            CreatedAt      = now, UpdatedAt = now,
-            CreatedBy      = T2AdminId, UpdatedBy = T2AdminId,
-        });
-        await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] TENANT-2: 1 ta brigada yaratildi");
-    }
-
-    private static async Task SeedTenant2WorkLogsAsync(UcmsDbContext db, ILogger? logger)
-    {
-        if (await db.WorkLogs.AnyAsync(w => w.Id == T2WL1Id))
-            return;
-
-        var now = Now();
-        var uid = T2ManagerId;
-
-        await db.WorkLogs.AddRangeAsync(
-            new WorkLog
-            {
-                Id               = T2WL1Id,
-                ProjectId        = T2Project1Id,
-                BrigadeId        = T2Brigade1Id,
-                EstimateItemId   = T2P1Item1Id,
-                Date             = D(2025, 2, 15),
-                Volume           = 150m,
-                BrigadeUnitPrice = 180_000m,
-                TotalAmount      = 150m * 180_000m,  // 27,000,000
-                Status           = WorkLogStatus.Confirmed,
-                CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
-            },
-            new WorkLog
-            {
-                Id               = T2WL2Id,
-                ProjectId        = T2Project1Id,
-                BrigadeId        = T2Brigade1Id,
-                EstimateItemId   = T2P1Item2Id,
-                Date             = D(2025, 3, 5),
-                Volume           = 80m,
-                BrigadeUnitPrice = 280_000m,
-                TotalAmount      = 80m * 280_000m,   // 22,400,000
-                Status           = WorkLogStatus.Draft,
-                CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
-            }
-        );
-        await db.SaveChangesAsync();
-        logger?.LogInformation("[Seed] TENANT-2: 2 ta work log yaratildi");
     }
 
     // ══════════════════════════════════════════════════════════════════════════

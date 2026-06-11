@@ -39,6 +39,11 @@ public class Organization : AuditableEntity, IDeletable
     public string? Email { get; set; }
 
     /// <summary>
+    /// Test tashkiloti belgisi — faqat Owner tashkilot tomonidan o'rnatiladi
+    /// </summary>
+    public bool IsTest { get; set; }
+
+    /// <summary>
     /// O'chirilgan yoki yo'q
     /// </summary>
     public bool IsDeleted { get; set; }

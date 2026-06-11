@@ -24,14 +24,16 @@ public class OrganizationController(
         string? Address,
         string? Phone,
         string? Email,
-        OrganizationType Type = OrganizationType.Tenant);
+        OrganizationType Type = OrganizationType.Tenant,
+        bool IsTest = false);
 
     public record UpdateOrganizationRequest(
         string Name,
         string? TaxId,
         string? Address,
         string? Phone,
-        string? Email);
+        string? Email,
+        bool? IsTest = null);
 
     // ── GET /api/organizations ─────────────────────────────────────────────────
 
@@ -52,7 +54,7 @@ public class OrganizationController(
             .Select(o => new
             {
                 o.Id, o.Name, o.TaxId, o.Address, o.Phone, o.Email,
-                o.Type, o.CreatedAt
+                o.Type, o.IsTest, o.CreatedAt
             })
             .ToListAsync(ct);
 
@@ -75,7 +77,7 @@ public class OrganizationController(
             .Select(o => new
             {
                 o.Id, o.Name, o.TaxId, o.Address, o.Phone, o.Email,
-                o.Type, o.CreatedAt, o.UpdatedAt,
+                o.Type, o.IsTest, o.CreatedAt, o.UpdatedAt,
                 ProjectCount = o.Projects.Count(p => !p.IsDeleted),
                 BrigadeCount = o.Brigades.Count(b => !b.IsDeleted),
             })
@@ -105,6 +107,8 @@ public class OrganizationController(
             Phone     = req.Phone,
             Email     = req.Email,
             Type      = req.Type,
+            // IsTest ni faqat Owner tashkilot foydalanuvchisi belgilay oladi
+            IsTest    = ctx.IsOwner && req.IsTest,
             IsDeleted = false,
             CreatedAt = now, UpdatedAt = now,
             CreatedBy = userId, UpdatedBy = userId,
@@ -137,6 +141,9 @@ public class OrganizationController(
         org.Address   = req.Address;
         org.Phone     = req.Phone;
         org.Email     = req.Email;
+        // IsTest ni faqat Owner belgilay oladi; Tenant so'rasa e'tiborsiz qoldiriladi
+        if (ctx.IsOwner && req.IsTest.HasValue)
+            org.IsTest = req.IsTest.Value;
         org.UpdatedAt = DateTimeOffset.UtcNow;
         org.UpdatedBy = ctx.UserId ?? Guid.Empty;
 
