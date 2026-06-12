@@ -10,8 +10,63 @@
   function applyStoredToken() {
     const token = localStorage.getItem('ucms_access_token');
     if (token && window.ui) {
-      window.ui.preauthorizeApiKey('Bearer', 'Bearer ' + token);
+      window.ui.preauthorizeApiKey('Bearer', token);
     }
+    updateLogoutButton();
+  }
+
+  // Logout tugmasini ko'rsatadi/yashiradi
+  function updateLogoutButton() {
+    const btn = document.getElementById('ucms-logout-btn');
+    if (!btn) return;
+    btn.style.display = localStorage.getItem('ucms_access_token') ? 'block' : 'none';
+  }
+
+  // Logout
+  function logout() {
+    localStorage.removeItem('ucms_access_token');
+    if (window.ui) { window.ui.preauthorizeApiKey('Bearer', ''); }
+    updateLogoutButton();
+    showToast('🚪 Token o\'chirildi. Tizimdan chiqdingiz.');
+  }
+
+  // Logout tugmasini Authorize tugmasi yoniga (auth-wrapper ichiga) qo'shadi
+  function injectLogoutButton() {
+    if (document.getElementById('ucms-logout-btn')) { updateLogoutButton(); return; }
+    const wrapper = document.querySelector('.auth-wrapper');
+    if (!wrapper) return; // hali render bo'lmagan
+
+    const btn = document.createElement('button');
+    btn.id = 'ucms-logout-btn';
+    btn.className = 'btn authorize';
+    btn.textContent = '🚪 Logout';
+    btn.style.cssText = [
+      'display:none', 'margin-left:10px',
+      'background:#e53e3e', 'color:#fff',
+      'border:2px solid #e53e3e', 'border-radius:4px',
+      'padding:6px 16px', 'font-size:14px',
+      'font-weight:700', 'cursor:pointer',
+    ].join(';');
+    btn.addEventListener('mouseenter', function () { btn.style.background = '#c53030'; btn.style.borderColor = '#c53030'; });
+    btn.addEventListener('mouseleave', function () { btn.style.background = '#e53e3e'; btn.style.borderColor = '#e53e3e'; });
+    btn.addEventListener('click', function (e) { e.stopPropagation(); logout(); });
+    wrapper.appendChild(btn);
+    updateLogoutButton();
+  }
+
+  // Swagger UI render bo'lishini kuzatadi va tugmani qo'shadi
+  function watchAndInject() {
+    if (document.querySelector('.auth-wrapper')) {
+      injectLogoutButton();
+      return;
+    }
+    const observer = new MutationObserver(function () {
+      if (document.querySelector('.auth-wrapper')) {
+        observer.disconnect();
+        injectLogoutButton();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   // Login sahifasidan postMessage orqali token qabul qiladi
@@ -20,6 +75,7 @@
       const token = e.data.ucmsToken;
       localStorage.setItem('ucms_access_token', token);
       applyStoredToken();
+      injectLogoutButton();
       showToast('✅ Token muvaffaqiyatli qo\'yildi!');
     }
   });
@@ -52,7 +108,8 @@
       const token = localStorage.getItem('ucms_access_token');
       if (token && window.ui) {
         clearInterval(poll);
-        window.ui.preauthorizeApiKey('Bearer', 'Bearer ' + token);
+        window.ui.preauthorizeApiKey('Bearer', token);
+        injectLogoutButton();
         showToast('✅ Token qo\'yildi! Endi API\'larni test qilishingiz mumkin.');
         if (popup && !popup.closed) popup.close();
       }
@@ -82,6 +139,7 @@
 
   // Sahifa yüklenganda mavjud tokenni qo'llaydi
   window.addEventListener('load', function () {
+    watchAndInject();
     setTimeout(applyStoredToken, 1200);
   });
 })();

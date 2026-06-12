@@ -1,5 +1,6 @@
 namespace Ucms.Api.Extensions;
 
+using System.Reflection;
 using Microsoft.OpenApi.Models;
 using Ucms.Api.Filters;
 
@@ -30,6 +31,11 @@ public static class SwaggerConfiguration
             });
 
             options.OperationFilter<BearerSecurityOperationFilter>();
+
+            // XML doc commentlarni Swagger'ga ulash
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
         });
 
         return services;
