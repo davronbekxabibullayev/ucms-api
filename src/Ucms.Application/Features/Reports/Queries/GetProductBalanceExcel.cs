@@ -1,5 +1,6 @@
-namespace Ucms.Application.Features.Reports;
+namespace Ucms.Application.Features.Reports.Queries;
 
+using Ucms.Application.Features.Reports.DTOs;
 using Ucms.Application.Services;
 
 public static class GetProductBalanceExcel

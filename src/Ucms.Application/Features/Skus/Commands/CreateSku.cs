@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Skus.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

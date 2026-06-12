@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Manufacturers;
+namespace Ucms.Application.Features.Manufacturers.Queries;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using QueryForge.Abstractions;
 using QueryForge.Extensions;
 using QueryForge.Models;
+using Ucms.Application.Features.Manufacturers.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetStockSkuManufacturers

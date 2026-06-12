@@ -1,9 +1,10 @@
-namespace Ucms.Application.Features.Stocks;
+namespace Ucms.Application.Features.Stocks.Queries;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Stocks.DTOs;
 using Ucms.Application.Persistence;
 
 public static class FindStocks

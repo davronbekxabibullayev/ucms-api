@@ -1,10 +1,11 @@
-namespace Ucms.Application.Features.StockSkus;
+namespace Ucms.Application.Features.StockSkus.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using QueryForge.Abstractions;
 using QueryForge.Extensions;
 using QueryForge.Models;
+using Ucms.Application.Features.StockSkus.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 

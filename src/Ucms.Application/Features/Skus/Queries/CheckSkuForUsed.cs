@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Skus.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

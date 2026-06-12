@@ -1,13 +1,12 @@
 namespace Ucms.Application.Services;
 
-using Ucms.Application.Features.Outcomes;
-
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Domain.Enums;
 using Ucms.Domain.Exceptions;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
+using Ucms.Application.Features.Outcomes.DTOs;
 
 public class OutcomeService(IUcmsDbContext dbContext, IMapper mapper) : IOutcomeService
 {

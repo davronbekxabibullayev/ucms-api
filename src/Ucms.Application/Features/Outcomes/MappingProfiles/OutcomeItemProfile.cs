@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.MappingProfiles;
 
 using AutoMapper;
 using Ucms.Domain.Enums;
 using Ucms.Domain.Entities;
+using Ucms.Application.Features.Outcomes.DTOs;
 
 public class OutcomeItemProfile : Profile
 {

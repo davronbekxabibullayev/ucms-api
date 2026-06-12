@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Payments;
+namespace Ucms.Application.Features.Payments.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

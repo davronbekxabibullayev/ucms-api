@@ -1,7 +1,6 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.DTOs;
 
-using Ucms.Application.Features.Stocks;
-
+using Ucms.Application.Features.Stocks.DTOs;
 using Ucms.Domain.Enums;
 
 public record IncomeModel

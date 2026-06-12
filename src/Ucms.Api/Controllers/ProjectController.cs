@@ -2,7 +2,9 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Projects;
+using Ucms.Application.Features.Projects.Commands;
+using Ucms.Application.Features.Projects.DTOs;
+using Ucms.Application.Features.Projects.Queries;
 using Ucms.Domain.Enums;
 
 /// <summary>
@@ -61,7 +63,7 @@ public class ProjectController(
     /// Получить проект по ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(ProjectDetailDto), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {

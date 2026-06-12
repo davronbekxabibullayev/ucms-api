@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Products;
+namespace Ucms.Application.Features.Products.DTOs;
 
 using Ucms.Domain.Enums;
 

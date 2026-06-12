@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Organizations;
+namespace Ucms.Application.Features.Organizations.Commands;
 
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;

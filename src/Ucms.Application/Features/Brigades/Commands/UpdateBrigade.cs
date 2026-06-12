@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Brigades;
+namespace Ucms.Application.Features.Brigades.Commands;
 
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;
@@ -24,6 +24,7 @@ public static class UpdateBrigade
 
             db.Brigades.Update(brigade);
             await db.SaveChangesAsync(ct);
+
             return (false, false);
         }
     }

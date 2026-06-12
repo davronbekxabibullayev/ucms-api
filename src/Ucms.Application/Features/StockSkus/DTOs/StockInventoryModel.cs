@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.StockSkus;
+namespace Ucms.Application.Features.StockSkus.DTOs;
 
 using Ucms.Domain.Enums;
 

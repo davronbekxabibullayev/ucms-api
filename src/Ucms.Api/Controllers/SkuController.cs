@@ -2,8 +2,11 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.Skus;
+using Ucms.Application.Features.Skus.Commands;
+using Ucms.Application.Features.Skus.DTOs;
+using Ucms.Application.Features.Skus.Queries;
 using Ucms.Domain.Enums;
 
 [Route("api/sku")]
@@ -26,12 +29,16 @@ public class SkuController(
     [HttpGet]
     [ProducesResponseType(typeof(List<SkuModel>), 200)]
     public async Task<IActionResult> GetSkus(CancellationToken ct = default)
-        => Ok(await getAll.HandleAsync(new(), ct));
+        {
+            return Ok(await getAll.HandleAsync(new(), ct));
+        }
 
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<SkuModel>), 200)]
     public async Task<IActionResult> SearchSkus([FromBody] GetSkusRequest req, CancellationToken ct = default)
-        => Ok(await getFiltered.HandleAsync(new(req, req.Query, req.Seria), ct));
+        {
+            return Ok(await getFiltered.HandleAsync(new(req, req.Query, req.Seria), ct));
+        }
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(SkuModel), 200)]
@@ -44,7 +51,9 @@ public class SkuController(
     [HttpGet("product/{id:guid}")]
     [ProducesResponseType(typeof(List<SkuModel>), 200)]
     public async Task<IActionResult> GetProductSkus(Guid id, CancellationToken ct = default)
-        => Ok(await getProductSkus.HandleAsync(new(id), ct));
+        {
+            return Ok(await getProductSkus.HandleAsync(new(id), ct));
+        }
 
     [HttpGet("product-stock")]
     [ProducesResponseType(typeof(List<SkuModel>), 200)]
@@ -52,23 +61,30 @@ public class SkuController(
         [FromQuery] Guid? productId, [FromQuery] Guid? stockId,
         [FromQuery] List<ProductType>? types, [FromQuery] string? query,
         [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
-        => Ok(await getProductStockSkus.HandleAsync(
-            new(new PagedRequest { Page = page, PageSize = size }, productId, stockId, types, query), ct));
+        {
+            return Ok(await getProductStockSkus.HandleAsync( new(new PagedRequest { Page = page, PageSize = size }, productId, stockId, types, query), ct));
+        }
 
     [HttpGet("serial/{serial}")]
     [ProducesResponseType(typeof(SkuModel), 200)]
     public async Task<IActionResult> FindBySerial(string serial, CancellationToken ct = default)
-        => Ok(await findBySerial.HandleAsync(new(serial), ct));
+        {
+            return Ok(await findBySerial.HandleAsync(new(serial), ct));
+        }
 
     [HttpGet("search/{query}")]
     [ProducesResponseType(typeof(List<SkuModel>), 200)]
     public async Task<IActionResult> SearchByQuery(string query, CancellationToken ct = default)
-        => Ok(await findSkus.HandleAsync(new(query), ct));
+        {
+            return Ok(await findSkus.HandleAsync(new(query), ct));
+        }
 
     [HttpGet("check-for-used/{id:guid}")]
     [ProducesResponseType(typeof(bool), 200)]
     public async Task<IActionResult> CheckForUsed(Guid id, CancellationToken ct = default)
-        => Ok(await checkUsed.HandleAsync(new(id), ct));
+        {
+            return Ok(await checkUsed.HandleAsync(new(id), ct));
+        }
 
     public record CreateSkuRequest(string Name, string NameRu, string? NameEn, string? NameKa,
         string SerialNumber, Guid ProductId, Guid? ManufacturerId, Guid MeasurementUnitId,
@@ -117,7 +133,7 @@ public class SkuController(
 }
 
 // Inline request type for table-list
-public record GetSkusRequest : PagedRequest
+public class GetSkusRequest : PagedRequest
 {
     public string? Query { get; init; }
     public string? Seria { get; init; }

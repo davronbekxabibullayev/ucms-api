@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.Outcomes.DTOs;
 using Ucms.Application.Persistence;
 
 public static class FindOutcome

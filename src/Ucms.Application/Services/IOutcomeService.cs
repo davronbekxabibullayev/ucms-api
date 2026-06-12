@@ -1,7 +1,6 @@
 namespace Ucms.Application.Services;
 
-using Ucms.Application.Features.Outcomes;
-
+using Ucms.Application.Features.Outcomes.DTOs;
 using Ucms.Domain.Entities;
 
 public interface IOutcomeService

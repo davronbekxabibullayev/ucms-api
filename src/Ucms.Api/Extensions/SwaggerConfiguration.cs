@@ -1,7 +1,7 @@
 namespace Ucms.Api.Extensions;
 
 using Microsoft.OpenApi.Models;
-using Ucms.Core.Filters;
+using Ucms.Api.Filters;
 
 public static class SwaggerConfiguration
 {

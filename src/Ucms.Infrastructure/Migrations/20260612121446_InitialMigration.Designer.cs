@@ -12,7 +12,7 @@ using Ucms.Infrastructure.Persistence;
 namespace Ucms.Infrastructure.Migrations
 {
     [DbContext(typeof(UcmsDbContext))]
-    [Migration("20260611143933_InitialMigration")]
+    [Migration("20260612121446_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -268,6 +268,9 @@ namespace Ucms.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<Guid>("MeasurementUnitId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
@@ -279,11 +282,6 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<Guid>("SectionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
                     b.Property<decimal>("Volume")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
@@ -291,6 +289,8 @@ namespace Ucms.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Id");
+
+                    b.HasIndex("MeasurementUnitId");
 
                     b.HasIndex("SectionId");
 
@@ -352,7 +352,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", "Identity");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Identity.Role", b =>
@@ -625,7 +625,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("Income");
+                    b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.IncomeItem", b =>
@@ -659,7 +659,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("SkuId");
 
-                    b.ToTable("IncomeItem");
+                    b.ToTable("IncomeItems");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.IncomeOutcome", b =>
@@ -700,7 +700,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("OutcomeStockId");
 
-                    b.ToTable("IncomeOutcome");
+                    b.ToTable("IncomeOutcomes");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Manufacturer", b =>
@@ -738,7 +738,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("Id");
 
-                    b.ToTable("Manufacturer");
+                    b.ToTable("Manufacturers");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.MeasurementUnit", b =>
@@ -809,6 +809,11 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsTest")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
@@ -864,7 +869,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("MeasurementUnitId");
 
-                    b.ToTable("OrganizationMeasurementUnit");
+                    b.ToTable("OrganizationMeasurementUnits");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.OrganizationSku", b =>
@@ -885,7 +890,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("SkuId");
 
-                    b.ToTable("OrganizationSku");
+                    b.ToTable("OrganizationSkus");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Outcome", b =>
@@ -942,7 +947,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("Outcome");
+                    b.ToTable("Outcomes");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.OutcomeItem", b =>
@@ -979,7 +984,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("SkuId");
 
-                    b.ToTable("OutcomeItem");
+                    b.ToTable("OutcomeItems");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Product", b =>
@@ -1022,7 +1027,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Project", b =>
@@ -1148,7 +1153,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Sku");
+                    b.ToTable("Skus");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Stock", b =>
@@ -1201,7 +1206,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Stock");
+                    b.ToTable("Stocks");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.StockBalanceRegister", b =>
@@ -1250,7 +1255,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("StockBalanceRegister");
+                    b.ToTable("StockBalanceRegisters");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.StockDemand", b =>
@@ -1305,7 +1310,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("StockDemand");
+                    b.ToTable("StockDemands");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.StockDemandItem", b =>
@@ -1346,7 +1351,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("StockDemandId");
 
-                    b.ToTable("StockDemandItem");
+                    b.ToTable("StockDemandItems");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.StockSku", b =>
@@ -1383,7 +1388,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("StockSku");
+                    b.ToTable("StockSkus");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Supplier", b =>
@@ -1422,7 +1427,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.HasIndex("Id");
 
-                    b.ToTable("Supplier");
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.WorkLog", b =>
@@ -1571,11 +1576,19 @@ namespace Ucms.Infrastructure.Migrations
 
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>
                 {
+                    b.HasOne("Ucms.Domain.Entities.MeasurementUnit", "MeasurementUnit")
+                        .WithMany()
+                        .HasForeignKey("MeasurementUnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Ucms.Domain.Entities.EstimateSection", "Section")
                         .WithMany("EstimateItems")
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MeasurementUnit");
 
                     b.Navigation("Section");
                 });

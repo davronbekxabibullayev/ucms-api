@@ -1,8 +1,8 @@
-namespace Ucms.Application.Features.StockSkus;
+namespace Ucms.Application.Features.StockSkus.DTOs;
 
-using Ucms.Application.Features.MeasurementUnits;
-using Ucms.Application.Features.Skus;
-using Ucms.Application.Features.Stocks;
+using Ucms.Application.Features.MeasurementUnits.DTOs;
+using Ucms.Application.Features.Skus.DTOs;
+using Ucms.Application.Features.Stocks.DTOs;
 
 public record StockSkuModel
 {

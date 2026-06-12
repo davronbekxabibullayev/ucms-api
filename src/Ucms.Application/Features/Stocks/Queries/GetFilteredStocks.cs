@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Stocks;
+namespace Ucms.Application.Features.Stocks.Queries;
 
 using AutoMapper;
 using QueryForge.Abstractions;
@@ -7,6 +7,7 @@ using QueryForge.Models;
 using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Authorization;
 using Ucms.Application.Abstractions.Constants;
+using Ucms.Application.Features.Stocks.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 

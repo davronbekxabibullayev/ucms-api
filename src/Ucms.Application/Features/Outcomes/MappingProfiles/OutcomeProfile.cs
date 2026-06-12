@@ -1,6 +1,7 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.MappingProfiles;
 
 using AutoMapper;
+using Ucms.Application.Features.Outcomes.DTOs;
 using Ucms.Domain.Entities;
 
 public class OutcomeProfile : Profile

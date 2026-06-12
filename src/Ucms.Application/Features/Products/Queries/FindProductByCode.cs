@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Products;
+namespace Ucms.Application.Features.Products.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.Products.DTOs;
 using Ucms.Application.Persistence;
 
 public static class FindProductByCode

@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Users;
+using Ucms.Application.Features.Users.Commands;
+using Ucms.Application.Features.Users.Queries;
 
 /// <summary>
 /// Foydalanuvchilarni boshqarish.

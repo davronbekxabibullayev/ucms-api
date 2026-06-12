@@ -1,7 +1,7 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.DTOs;
 
-using Ucms.Application.Features.MeasurementUnits;
-using Ucms.Application.Features.Skus;
+using Ucms.Application.Features.MeasurementUnits.DTOs;
+using Ucms.Application.Features.Skus.DTOs;
 
 public record IncomeItemModel(
     Guid Id,

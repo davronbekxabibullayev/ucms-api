@@ -1,6 +1,6 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.DTOs;
 
-using Ucms.Application.Features.Skus;
+using Ucms.Application.Features.Skus.DTOs;
 
 public record OutcomeStatsModel(
     List<OutcomeStatItemModel> CurrentPeriod,

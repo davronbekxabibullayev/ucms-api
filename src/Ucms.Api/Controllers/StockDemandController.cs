@@ -2,8 +2,11 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.StockDemands;
+using Ucms.Application.Features.StockDemands.Commands;
+using Ucms.Application.Features.StockDemands.DTOs;
+using Ucms.Application.Features.StockDemands.Queries;
 using Ucms.Domain.Enums;
 
 [Route("api/stock-demand")]
@@ -24,7 +27,9 @@ public class StockDemandController(
     [HttpGet]
     [ProducesResponseType(typeof(List<StockDemandModel>), 200)]
     public async Task<IActionResult> GetAll(CancellationToken ct = default)
-        => Ok(await getAll.HandleAsync(new(), ct));
+        {
+            return Ok(await getAll.HandleAsync(new(), ct));
+        }
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(StockDemandModel), 200)]
@@ -36,23 +41,31 @@ public class StockDemandController(
 
     [HttpGet("name/{name}")]
     public async Task<IActionResult> FindByName(string name, CancellationToken ct = default)
-        => Ok(await findByName.HandleAsync(new(name), ct));
+        {
+            return Ok(await findByName.HandleAsync(new(name), ct));
+        }
 
     [HttpGet("search/{query}")]
     public async Task<IActionResult> Search(string query, CancellationToken ct = default)
-        => Ok(await findMany.HandleAsync(new(query), ct));
+        {
+            return Ok(await findMany.HandleAsync(new(query), ct));
+        }
 
     public record DemandsRequest(PagedRequest Filter, DateTime? From, DateTime? To, string? Name);
 
     [HttpPost("requested-demands")]
     [ProducesResponseType(typeof(PagedResult<RequestedDemandModel>), 200)]
     public async Task<IActionResult> GetRequestedDemands([FromBody] DemandsRequest req, CancellationToken ct = default)
-        => Ok(await getRequested.HandleAsync(new(req.Filter, req.From, req.To, req.Name), ct));
+    {
+        return Ok(await getRequested.HandleAsync(new(req.Filter, req.From, req.To, req.Name), ct));
+    }
 
     [HttpPost("received-demands")]
     [ProducesResponseType(typeof(PagedResult<ReceivedDemandModel>), 200)]
     public async Task<IActionResult> GetReceivedDemands([FromBody] DemandsRequest req, CancellationToken ct = default)
-        => Ok(await getReceived.HandleAsync(new(req.Filter, req.From, req.To, req.Name), ct));
+        {
+            return Ok(await getReceived.HandleAsync(new(req.Filter, req.From, req.To, req.Name), ct));
+        }
 
     public record CreateStockDemandRequest(string Name, string? Note, DateTimeOffset DemandDate,
         StockDemandStatus DemandStatus, Guid SenderId, Guid RecipientId, IEnumerable<StockDemandItemModel> Items);
@@ -79,10 +92,10 @@ public class StockDemandController(
         return error is not null ? Conflict(error) : Ok(req.Id);
     }
 
-    public record UpdateStatusRequest(Guid Id, StockDemandStatus Status);
+    public record UpdateDemandStatusRequest(Guid Id, StockDemandStatus Status);
 
     [HttpPut("update-status")]
-    public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusRequest req, CancellationToken ct = default)
+    public async Task<IActionResult> UpdateStatus([FromBody] UpdateDemandStatusRequest req, CancellationToken ct = default)
     {
         var (notFound, error) = await updateStatus.HandleAsync(new(req.Id, req.Status), ct);
         if (notFound) return NotFound();

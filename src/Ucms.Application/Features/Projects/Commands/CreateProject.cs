@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Projects;
+namespace Ucms.Application.Features.Projects.Commands;
 
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;

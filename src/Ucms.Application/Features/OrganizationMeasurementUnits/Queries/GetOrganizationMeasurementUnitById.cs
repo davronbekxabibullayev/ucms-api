@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.OrganizationMeasurementUnits;
+namespace Ucms.Application.Features.OrganizationMeasurementUnits.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.OrganizationMeasurementUnits.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetOrganizationMeasurementUnitById

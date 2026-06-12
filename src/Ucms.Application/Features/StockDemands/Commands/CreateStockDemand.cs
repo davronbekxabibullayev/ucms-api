@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.StockDemands.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Application.Services;
 using Ucms.Domain.Entities;

@@ -1,6 +1,7 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.Validators;
 
 using FluentValidation;
+using Ucms.Application.Features.Incomes.Commands;
 
 public class UpdateIncomeRequestValidator : AbstractValidator<UpdateIncome.Command>
 {

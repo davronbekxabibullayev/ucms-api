@@ -74,6 +74,14 @@ public class UcmsDbContextSeed
     // ClientPayment
     private static readonly Guid T1CP1Id        = new("00000000-0000-0000-0009-000000000101");
 
+    // ── O'lchov birliklari (fixed — idempotent seeding uchun) ─────────────────
+    private static readonly Guid UnitM2Id   = new("00000000-0000-0000-000A-000000000001");
+    private static readonly Guid UnitM3Id   = new("00000000-0000-0000-000A-000000000002");
+    private static readonly Guid UnitMId    = new("00000000-0000-0000-000A-000000000003");
+    private static readonly Guid UnitMpId   = new("00000000-0000-0000-000A-000000000004");
+    private static readonly Guid UnitDonaId = new("00000000-0000-0000-000A-000000000005");
+    private static readonly Guid UnitKgId   = new("00000000-0000-0000-000A-000000000006");
+    private static readonly Guid UnitTonId  = new("00000000-0000-0000-000A-000000000007");
 
     // ══════════════════════════════════════════════════════════════════════════
 
@@ -150,19 +158,19 @@ public class UcmsDbContextSeed
 
         var units = new List<MeasurementUnit>
         {
-            new() { Id = NewId(), Code = "M2",   Name = "m²",    NameRu = "м²",   NameEn = "m²",
+            new() { Id = UnitM2Id,   Code = "M2",   Name = "m²",    NameRu = "м²",   NameEn = "m²",
                     Multiplier = 1,    Type = MeasurementUnitType.Volume,   IsDeleted = false },
-            new() { Id = NewId(), Code = "M3",   Name = "m³",    NameRu = "м³",   NameEn = "m³",
+            new() { Id = UnitM3Id,   Code = "M3",   Name = "m³",    NameRu = "м³",   NameEn = "m³",
                     Multiplier = 1,    Type = MeasurementUnitType.Volume,   IsDeleted = false },
-            new() { Id = NewId(), Code = "M",    Name = "m",     NameRu = "м",    NameEn = "m",
+            new() { Id = UnitMId,    Code = "M",    Name = "m",     NameRu = "м",    NameEn = "m",
                     Multiplier = 1,    Type = MeasurementUnitType.Length,   IsDeleted = false },
-            new() { Id = NewId(), Code = "MP",   Name = "m.p.",  NameRu = "м.п.", NameEn = "lm",
+            new() { Id = UnitMpId,   Code = "MP",   Name = "m.p.",  NameRu = "м.п.", NameEn = "lm",
                     Multiplier = 1,    Type = MeasurementUnitType.Length,   IsDeleted = false },
-            new() { Id = NewId(), Code = "DONA", Name = "dona",  NameRu = "шт.",  NameEn = "pcs",
+            new() { Id = UnitDonaId, Code = "DONA", Name = "dona",  NameRu = "шт.",  NameEn = "pcs",
                     Multiplier = 1,    Type = MeasurementUnitType.Quantity, IsDeleted = false },
-            new() { Id = NewId(), Code = "KG",   Name = "kg",    NameRu = "кг",   NameEn = "kg",
+            new() { Id = UnitKgId,   Code = "KG",   Name = "kg",    NameRu = "кг",   NameEn = "kg",
                     Multiplier = 1,    Type = MeasurementUnitType.Weight,   IsDeleted = false },
-            new() { Id = NewId(), Code = "TON",  Name = "tonna", NameRu = "тонн", NameEn = "ton",
+            new() { Id = UnitTonId,  Code = "TON",  Name = "tonna", NameRu = "тонн", NameEn = "ton",
                     Multiplier = 1000, Type = MeasurementUnitType.Weight,   IsDeleted = false },
         };
 
@@ -321,15 +329,15 @@ public class UcmsDbContextSeed
 
         var items1 = new[]
         {
-            Item(T1P1Item1Id, T1P1Sec1Id, "Pol shtukaturkasi (M-200 beton stяjka)", "m²",
+            Item(T1P1Item1Id, T1P1Sec1Id, "Pol shtukaturkasi (M-200 beton stяjka)", UnitM2Id,
                  450m, 85_000m, 55_000m, 1),
-            Item(T1P1Item2Id, T1P1Sec1Id, "Keramik plitka qo'yish", "m²",
+            Item(T1P1Item2Id, T1P1Sec1Id, "Keramik plitka qo'yish", UnitM2Id,
                  450m, 120_000m, 80_000m, 2),
-            Item(T1P1Item3Id, T1P1Sec2Id, "Gips shtukaturka (devorlar)", "m²",
+            Item(T1P1Item3Id, T1P1Sec2Id, "Gips shtukaturka (devorlar)", UnitM2Id,
                  1_200m, 48_000m, 30_000m, 1),
-            Item(T1P1Item4Id, T1P1Sec2Id, "Bo'yoq (2 qavat)", "m²",
+            Item(T1P1Item4Id, T1P1Sec2Id, "Bo'yoq (2 qavat)", UnitM2Id,
                  1_200m, 22_000m, 14_000m, 2),
-            Item(T1P1Item5Id, T1P1Sec2Id, "Gips karton (GKL) montaj", "m²",
+            Item(T1P1Item5Id, T1P1Sec2Id, "Gips karton (GKL) montaj", UnitM2Id,
                  320m, 75_000m, 50_000m, 3),
         };
 
@@ -354,9 +362,9 @@ public class UcmsDbContextSeed
         var s3    = Sec(T1P2Sec1Id, T1Project2Id, "Umumiy ta'mirlash ishlari", 1);
         var items2 = new[]
         {
-            Item(T1P2Item1Id, T1P2Sec1Id, "Derazalar almashtirish", "dona",
+            Item(T1P2Item1Id, T1P2Sec1Id, "Derazalar almashtirish", UnitDonaId,
                  24m, 850_000m, 600_000m, 1),
-            Item(T1P2Item2Id, T1P2Sec1Id, "Eshiklar o'rnatish", "dona",
+            Item(T1P2Item2Id, T1P2Sec1Id, "Eshiklar o'rnatish", UnitDonaId,
                  12m, 1_200_000m, 900_000m, 2),
         };
 
@@ -522,7 +530,7 @@ public class UcmsDbContextSeed
             ProjectId   = T1Project1Id,
             ActNumber   = "AKT-2024/001",
             ActDate     = D(2024, 4, 1),
-            TotalAmount = 120m * 85_000m + 80m * 120_000m,   // 10,200,000 + 9,600,000 = 19,800,000
+            TotalAmount = (120m * 85_000m) + (80m * 120_000m),   // 10,200,000 + 9,600,000 = 19,800,000
             Status      = ActStatus.PaidPartially,
             Note        = "1-oylik ish natijalari bo'yicha akt",
             CreatedAt = now, UpdatedAt = now, CreatedBy = uid, UpdatedBy = uid,
@@ -605,29 +613,42 @@ public class UcmsDbContextSeed
         logger?.LogInformation("[Seed] User: {User} / {Pwd} [{Role}]", user.UserName, password, role);
     }
 
-    private static EstimateSection Sec(Guid id, Guid projectId, string name, int order) =>
-        new() { Id = id, ProjectId = projectId, Name = name, Order = order };
+    private static EstimateSection Sec(Guid id, Guid projectId, string name, int order)
+    {
+        return new() { Id = id, ProjectId = projectId, Name = name, Order = order };
+    }
 
     private static EstimateItem Item(
-        Guid id, Guid sectionId, string name, string unit,
-        decimal volume, decimal clientPrice, decimal brigadePrice, int order) =>
-        new()
+        Guid id, Guid sectionId, string name, Guid measurementUnitId,
+        decimal volume, decimal clientPrice, decimal brigadePrice, int order)
+    {
+        return new()
         {
-            Id               = id,
-            SectionId        = sectionId,
-            Name             = name,
-            Unit             = unit,
-            Volume           = volume,
-            ClientUnitPrice  = clientPrice,
-            BrigadeUnitPrice = brigadePrice,
-            Order            = order,
+            Id                = id,
+            SectionId         = sectionId,
+            Name              = name,
+            MeasurementUnitId = measurementUnitId,
+            Volume            = volume,
+            ClientUnitPrice   = clientPrice,
+            BrigadeUnitPrice  = brigadePrice,
+            Order             = order,
         };
+    }
 
-    private static DateTimeOffset D(int y, int m, int d) =>
-        new(y, m, d, 0, 0, 0, TimeSpan.Zero);
+    private static DateTimeOffset D(int y, int m, int d)
+    {
+        return new(y, m, d, 0, 0, 0, TimeSpan.Zero);
+    }
 
-    private static DateTimeOffset Now() => DateTimeOffset.UtcNow;
-    private static Guid NewId() => Guid.NewGuid();
+    private static DateTimeOffset Now()
+    {
+        return DateTimeOffset.UtcNow;
+    }
+
+    private static Guid NewId()
+    {
+        return Guid.NewGuid();
+    }
 
     private static AsyncRetryPolicy CreatePolicy(ILogger<UcmsDbContextSeed> logger, string prefix, int retries = 3)
     {

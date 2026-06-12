@@ -1,24 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <RootNamespace>Ucms.Api</RootNamespace>
   </PropertyGroup>
-
-  <!-- Exclude old controllers from the previous medical stock management system -->
-  <ItemGroup>
-    <Compile Remove="Controllers\IncomeController.cs" />
-    <Compile Remove="Controllers\ManufacturerController.cs" />
-    <Compile Remove="Controllers\OrganizationMeasurementUnitController.cs" />
-    <Compile Remove="Controllers\OutcomeController.cs" />
-    <Compile Remove="Controllers\ProductController.cs" />
-    <Compile Remove="Controllers\ReportController.cs" />
-    <Compile Remove="Controllers\SkuController.cs" />
-    <Compile Remove="Controllers\StockController.cs" />
-    <Compile Remove="Controllers\StockDemandController.cs" />
-    <Compile Remove="Controllers\StockSkuController.cs" />
-    <Compile Remove="Controllers\StockStatsController.cs" />
-    <Compile Remove="Controllers\SupplierController.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

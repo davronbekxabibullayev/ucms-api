@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.WorkLogs;
+namespace Ucms.Application.Features.WorkLogs.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

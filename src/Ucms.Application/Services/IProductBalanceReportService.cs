@@ -1,7 +1,6 @@
 namespace Ucms.Application.Services;
 
-using Ucms.Application.Features.Reports;
-
+using Ucms.Application.Features.Reports.DTOs;
 
 public interface IProductBalanceReportService
 {

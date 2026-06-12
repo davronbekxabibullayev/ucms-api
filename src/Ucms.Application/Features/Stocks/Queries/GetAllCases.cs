@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.Stocks;
+namespace Ucms.Application.Features.Stocks.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Stocks.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Enums;
 

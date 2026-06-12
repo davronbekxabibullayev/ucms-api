@@ -1,9 +1,8 @@
-namespace Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Skus.DTOs;
 
-using Ucms.Application.Features.Manufacturers;
-using Ucms.Application.Features.MeasurementUnits;
-using Ucms.Application.Features.Suppliers;
-
+using Ucms.Application.Features.Manufacturers.DTOs;
+using Ucms.Application.Features.MeasurementUnits.DTOs;
+using Ucms.Application.Features.Suppliers.DTOs;
 using Ucms.Domain.Enums;
 
 public record SkuModel

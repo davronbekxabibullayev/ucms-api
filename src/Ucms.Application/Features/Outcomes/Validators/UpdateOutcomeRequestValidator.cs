@@ -1,6 +1,8 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.Validators;
 
 using FluentValidation;
+using Ucms.Application.Features.Outcomes.Commands;
+using Ucms.Application.Features.Outcomes.DTOs;
 using Ucms.Domain.Enums;
 
 public class UpdateOutcomeRequestValidator : AbstractValidator<UpdateOutcome.Command>

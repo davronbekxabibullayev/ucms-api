@@ -1,13 +1,13 @@
 namespace Ucms.Api.Extensions;
 
-using Ucms.Application.Features.MeasurementUnits;
-
 using System.Text.Json;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Ucms.Application.Features;
 using Ucms.Api.Middlewares;
+using Ucms.Application.Features;
+using Ucms.Application.Features.MeasurementUnits.MappingProfiles;
+using Ucms.Infrastructure.Persistence;
 
 public static class WebApplicationExtensions
 {
@@ -78,6 +78,19 @@ public static class WebApplicationExtensions
                 Path.Combine(env.WebRootPath, "auth", "login.html"),
                 "text/html"))
             .ExcludeFromDescription();
+
+        app.MigrateDbContext<UcmsDbContext>((context, services) =>
+        {
+            context.Database.Migrate();
+
+            var config = services.GetRequiredService<IConfiguration>();
+            if (config.GetValue<bool>("Database:EnabledDataSeeding"))
+            {
+                new UcmsDbContextSeed()
+                    .SeedAsync(services)
+                    .Wait();
+            }
+        });
 
         return app;
     }

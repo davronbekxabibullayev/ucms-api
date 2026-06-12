@@ -2,14 +2,16 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.Suppliers;
+using Ucms.Application.Features.Suppliers.Commands;
+using Ucms.Application.Features.Suppliers.DTOs;
+using Ucms.Application.Features.Suppliers.Queries;
 
 [Route("api/suppliers")]
 [ApiController]
 [Authorize]
 public class SupplierController(
-    GetSuppliers.Handler getAll,
     GetFilteredSuppliers.Handler getFiltered,
     GetSupplierById.Handler getById,
     FindSupplierByCode.Handler findByCode,
@@ -18,16 +20,13 @@ public class SupplierController(
     DeleteSupplier.Handler delete,
     DeleteSuppliers.Handler deleteRange) : ControllerBase
 {
-    [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<SupplierModel>), 200)]
-    public async Task<IActionResult> GetSuppliers([FromQuery] string? query,
-        [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
-        => Ok(await getAll.HandleAsync(new(query, page, size), ct));
-
+   
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<SupplierModel>), 200)]
     public async Task<IActionResult> SearchSuppliers([FromBody] PagedRequest filter, CancellationToken ct = default)
-        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+        {
+            return Ok(await getFiltered.HandleAsync(new(filter), ct));
+        }
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(SupplierModel), 200)]
@@ -39,7 +38,9 @@ public class SupplierController(
 
     [HttpGet("code/{code}")]
     public async Task<IActionResult> FindByCode(string code, CancellationToken ct = default)
-        => Ok(await findByCode.HandleAsync(new(code), ct));
+        {
+            return Ok(await findByCode.HandleAsync(new(code), ct));
+        }
 
     public record CreateSupplierRequest(string Name, string NameRu, string? NameEn, string? NameKa, string Code);
 

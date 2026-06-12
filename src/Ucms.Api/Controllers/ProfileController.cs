@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Profile;
+using Ucms.Application.Features.Profile.Commands;
+using Ucms.Application.Features.Profile.Queries;
 
 /// <summary>
 /// Joriy foydalanuvchi profilini boshqarish.

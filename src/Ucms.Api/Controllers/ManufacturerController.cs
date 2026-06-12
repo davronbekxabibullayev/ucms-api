@@ -2,8 +2,11 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.Manufacturers;
+using Ucms.Application.Features.Manufacturers.Commands;
+using Ucms.Application.Features.Manufacturers.DTOs;
+using Ucms.Application.Features.Manufacturers.Queries;
 
 /// <summary>
 /// Ishlab chiqaruvchilarni boshqarish.
@@ -32,7 +35,9 @@ public class ManufacturerController(
     [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), 200)]
     public async Task<IActionResult> GetManufacturers([FromQuery] string? query,
         [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
-        => Ok(await getAll.HandleAsync(new(query, page, size), ct));
+        {
+            return Ok(await getAll.HandleAsync(new(query, page, size), ct));
+        }
 
     /// <summary>
     /// Ombordagi SKU bo'yicha ishlab chiqaruvchilar.
@@ -43,7 +48,9 @@ public class ManufacturerController(
     public async Task<IActionResult> GetStockSkuManufacturers([FromQuery] string? query,
         [FromQuery] Guid? organizationId, [FromQuery] Guid? stockId, [FromQuery] Guid? productId,
         [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
-        => Ok(await getStockSku.HandleAsync(new(query, organizationId, stockId, productId, page, size), ct));
+        {
+            return Ok(await getStockSku.HandleAsync(new(query, organizationId, stockId, productId, page, size), ct));
+        }
 
     /// <summary>
     /// Filtrланган jadval ro'yxati.
@@ -52,7 +59,9 @@ public class ManufacturerController(
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), 200)]
     public async Task<IActionResult> SearchManufacturers([FromBody] PagedRequest filter, CancellationToken ct = default)
-        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+        {
+            return Ok(await getFiltered.HandleAsync(new(filter), ct));
+        }
 
     /// <summary>
     /// ID bo'yicha ishlab chiqaruvchini olish.
@@ -73,7 +82,9 @@ public class ManufacturerController(
     /// </summary>
     [HttpGet("code/{code}")]
     public async Task<IActionResult> FindByCode(string code, CancellationToken ct = default)
-        => Ok(await findByCode.HandleAsync(new(code), ct));
+        {
+            return Ok(await findByCode.HandleAsync(new(code), ct));
+        }
 
     /// <summary>
     /// Nom bo'yicha ishlab chiqaruvchini qidirish.
@@ -81,7 +92,9 @@ public class ManufacturerController(
     /// </summary>
     [HttpGet("name/{name}")]
     public async Task<IActionResult> FindByName(string name, CancellationToken ct = default)
-        => Ok(await findByName.HandleAsync(new(name), ct));
+        {
+            return Ok(await findByName.HandleAsync(new(name), ct));
+        }
 
     public record CreateManufacturerRequest(string Name, string NameRu, string? NameEn, string? NameKa, string? Code);
 

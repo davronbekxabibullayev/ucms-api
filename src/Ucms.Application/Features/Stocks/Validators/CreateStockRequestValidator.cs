@@ -1,6 +1,7 @@
-namespace Ucms.Application.Features.Stocks;
+namespace Ucms.Application.Features.Stocks.Validators;
 
 using FluentValidation;
+using Ucms.Application.Features.Stocks.Commands;
 
 public class CreateStockRequestValidator : AbstractValidator<CreateStock.Command>
 {

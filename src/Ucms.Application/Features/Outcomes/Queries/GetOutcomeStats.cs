@@ -1,10 +1,10 @@
-namespace Ucms.Application.Features.Outcomes;
-
-using Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Outcomes.Queries;
 
 using AutoMapper;
 using Ucms.Application.Abstractions.Organization;
 using Ucms.Application.Persistence;
+using Ucms.Application.Features.Skus.DTOs;
+using Ucms.Application.Features.Outcomes.DTOs;
 
 public static class GetOutcomeStats
 {

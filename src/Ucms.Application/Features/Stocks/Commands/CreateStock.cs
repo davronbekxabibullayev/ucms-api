@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Stocks;
+namespace Ucms.Application.Features.Stocks.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.Commands;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

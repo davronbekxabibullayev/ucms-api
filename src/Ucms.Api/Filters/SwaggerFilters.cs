@@ -1,4 +1,4 @@
-namespace Ucms.Core.Filters;
+namespace Ucms.Api.Filters;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;

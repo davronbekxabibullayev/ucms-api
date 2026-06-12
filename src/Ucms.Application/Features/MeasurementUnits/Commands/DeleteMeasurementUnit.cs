@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.MeasurementUnits;
+namespace Ucms.Application.Features.MeasurementUnits.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

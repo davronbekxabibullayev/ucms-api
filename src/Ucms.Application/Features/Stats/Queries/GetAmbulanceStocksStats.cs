@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Stats;
+namespace Ucms.Application.Features.Stats.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

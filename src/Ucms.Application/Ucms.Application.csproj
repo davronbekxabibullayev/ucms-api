@@ -4,11 +4,6 @@
     <RootNamespace>Ucms.Application</RootNamespace>
   </PropertyGroup>
 
-  <!-- TODO: Delete Handlers\ folder then remove this ItemGroup -->
-  <ItemGroup>
-    <Compile Remove="Handlers\**\*.cs" />
-  </ItemGroup>
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="AutoMapper" />

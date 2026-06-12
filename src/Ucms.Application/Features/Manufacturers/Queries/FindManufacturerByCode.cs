@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Manufacturers;
+namespace Ucms.Application.Features.Manufacturers.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.Manufacturers.DTOs;
 using Ucms.Application.Persistence;
 
 public static class FindManufacturerByCode

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Reports;
+namespace Ucms.Application.Features.Reports.DTOs;
 
 using Ucms.Domain.Enums;
 

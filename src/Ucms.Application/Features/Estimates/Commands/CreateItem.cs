@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Estimates;
+namespace Ucms.Application.Features.Estimates.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
@@ -9,7 +9,7 @@ public static class CreateItem
 {
     public record Command(
         Guid ProjectId, Guid SectionId,
-        string Name, string Unit, decimal Volume,
+        string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
     public record Result(Guid Id, string Name);
@@ -32,16 +32,22 @@ public static class CreateItem
             if (!sectionExists)
                 return (null, false, "Bo'lim ushbu loyihaga tegishli emas");
 
+            var unitExists = await db.MeasurementUnits
+                .AnyAsync(u => u.Id == cmd.MeasurementUnitId && !u.IsDeleted, ct);
+
+            if (!unitExists)
+                return (null, false, "O'lchov birligi topilmadi");
+
             var item = new EstimateItem
             {
-                Id               = Guid.NewGuid(),
-                SectionId        = cmd.SectionId,
-                Name             = cmd.Name,
-                Unit             = cmd.Unit,
-                Volume           = cmd.Volume,
-                ClientUnitPrice  = cmd.ClientUnitPrice,
-                BrigadeUnitPrice = cmd.BrigadeUnitPrice,
-                Order            = cmd.Order,
+                Id                = Guid.NewGuid(),
+                SectionId         = cmd.SectionId,
+                Name              = cmd.Name,
+                MeasurementUnitId = cmd.MeasurementUnitId,
+                Volume            = cmd.Volume,
+                ClientUnitPrice   = cmd.ClientUnitPrice,
+                BrigadeUnitPrice  = cmd.BrigadeUnitPrice,
+                Order             = cmd.Order,
             };
 
             await db.EstimateItems.AddAsync(item, ct);

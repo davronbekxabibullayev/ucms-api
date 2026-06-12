@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Estimates;
+namespace Ucms.Application.Features.Estimates.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
@@ -8,7 +8,7 @@ public static class UpdateItem
 {
     public record Command(
         Guid ProjectId, Guid ItemId,
-        string Name, string Unit, decimal Volume,
+        string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
@@ -29,12 +29,12 @@ public static class UpdateItem
 
             if (item is null) return (true, false);
 
-            item.Name             = cmd.Name;
-            item.Unit             = cmd.Unit;
-            item.Volume           = cmd.Volume;
-            item.ClientUnitPrice  = cmd.ClientUnitPrice;
-            item.BrigadeUnitPrice = cmd.BrigadeUnitPrice;
-            item.Order            = cmd.Order;
+            item.Name              = cmd.Name;
+            item.MeasurementUnitId = cmd.MeasurementUnitId;
+            item.Volume            = cmd.Volume;
+            item.ClientUnitPrice   = cmd.ClientUnitPrice;
+            item.BrigadeUnitPrice  = cmd.BrigadeUnitPrice;
+            item.Order             = cmd.Order;
 
             db.EstimateItems.Update(item);
             await db.SaveChangesAsync(ct);

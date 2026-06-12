@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +8,7 @@ using QueryForge.Models;
 using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Authorization;
 using Ucms.Application.Abstractions.Constants;
+using Ucms.Application.Features.StockDemands.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 using Ucms.Domain.Enums;

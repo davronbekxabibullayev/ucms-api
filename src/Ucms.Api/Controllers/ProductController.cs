@@ -2,8 +2,11 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.Products;
+using Ucms.Application.Features.Products.Commands;
+using Ucms.Application.Features.Products.DTOs;
+using Ucms.Application.Features.Products.Queries;
 using Ucms.Domain.Enums;
 
 [Route("api/products")]
@@ -24,12 +27,16 @@ public class ProductController(
     [ProducesResponseType(typeof(PagedResult<ProductModel>), 200)]
     public async Task<IActionResult> GetProducts([FromQuery] string? query, [FromQuery] List<ProductType>? type,
         [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
-        => Ok(await getProducts.HandleAsync(new(query, type, page, size), ct));
+        {
+            return Ok(await getProducts.HandleAsync(new(query, type, page, size), ct));
+        }
 
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<ProductModel>), 200)]
     public async Task<IActionResult> SearchProducts([FromBody] PagedRequest filter, CancellationToken ct = default)
-        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+        {
+            return Ok(await getFiltered.HandleAsync(new(filter), ct));
+        }
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ProductModel), 200)]
@@ -42,12 +49,16 @@ public class ProductController(
     [HttpGet("code/{code}")]
     [ProducesResponseType(typeof(ProductModel), 200)]
     public async Task<IActionResult> GetProductByCode(string code, CancellationToken ct = default)
-        => Ok(await findByCode.HandleAsync(new(code), ct));
+        {
+            return Ok(await findByCode.HandleAsync(new(code), ct));
+        }
 
     [HttpGet("name/{name}")]
     [ProducesResponseType(typeof(ProductModel), 200)]
     public async Task<IActionResult> GetProductByName(string name, CancellationToken ct = default)
-        => Ok(await findByName.HandleAsync(new(name), ct));
+        {
+            return Ok(await findByName.HandleAsync(new(name), ct));
+        }
 
     public record CreateProductRequest(string Name, string NameRu, string? NameEn, string? NameKa,
         string? Code, string? InternationalCode, string? InternationalName, string? AlternativeName, ProductType Type);

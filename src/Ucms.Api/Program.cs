@@ -1,42 +1,21 @@
-using Microsoft.EntityFrameworkCore;
 using Ucms.Api.Extensions;
-using Ucms.Infrastructure.Persistence;
 
-Console.Title = "UCMS STOCK API";
-
+Console.Title = "UCMS API";
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.ConfigureAppConfiguration(SetupConfiguration());
+var env = builder.Environment;
+
+builder.Configuration
+    .SetBasePath(env.ContentRootPath)
+    .AddJsonFile("appsettings.json", true, true)
+    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
+    .AddEnvironmentVariables();
+
 builder.Host.UseApplicationSerilog();
 
 var app = builder
     .ConfigureServices()
     .ConfigurePipeline();
 
-app.MigrateDbContext<UcmsDbContext>((context, services) =>
-{
-    context.Database.Migrate();
-
-    var config = services.GetRequiredService<IConfiguration>();
-    if (config.GetValue<bool>("Database:EnabledDataSeeding"))
-    {
-        new UcmsDbContextSeed()
-            .SeedAsync(services)
-            .Wait();
-    }
-});
 app.Run();
-
-static Action<HostBuilderContext, IConfigurationBuilder> SetupConfiguration()
-{
-    return (hostingContext, config) =>
-    {
-        var env = hostingContext.HostingEnvironment;
-        config
-            .SetBasePath(env.ContentRootPath)
-            .AddJsonFile("appsettings.json", true, true)
-            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
-            .AddEnvironmentVariables();
-    };
-}

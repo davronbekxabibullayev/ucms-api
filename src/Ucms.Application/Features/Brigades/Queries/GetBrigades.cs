@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Brigades;
+namespace Ucms.Application.Features.Brigades.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

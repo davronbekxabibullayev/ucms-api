@@ -1,8 +1,7 @@
 namespace Ucms.Application.Services;
 
-using Ucms.Application.Features.Reports;
-
 using ClosedXML.Excel;
+using Ucms.Application.Features.Reports.DTOs;
 
 public class ProductBalanceReportService : IProductBalanceReportService
 {

@@ -1,6 +1,7 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.MappingProfiles;
 
 using AutoMapper;
+using Ucms.Application.Features.StockDemands.DTOs;
 using Ucms.Domain.Entities;
 
 public class StockDemandItemProfile : Profile

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Skus.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +6,7 @@ using QueryForge.Abstractions;
 using QueryForge.Extensions;
 using QueryForge.Models;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Skus.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 

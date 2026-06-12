@@ -2,7 +2,9 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.WorkLogs;
+using Ucms.Application.Features.WorkLogs.Commands;
+using Ucms.Application.Features.WorkLogs.DTOs;
+using Ucms.Application.Features.WorkLogs.Queries;
 using Ucms.Domain.Enums;
 
 /// <summary>
@@ -39,7 +41,7 @@ public class WorkLogController(
     /// Список журналов работ проекта (с фильтром и пагинацией).
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(WorkLogPagedResult), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetAll(
         Guid projectId,
@@ -63,7 +65,7 @@ public class WorkLogController(
     /// Получить журнал работ по ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(WorkLogDetailDto), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid projectId, Guid id, CancellationToken ct)
     {

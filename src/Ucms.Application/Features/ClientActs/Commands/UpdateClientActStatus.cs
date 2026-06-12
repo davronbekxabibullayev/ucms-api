@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.ClientActs;
+namespace Ucms.Application.Features.ClientActs.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

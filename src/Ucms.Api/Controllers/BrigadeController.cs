@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Brigades;
+using Ucms.Application.Features.Brigades.Commands;
+using Ucms.Application.Features.Brigades.Queries;
 
 /// <summary>
 /// Brigadalarni boshqarish.
@@ -30,7 +31,9 @@ public class BrigadeController(
     [HttpGet]
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetAll([FromQuery] bool? isActive, CancellationToken ct)
-        => Ok(await getAll.HandleAsync(new(isActive), ct));
+    {
+        return Ok(await getAll.HandleAsync(new(isActive), ct));
+    }
 
     /// <summary>
     /// ID bo'yicha brigadani olish.
@@ -62,8 +65,8 @@ public class BrigadeController(
     }
 
     /// <summary>
-    /// Brigada ma'lumotlarini yangilash. Admin yoki Manager uchun.
-    /// Обновить данные бригады. Для Admin или Manager.
+    /// Brigadani yangilash. Admin yoki Manager uchun.
+    /// Обновить бригаду. Для Admin или Manager.
     /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
@@ -71,8 +74,7 @@ public class BrigadeController(
     [ProducesResponseType(404)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateBrigadeRequest req, CancellationToken ct)
     {
-        var (notFound, forbidden) = await update.HandleAsync(
-            new(id, req.Name, req.ForemanName, req.Phone, req.IsActive), ct);
+        var (notFound, forbidden) = await update.HandleAsync(new(id, req.Name, req.ForemanName, req.Phone, req.IsActive), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
         return NoContent();

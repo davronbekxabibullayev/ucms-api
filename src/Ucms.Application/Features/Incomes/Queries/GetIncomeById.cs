@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.Incomes.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetIncomeById

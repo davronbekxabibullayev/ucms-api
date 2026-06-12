@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Incomes.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Application.Services;
 using Ucms.Domain.Entities;

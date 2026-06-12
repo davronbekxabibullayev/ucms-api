@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Payments;
+using Ucms.Application.Features.Payments.Commands;
+using Ucms.Application.Features.Payments.Queries;
 using Ucms.Domain.Enums;
 
 /// <summary>

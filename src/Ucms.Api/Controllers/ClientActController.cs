@@ -2,7 +2,9 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.ClientActs;
+using Ucms.Application.Features.ClientActs.Commands;
+using Ucms.Application.Features.ClientActs.DTOs;
+using Ucms.Application.Features.ClientActs.Queries;
 using Ucms.Domain.Enums;
 
 /// <summary>
@@ -49,7 +51,7 @@ public class ClientActController(
     /// Получить акт по ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(ClientActDetailDto), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid projectId, Guid id, CancellationToken ct)
     {

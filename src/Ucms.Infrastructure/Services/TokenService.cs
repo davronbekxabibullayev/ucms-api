@@ -14,8 +14,8 @@ public class TokenService(IConfiguration config) : ITokenService
     private readonly string _key       = config["Jwt:Key"]      ?? throw new InvalidOperationException("Jwt:Key mavjud emas");
     private readonly string _issuer    = config["Jwt:Issuer"]   ?? "ucms-api";
     private readonly string _audience  = config["Jwt:Audience"] ?? "ucms-clients";
-    private readonly int    _accessMin = int.Parse(config["Jwt:AccessTokenExpirationMinutes"] ?? "60");
-    private readonly int    _refreshDays = int.Parse(config["Jwt:RefreshTokenExpirationDays"] ?? "7");
+    private readonly int    _accessMin = int.TryParse(config["Jwt:AccessTokenExpirationMinutes"] ?? "60", out var accessMin) ? accessMin : 60;
+    private readonly int    _refreshDays = int.TryParse(config["Jwt:RefreshTokenExpirationDays"] ?? "7", out var refreshDays) ? refreshDays : 7;
 
     public string GenerateAccessToken(User user, IList<string> roles, string? orgType = null)
     {
@@ -91,6 +91,13 @@ public class TokenService(IConfiguration config) : ITokenService
         }
     }
 
-    public DateTimeOffset GetAccessTokenExpiry()  => DateTimeOffset.UtcNow.AddMinutes(_accessMin);
-    public DateTimeOffset GetRefreshTokenExpiry() => DateTimeOffset.UtcNow.AddDays(_refreshDays);
+    public DateTimeOffset GetAccessTokenExpiry()
+    {
+        return DateTimeOffset.UtcNow.AddMinutes(_accessMin);
+    }
+
+    public DateTimeOffset GetRefreshTokenExpiry()
+    {
+        return DateTimeOffset.UtcNow.AddDays(_refreshDays);
+    }
 }

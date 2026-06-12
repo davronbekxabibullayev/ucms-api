@@ -2,9 +2,12 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
 using Ucms.Application.Abstractions.Storage;
-using Ucms.Application.Features.Outcomes;
+using Ucms.Application.Features.Outcomes.Commands;
+using Ucms.Application.Features.Outcomes.DTOs;
+using Ucms.Application.Features.Outcomes.Queries;
 using Ucms.Domain.Enums;
 
 /// <summary>
@@ -15,7 +18,6 @@ using Ucms.Domain.Enums;
 [ApiController]
 [Authorize]
 public class OutcomeController(
-    GetOutcomes.Handler getOutcomes,
     GetOutcomeById.Handler getById,
     GetOutcomeByExecutionId.Handler getByExecutionId,
     FindOutcome.Handler findOutcome,
@@ -26,8 +28,7 @@ public class OutcomeController(
     UpdateOutcome.Handler update,
     UpdateOutcomeStatus.Handler updateStatus,
     DeleteOutcome.Handler delete,
-    UploadOutcomeFile.Handler uploadFile,
-    IFileStorageClient storageClient) : ControllerBase
+    UploadOutcomeFile.Handler uploadFile) : ControllerBase
 {
     public record GetOutcomesRequest(PagedRequest Filter, Guid? StockId, string? Query, DateTime? From, DateTime? To);
     public record GetOutcomeStatsRequest(Guid OrganizationId, DateTime From, DateTime To, DateTime PreviousFrom, DateTime PreviousTo);
@@ -66,25 +67,15 @@ public class OutcomeController(
     }
 
     /// <summary>
-    /// Barcha chiqimlar ro'yxati (sahifalash bilan).
-    /// Список всех расходов (с пагинацией).
-    /// </summary>
-    [HttpGet]
-    [ProducesResponseType(typeof(OutcomeModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOutcomes(
-        [FromQuery] int page = 1,
-        [FromQuery] int size = 20,
-        CancellationToken ct = default)
-        => Ok(await getOutcomes.HandleAsync(new(page, size), ct));
-
-    /// <summary>
-    /// Filtrланган chiqimlar jadval ro'yxati.
+    /// Filtrlangan chiqimlar jadval ro'yxati.
     /// Фильтрованный табличный список расходов.
     /// </summary>
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<OutcomeModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetFilteredOutcomes([FromBody] GetOutcomesRequest request, CancellationToken ct)
-        => Ok(await getFiltered.HandleAsync(new(request.Filter, request.StockId, request.Query, request.From, request.To), ct));
+    {
+        return Ok(await getFiltered.HandleAsync(new(request.Filter, request.StockId, request.Query, request.From, request.To), ct));
+    }
 
     /// <summary>
     /// Nom bo'yicha chiqimni qidirish.
@@ -93,7 +84,9 @@ public class OutcomeController(
     [HttpGet("name")]
     [ProducesResponseType(typeof(OutcomeModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetOutcomeByName([FromQuery] string name, CancellationToken ct)
-        => Ok(await findOutcome.HandleAsync(new(name), ct));
+    {
+        return Ok(await findOutcome.HandleAsync(new(name), ct));
+    }
 
     /// <summary>
     /// Matn bo'yicha chiqimlarni qidirish.
@@ -102,7 +95,9 @@ public class OutcomeController(
     [HttpGet("search/{query}")]
     [ProducesResponseType(typeof(OutcomeModel[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchOutcomes(string query, CancellationToken ct)
-        => Ok(await findOutcomes.HandleAsync(new(query), ct));
+    {
+        return Ok(await findOutcomes.HandleAsync(new(query), ct));
+    }
 
     /// <summary>
     /// Yangi chiqim yaratish.
@@ -140,23 +135,14 @@ public class OutcomeController(
     [HttpPut("update-status")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> UpdateOutcomeStatus([FromBody] UpdateOutcomeStatusRequest request, CancellationToken ct)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateOutcomeStatus([FromBody] UpdateOutcomeStatusRequest req, CancellationToken ct)
     {
-        var (notFound, error) = await updateStatus.HandleAsync(new(request.Id, request.Status), ct);
-        if (notFound) return NotFound();
-        if (error is not null) return Conflict(error);
+        var (notFound, error) = await updateStatus.HandleAsync(new(req.Id, req.Status), ct);
+        if (notFound)          return NotFound();
+        if (error is not null) return BadRequest(new { message = error });
         return NoContent();
     }
-
-    /// <summary>
-    /// Chiqimlar statistikasi.
-    /// Статистика расходов.
-    /// </summary>
-    [HttpGet("stats")]
-    [ProducesResponseType(typeof(OutcomeStatsModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOutcomeStats([FromQuery] GetOutcomeStatsRequest request, CancellationToken ct)
-        => Ok(await getStats.HandleAsync(new(request.OrganizationId, request.From, request.To, request.PreviousFrom, request.PreviousTo), ct));
 
     /// <summary>
     /// Chiqimni o'chirish.
@@ -167,13 +153,25 @@ public class OutcomeController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteOutcome(Guid id, CancellationToken ct)
     {
-        var found = await delete.HandleAsync(new(id), ct);
-        return found ? NoContent() : NotFound();
+        var ok = await delete.HandleAsync(new(id), ct);
+        return ok ? NoContent() : NotFound();
     }
 
     /// <summary>
-    /// Chiqimga fayl yuklash (maks. 10 MB).
-    /// Загрузить файл к расходу (макс. 10 МБ).
+    /// Chiqim statistikasi.
+    /// Статистика расходов.
+    /// </summary>
+    [HttpPost("stats")]
+    [ProducesResponseType(typeof(OutcomeStatsModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetStats([FromBody] GetOutcomeStatsRequest req, CancellationToken ct)
+    {
+        return Ok(await getStats.HandleAsync(
+            new(req.OrganizationId, req.From, req.To, req.PreviousFrom, req.PreviousTo), ct));
+    }
+
+    /// <summary>
+    /// Chiqimga fayl yuklash (maks. 10 MB, faqat PDF).
+    /// Загрузить файл к расходу (макс. 10 МБ, только PDF).
     /// </summary>
     [HttpPost("upload/{id:guid}")]
     [RequestSizeLimit(10L * 1024L * 1024L)]
@@ -183,16 +181,7 @@ public class OutcomeController(
     public async Task<IActionResult> Upload(Guid id, IFormFile file, CancellationToken ct)
     {
         var (result, error) = await uploadFile.HandleAsync(new(id, file), ct);
-        if (error is not null) return BadRequest(error);
-        return Ok(result);
+        return error is not null ? BadRequest(new { message = error }) : Ok(result);
     }
 
-    /// <summary>
-    /// Chiqimga biriktirilgan faylni yuklab olish. Hozircha amalga oshirilmagan.
-    /// Скачать прикреплённый файл расхода. Пока не реализовано.
-    /// </summary>
-    [HttpGet("download/{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status501NotImplemented)]
-    public IActionResult Download(Guid id, [FromQuery] string path)
-        => StatusCode(501, new { message = "Fayl yuklab olish hozircha amalga oshirilmagan. / Скачивание файлов ещё не реализовано." });
 }

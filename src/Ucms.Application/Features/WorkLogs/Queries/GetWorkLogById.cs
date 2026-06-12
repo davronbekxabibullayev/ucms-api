@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.WorkLogs;
+namespace Ucms.Application.Features.WorkLogs.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.WorkLogs.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetWorkLogById
@@ -10,7 +11,7 @@ public static class GetWorkLogById
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
-        public async Task<(object? Data, bool ProjectNotFound, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
+        public async Task<(WorkLogDetailDto? Data, bool ProjectNotFound, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
         {
             var orgId = await db.Projects
                 .Where(p => p.Id == q.ProjectId && !p.IsDeleted)
@@ -22,14 +23,22 @@ public static class GetWorkLogById
 
             var workLog = await db.WorkLogs
                 .Where(w => w.Id == q.Id && w.ProjectId == q.ProjectId)
-                .Select(w => (object)new
-                {
-                    w.Id, w.Date, w.Volume, w.BrigadeUnitPrice, w.TotalAmount,
-                    w.Status, w.Note, w.BrigadePaymentId,
-                    w.CreatedAt, w.UpdatedAt,
-                    Brigade      = new { w.Brigade!.Id, w.Brigade.Name },
-                    EstimateItem = new { w.EstimateItem!.Id, w.EstimateItem.Name, w.EstimateItem.Unit },
-                })
+                .Select(w => new WorkLogDetailDto(
+                    w.Id,
+                    w.Date,
+                    w.Volume,
+                    w.BrigadeUnitPrice,
+                    w.TotalAmount,
+                    w.Status,
+                    w.Note,
+                    w.BrigadePaymentId,
+                    w.CreatedAt,
+                    w.UpdatedAt,
+                    new WorkLogBrigadeDto(w.Brigade!.Id, w.Brigade.Name),
+                    new WorkLogDetailEstimateItemDto(
+                        w.EstimateItem!.Id,
+                        w.EstimateItem.Name,
+                        w.EstimateItem.MeasurementUnit!.Code)))
                 .FirstOrDefaultAsync(ct);
 
             return (workLog, false, false);

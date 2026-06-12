@@ -1,6 +1,4 @@
-namespace Ucms.Application.Features.StockSkus;
-
-using Ucms.Application.Features.MeasurementUnits;
+namespace Ucms.Application.Features.StockSkus.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +10,8 @@ using Ucms.Application.Abstractions.Authorization;
 using Ucms.Application.Abstractions.Constants;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
+using Ucms.Application.Features.StockSkus.DTOs;
+using Ucms.Application.Features.MeasurementUnits.DTOs;
 
 public static class GetStockSkus
 {

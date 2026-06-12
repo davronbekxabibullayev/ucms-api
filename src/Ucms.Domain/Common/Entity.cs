@@ -15,6 +15,13 @@ public abstract class Entity : IEntity
     [System.Text.Json.Serialization.JsonIgnore]
     public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    public void AddDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
-    public void ClearDomainEvents() => _domainEvents.Clear();
+    public void AddDomainEvent(IDomainEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+    }
+
+    public void ClearDomainEvents()
+    {
+        _domainEvents.Clear();
+    }
 }

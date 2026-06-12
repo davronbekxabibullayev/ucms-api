@@ -1,6 +1,7 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.Validators;
 
 using FluentValidation;
+using Ucms.Application.Features.StockDemands.Commands;
 
 public class UpdateStockDemandRequestValidator : AbstractValidator<UpdateStockDemand.Command>
 {

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Estimates;
+namespace Ucms.Application.Features.Estimates.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

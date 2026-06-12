@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.OrganizationMeasurementUnits;
+namespace Ucms.Application.Features.OrganizationMeasurementUnits.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

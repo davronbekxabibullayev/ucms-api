@@ -1,7 +1,6 @@
-namespace Ucms.Application.Features.OrganizationMeasurementUnits;
+namespace Ucms.Application.Features.OrganizationMeasurementUnits.DTOs;
 
-using Ucms.Application.Features.MeasurementUnits;
-
+using Ucms.Application.Features.MeasurementUnits.DTOs;
 using Ucms.Domain.Enums;
 
 public record OrganizationMeasurementUnitModel

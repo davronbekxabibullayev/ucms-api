@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Estimates;
+namespace Ucms.Application.Features.Estimates.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
@@ -25,7 +25,10 @@ public static class GetItems
                 .OrderBy(i => i.Order)
                 .Select(i => (object)new
                 {
-                    i.Id, i.Name, i.Unit, i.Volume,
+                    i.Id, i.Name,
+                    MeasurementUnitId   = i.MeasurementUnitId,
+                    MeasurementUnitCode = i.MeasurementUnit!.Code,
+                    i.Volume,
                     i.ClientUnitPrice, i.BrigadeUnitPrice,
                     ClientTotal  = i.Volume * i.ClientUnitPrice,
                     BrigadeTotal = i.Volume * i.BrigadeUnitPrice,

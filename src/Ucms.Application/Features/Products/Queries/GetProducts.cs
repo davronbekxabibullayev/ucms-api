@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Products;
+namespace Ucms.Application.Features.Products.Queries;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -7,6 +7,7 @@ using QueryForge.Abstractions;
 using QueryForge.Extensions;
 using QueryForge.Models;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Products.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Enums;
 

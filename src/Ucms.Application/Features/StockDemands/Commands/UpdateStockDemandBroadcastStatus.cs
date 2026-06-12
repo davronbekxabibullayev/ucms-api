@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

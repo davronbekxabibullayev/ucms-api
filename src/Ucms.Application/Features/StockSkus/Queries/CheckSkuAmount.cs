@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.StockSkus;
+namespace Ucms.Application.Features.StockSkus.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

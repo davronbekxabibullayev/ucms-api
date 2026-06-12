@@ -2,8 +2,10 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.StockSkus;
+using Ucms.Application.Features.StockSkus.DTOs;
+using Ucms.Application.Features.StockSkus.Queries;
 
 [Route("api/stock-sku")]
 [ApiController]
@@ -23,8 +25,9 @@ public class StockSkuController(
     [HttpPost]
     [ProducesResponseType(typeof(PagedResult<StockSkuModel>), 200)]
     public async Task<IActionResult> GetStockSkus([FromBody] GetStockSkusRequest req, CancellationToken ct = default)
-        => Ok(await getStockSkus.HandleAsync(
-            new(req.OrganizationId, req.Filter, req.StockId, req.MeasurementUnitId, req.ProductId, req.ManufacturerId, req.Seria), ct));
+        {
+            return Ok(await getStockSkus.HandleAsync( new(req.OrganizationId, req.Filter, req.StockId, req.MeasurementUnitId, req.ProductId, req.ManufacturerId, req.Seria), ct));
+        }
 
     public record GetCaseSkusRequest(PagedRequest Filter, Guid OrganizationId, Guid StockId, string? Seria);
 
@@ -41,28 +44,38 @@ public class StockSkuController(
     [HttpPost("inventory")]
     [ProducesResponseType(typeof(PagedResult<StockInventoryModel>), 200)]
     public async Task<IActionResult> GetStockInventory([FromBody] GetStockInventoryRequest req, CancellationToken ct = default)
-        => Ok(await getInventory.HandleAsync(new(req.Filter, req.StockId, req.ProductId, req.OrganizationId), ct));
+        {
+            return Ok(await getInventory.HandleAsync(new(req.Filter, req.StockId, req.ProductId, req.OrganizationId), ct));
+        }
 
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<StockSkuModel>), 200)]
     public async Task<IActionResult> SearchStockSkus([FromBody] PagedRequest filter, CancellationToken ct = default)
-        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+        {
+            return Ok(await getFiltered.HandleAsync(new(filter), ct));
+        }
 
     [HttpGet("check-amount")]
     [ProducesResponseType(typeof(bool), 200)]
     public async Task<IActionResult> CheckAmount(
         [FromQuery] Guid skuId, [FromQuery] Guid stockId,
         [FromQuery] Guid measurementUnitId, [FromQuery] decimal amount, CancellationToken ct = default)
-        => Ok(await checkAmount.HandleAsync(new(skuId, stockId, measurementUnitId, amount), ct));
+        {
+            return Ok(await checkAmount.HandleAsync(new(skuId, stockId, measurementUnitId, amount), ct));
+        }
 
     [HttpGet("product-balance")]
     [ProducesResponseType(typeof(decimal), 200)]
     public async Task<IActionResult> GetProductBalance(
         [FromQuery] Guid stockId, [FromQuery] Guid productId, [FromQuery] Guid measurementUnitId, CancellationToken ct = default)
-        => Ok(await getBalance.HandleAsync(new(stockId, productId, measurementUnitId), ct));
+        {
+            return Ok(await getBalance.HandleAsync(new(stockId, productId, measurementUnitId), ct));
+        }
 
     [HttpGet("stats/{organizationId:guid}")]
     [ProducesResponseType(typeof(StockSkuStatModel), 200)]
     public async Task<IActionResult> GetStats(Guid organizationId, CancellationToken ct = default)
-        => Ok(await getStats.HandleAsync(new(organizationId), ct));
+        {
+            return Ok(await getStats.HandleAsync(new(organizationId), ct));
+        }
 }

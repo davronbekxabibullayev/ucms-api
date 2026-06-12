@@ -1,6 +1,7 @@
-namespace Ucms.Application.Features.Products;
+namespace Ucms.Application.Features.Products.Validators;
 
 using FluentValidation;
+using Ucms.Application.Features.Products.Commands;
 
 public class UpdateProductRequestValidator : AbstractValidator<UpdateProduct.Command>
 {

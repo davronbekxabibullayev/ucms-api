@@ -18,9 +18,11 @@ public class EstimateItem : Entity
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// O'lchov birligi (m², m³, dona, m.p.)
+    /// O'lchov birligi ID (MeasurementUnit ga FK)
     /// </summary>
-    public string Unit { get; set; } = default!;
+    public Guid MeasurementUnitId { get; set; }
+
+    public virtual MeasurementUnit? MeasurementUnit { get; set; }
 
     /// <summary>
     /// Smeta bo'yicha umumiy hajm (zakazchik bilan kelishilgan)

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.MeasurementUnits;
+namespace Ucms.Application.Features.MeasurementUnits.DTOs;
 
 using Ucms.Domain.Enums;
 

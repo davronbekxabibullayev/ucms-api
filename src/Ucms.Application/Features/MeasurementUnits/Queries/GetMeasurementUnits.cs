@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.MeasurementUnits;
+namespace Ucms.Application.Features.MeasurementUnits.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.MeasurementUnits.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Enums;
 

@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Skus.MappingProfiles;
 
 using AutoMapper;
 using Ucms.Domain.Enums;
 using Ucms.Domain.Entities;
+using Ucms.Application.Features.Skus.DTOs;
 
 public class SkuProfile : Profile
 {

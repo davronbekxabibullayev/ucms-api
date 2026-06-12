@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Dashboard;
+namespace Ucms.Application.Features.Dashboard.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Manufacturers;
+namespace Ucms.Application.Features.Manufacturers.DTOs;
 
 public record ManufacturerModel(Guid Id,
                                 string Name,

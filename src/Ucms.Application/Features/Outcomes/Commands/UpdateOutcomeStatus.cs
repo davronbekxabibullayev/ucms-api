@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Users;
+namespace Ucms.Application.Features.Users.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

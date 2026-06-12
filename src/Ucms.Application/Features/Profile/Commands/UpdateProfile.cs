@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Profile;
+namespace Ucms.Application.Features.Profile.Commands;
 
 using Microsoft.AspNetCore.Identity;
 using Ucms.Application.Abstractions;

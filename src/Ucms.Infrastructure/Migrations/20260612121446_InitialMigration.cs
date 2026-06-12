@@ -16,7 +16,7 @@ namespace Ucms.Infrastructure.Migrations
                 name: "Identity");
 
             migrationBuilder.CreateTable(
-                name: "Manufacturer",
+                name: "Manufacturers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -29,7 +29,7 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Manufacturer", x => x.Id);
+                    table.PrimaryKey("PK_Manufacturers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,6 +62,7 @@ namespace Ucms.Infrastructure.Migrations
                     Address = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
                     Phone = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    IsTest = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -74,7 +75,7 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -91,7 +92,7 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,7 +112,7 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Stock",
+                name: "Stocks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -130,16 +131,16 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stock", x => x.Id);
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Stock_Stock_ParentId",
+                        name: "FK_Stocks_Stocks_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Supplier",
+                name: "Suppliers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -152,7 +153,7 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Supplier", x => x.Id);
+                    table.PrimaryKey("PK_Suppliers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,7 +190,7 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrganizationMeasurementUnit",
+                name: "OrganizationMeasurementUnits",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -200,9 +201,9 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrganizationMeasurementUnit", x => x.Id);
+                    table.PrimaryKey("PK_OrganizationMeasurementUnits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrganizationMeasurementUnit_MeasurementUnits_MeasurementUni~",
+                        name: "FK_OrganizationMeasurementUnits_MeasurementUnits_MeasurementUn~",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id",
@@ -291,7 +292,7 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Income",
+                name: "Incomes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -310,17 +311,17 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Income", x => x.Id);
+                    table.PrimaryKey("PK_Incomes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Income_Stock_StockId",
+                        name: "FK_Incomes_Stocks_StockId",
                         column: x => x.StockId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Outcome",
+                name: "Outcomes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -340,17 +341,17 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Outcome", x => x.Id);
+                    table.PrimaryKey("PK_Outcomes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Outcome_Stock_StockId",
+                        name: "FK_Outcomes_Stocks_StockId",
                         column: x => x.StockId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sku",
+                name: "Skus",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -371,33 +372,34 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sku", x => x.Id);
+                    table.PrimaryKey("PK_Skus", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sku_Manufacturer_ManufacturerId",
+                        name: "FK_Skus_Manufacturers_ManufacturerId",
                         column: x => x.ManufacturerId,
-                        principalTable: "Manufacturer",
+                        principalTable: "Manufacturers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Sku_MeasurementUnits_MeasurementUnitId",
+                        name: "FK_Skus_MeasurementUnits_MeasurementUnitId",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Sku_Product_ProductId",
+                        name: "FK_Skus_Products_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Sku_Supplier_SupplierId",
+                        name: "FK_Skus_Suppliers_SupplierId",
                         column: x => x.SupplierId,
-                        principalTable: "Supplier",
+                        principalTable: "Suppliers",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "RefreshTokens",
+                schema: "Identity",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -595,7 +597,7 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IncomeOutcome",
+                name: "IncomeOutcomes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -608,33 +610,33 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IncomeOutcome", x => x.Id);
+                    table.PrimaryKey("PK_IncomeOutcomes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IncomeOutcome_Income_IncomeId",
+                        name: "FK_IncomeOutcomes_Incomes_IncomeId",
                         column: x => x.IncomeId,
-                        principalTable: "Income",
+                        principalTable: "Incomes",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IncomeOutcome_Outcome_OutcomeId",
+                        name: "FK_IncomeOutcomes_Outcomes_OutcomeId",
                         column: x => x.OutcomeId,
-                        principalTable: "Outcome",
+                        principalTable: "Outcomes",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IncomeOutcome_Stock_IncomeStockId",
+                        name: "FK_IncomeOutcomes_Stocks_IncomeStockId",
                         column: x => x.IncomeStockId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IncomeOutcome_Stock_OutcomeStockId",
+                        name: "FK_IncomeOutcomes_Stocks_OutcomeStockId",
                         column: x => x.OutcomeStockId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "StockDemand",
+                name: "StockDemands",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -652,28 +654,28 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockDemand", x => x.Id);
+                    table.PrimaryKey("PK_StockDemands", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StockDemand_Outcome_OutcomeId",
+                        name: "FK_StockDemands_Outcomes_OutcomeId",
                         column: x => x.OutcomeId,
-                        principalTable: "Outcome",
+                        principalTable: "Outcomes",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_StockDemand_Stock_RecipientId",
+                        name: "FK_StockDemands_Stocks_RecipientId",
                         column: x => x.RecipientId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockDemand_Stock_SenderId",
+                        name: "FK_StockDemands_Stocks_SenderId",
                         column: x => x.SenderId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "IncomeItem",
+                name: "IncomeItems",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -685,28 +687,28 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IncomeItem", x => x.Id);
+                    table.PrimaryKey("PK_IncomeItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IncomeItem_Income_IncomeId",
+                        name: "FK_IncomeItems_Incomes_IncomeId",
                         column: x => x.IncomeId,
-                        principalTable: "Income",
+                        principalTable: "Incomes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IncomeItem_MeasurementUnits_MeasurementUnitId",
+                        name: "FK_IncomeItems_MeasurementUnits_MeasurementUnitId",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IncomeItem_Sku_SkuId",
+                        name: "FK_IncomeItems_Skus_SkuId",
                         column: x => x.SkuId,
-                        principalTable: "Sku",
+                        principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrganizationSku",
+                name: "OrganizationSkus",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -715,17 +717,17 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrganizationSku", x => x.Id);
+                    table.PrimaryKey("PK_OrganizationSkus", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrganizationSku_Sku_SkuId",
+                        name: "FK_OrganizationSkus_Skus_SkuId",
                         column: x => x.SkuId,
-                        principalTable: "Sku",
+                        principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OutcomeItem",
+                name: "OutcomeItems",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -738,28 +740,28 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OutcomeItem", x => x.Id);
+                    table.PrimaryKey("PK_OutcomeItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OutcomeItem_MeasurementUnits_MeasurementUnitId",
+                        name: "FK_OutcomeItems_MeasurementUnits_MeasurementUnitId",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_OutcomeItem_Outcome_OutcomeId",
+                        name: "FK_OutcomeItems_Outcomes_OutcomeId",
                         column: x => x.OutcomeId,
-                        principalTable: "Outcome",
+                        principalTable: "Outcomes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OutcomeItem_Sku_SkuId",
+                        name: "FK_OutcomeItems_Skus_SkuId",
                         column: x => x.SkuId,
-                        principalTable: "Sku",
+                        principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "StockBalanceRegister",
+                name: "StockBalanceRegisters",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -776,35 +778,35 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockBalanceRegister", x => x.Id);
+                    table.PrimaryKey("PK_StockBalanceRegisters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StockBalanceRegister_MeasurementUnits_MeasurementUnitId",
+                        name: "FK_StockBalanceRegisters_MeasurementUnits_MeasurementUnitId",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockBalanceRegister_Product_ProductId",
+                        name: "FK_StockBalanceRegisters_Products_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockBalanceRegister_Sku_SkuId",
+                        name: "FK_StockBalanceRegisters_Skus_SkuId",
                         column: x => x.SkuId,
-                        principalTable: "Sku",
+                        principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockBalanceRegister_Stock_StockId",
+                        name: "FK_StockBalanceRegisters_Stocks_StockId",
                         column: x => x.StockId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "StockSku",
+                name: "StockSkus",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -817,22 +819,22 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockSku", x => x.Id);
+                    table.PrimaryKey("PK_StockSkus", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StockSku_MeasurementUnits_MeasurementUnitId",
+                        name: "FK_StockSkus_MeasurementUnits_MeasurementUnitId",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_StockSku_Sku_SkuId",
+                        name: "FK_StockSkus_Skus_SkuId",
                         column: x => x.SkuId,
-                        principalTable: "Sku",
+                        principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockSku_Stock_StockId",
+                        name: "FK_StockSkus_Stocks_StockId",
                         column: x => x.StockId,
-                        principalTable: "Stock",
+                        principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -876,7 +878,7 @@ namespace Ucms.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     SectionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    Unit = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    MeasurementUnitId = table.Column<Guid>(type: "uuid", nullable: false),
                     Volume = table.Column<decimal>(type: "numeric(18,4)", precision: 18, scale: 4, nullable: false),
                     ClientUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     BrigadeUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
@@ -891,10 +893,16 @@ namespace Ucms.Infrastructure.Migrations
                         principalTable: "EstimateSections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EstimateItems_MeasurementUnits_MeasurementUnitId",
+                        column: x => x.MeasurementUnitId,
+                        principalTable: "MeasurementUnits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "StockDemandItem",
+                name: "StockDemandItems",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -908,23 +916,23 @@ namespace Ucms.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockDemandItem", x => x.Id);
+                    table.PrimaryKey("PK_StockDemandItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StockDemandItem_MeasurementUnits_MeasurementUnitId",
+                        name: "FK_StockDemandItems_MeasurementUnits_MeasurementUnitId",
                         column: x => x.MeasurementUnitId,
                         principalTable: "MeasurementUnits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockDemandItem_Product_ProductId",
+                        name: "FK_StockDemandItems_Products_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockDemandItem_StockDemand_StockDemandId",
+                        name: "FK_StockDemandItems_StockDemands_StockDemandId",
                         column: x => x.StockDemandId,
-                        principalTable: "StockDemand",
+                        principalTable: "StockDemands",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1071,6 +1079,11 @@ namespace Ucms.Infrastructure.Migrations
                 column: "Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EstimateItems_MeasurementUnitId",
+                table: "EstimateItems",
+                column: "MeasurementUnitId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EstimateItems_SectionId",
                 table: "EstimateItems",
                 column: "SectionId");
@@ -1086,65 +1099,65 @@ namespace Ucms.Infrastructure.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Income_Id",
-                table: "Income",
+                name: "IX_IncomeItems_Id",
+                table: "IncomeItems",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Income_StockId",
-                table: "Income",
-                column: "StockId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IncomeItem_Id",
-                table: "IncomeItem",
-                column: "Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IncomeItem_IncomeId",
-                table: "IncomeItem",
+                name: "IX_IncomeItems_IncomeId",
+                table: "IncomeItems",
                 column: "IncomeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeItem_MeasurementUnitId",
-                table: "IncomeItem",
+                name: "IX_IncomeItems_MeasurementUnitId",
+                table: "IncomeItems",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeItem_SkuId",
-                table: "IncomeItem",
+                name: "IX_IncomeItems_SkuId",
+                table: "IncomeItems",
                 column: "SkuId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeOutcome_Id",
-                table: "IncomeOutcome",
+                name: "IX_IncomeOutcomes_Id",
+                table: "IncomeOutcomes",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeOutcome_IncomeId",
-                table: "IncomeOutcome",
+                name: "IX_IncomeOutcomes_IncomeId",
+                table: "IncomeOutcomes",
                 column: "IncomeId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeOutcome_IncomeStockId",
-                table: "IncomeOutcome",
+                name: "IX_IncomeOutcomes_IncomeStockId",
+                table: "IncomeOutcomes",
                 column: "IncomeStockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeOutcome_OutcomeId",
-                table: "IncomeOutcome",
+                name: "IX_IncomeOutcomes_OutcomeId",
+                table: "IncomeOutcomes",
                 column: "OutcomeId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_IncomeOutcome_OutcomeStockId",
-                table: "IncomeOutcome",
+                name: "IX_IncomeOutcomes_OutcomeStockId",
+                table: "IncomeOutcomes",
                 column: "OutcomeStockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Manufacturer_Id",
-                table: "Manufacturer",
+                name: "IX_Incomes_Id",
+                table: "Incomes",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Incomes_StockId",
+                table: "Incomes",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Manufacturers_Id",
+                table: "Manufacturers",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
@@ -1153,13 +1166,13 @@ namespace Ucms.Infrastructure.Migrations
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationMeasurementUnit_Id",
-                table: "OrganizationMeasurementUnit",
+                name: "IX_OrganizationMeasurementUnits_Id",
+                table: "OrganizationMeasurementUnits",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationMeasurementUnit_MeasurementUnitId",
-                table: "OrganizationMeasurementUnit",
+                name: "IX_OrganizationMeasurementUnits_MeasurementUnitId",
+                table: "OrganizationMeasurementUnits",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
@@ -1168,44 +1181,44 @@ namespace Ucms.Infrastructure.Migrations
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationSku_Id",
-                table: "OrganizationSku",
+                name: "IX_OrganizationSkus_Id",
+                table: "OrganizationSkus",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationSku_SkuId",
-                table: "OrganizationSku",
+                name: "IX_OrganizationSkus_SkuId",
+                table: "OrganizationSkus",
                 column: "SkuId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Outcome_Id",
-                table: "Outcome",
+                name: "IX_OutcomeItems_Id",
+                table: "OutcomeItems",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Outcome_StockId",
-                table: "Outcome",
-                column: "StockId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OutcomeItem_Id",
-                table: "OutcomeItem",
-                column: "Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OutcomeItem_MeasurementUnitId",
-                table: "OutcomeItem",
+                name: "IX_OutcomeItems_MeasurementUnitId",
+                table: "OutcomeItems",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeItem_OutcomeId",
-                table: "OutcomeItem",
+                name: "IX_OutcomeItems_OutcomeId",
+                table: "OutcomeItems",
                 column: "OutcomeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OutcomeItem_SkuId",
-                table: "OutcomeItem",
+                name: "IX_OutcomeItems_SkuId",
+                table: "OutcomeItems",
                 column: "SkuId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Outcomes_Id",
+                table: "Outcomes",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Outcomes_StockId",
+                table: "Outcomes",
+                column: "StockId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_Id",
@@ -1219,6 +1232,7 @@ namespace Ucms.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
+                schema: "Identity",
                 table: "RefreshTokens",
                 column: "UserId");
 
@@ -1236,113 +1250,113 @@ namespace Ucms.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sku_ManufacturerId",
-                table: "Sku",
+                name: "IX_Skus_ManufacturerId",
+                table: "Skus",
                 column: "ManufacturerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sku_MeasurementUnitId",
-                table: "Sku",
+                name: "IX_Skus_MeasurementUnitId",
+                table: "Skus",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sku_ProductId",
-                table: "Sku",
+                name: "IX_Skus_ProductId",
+                table: "Skus",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sku_SupplierId",
-                table: "Sku",
+                name: "IX_Skus_SupplierId",
+                table: "Skus",
                 column: "SupplierId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Stock_ParentId",
-                table: "Stock",
-                column: "ParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockBalanceRegister_MeasurementUnitId",
-                table: "StockBalanceRegister",
+                name: "IX_StockBalanceRegisters_MeasurementUnitId",
+                table: "StockBalanceRegisters",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockBalanceRegister_ProductId",
-                table: "StockBalanceRegister",
+                name: "IX_StockBalanceRegisters_ProductId",
+                table: "StockBalanceRegisters",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockBalanceRegister_SkuId",
-                table: "StockBalanceRegister",
+                name: "IX_StockBalanceRegisters_SkuId",
+                table: "StockBalanceRegisters",
                 column: "SkuId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockBalanceRegister_StockId",
-                table: "StockBalanceRegister",
+                name: "IX_StockBalanceRegisters_StockId",
+                table: "StockBalanceRegisters",
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockDemand_Id",
-                table: "StockDemand",
+                name: "IX_StockDemandItems_Id",
+                table: "StockDemandItems",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockDemand_OutcomeId",
-                table: "StockDemand",
-                column: "OutcomeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockDemand_RecipientId",
-                table: "StockDemand",
-                column: "RecipientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockDemand_SenderId",
-                table: "StockDemand",
-                column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockDemandItem_Id",
-                table: "StockDemandItem",
-                column: "Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockDemandItem_MeasurementUnitId",
-                table: "StockDemandItem",
+                name: "IX_StockDemandItems_MeasurementUnitId",
+                table: "StockDemandItems",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockDemandItem_ProductId",
-                table: "StockDemandItem",
+                name: "IX_StockDemandItems_ProductId",
+                table: "StockDemandItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockDemandItem_StockDemandId",
-                table: "StockDemandItem",
+                name: "IX_StockDemandItems_StockDemandId",
+                table: "StockDemandItems",
                 column: "StockDemandId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockSku_Id",
-                table: "StockSku",
+                name: "IX_StockDemands_Id",
+                table: "StockDemands",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockSku_MeasurementUnitId",
-                table: "StockSku",
+                name: "IX_StockDemands_OutcomeId",
+                table: "StockDemands",
+                column: "OutcomeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockDemands_RecipientId",
+                table: "StockDemands",
+                column: "RecipientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockDemands_SenderId",
+                table: "StockDemands",
+                column: "SenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_ParentId",
+                table: "Stocks",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockSkus_Id",
+                table: "StockSkus",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockSkus_MeasurementUnitId",
+                table: "StockSkus",
                 column: "MeasurementUnitId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockSku_SkuId",
-                table: "StockSku",
+                name: "IX_StockSkus_SkuId",
+                table: "StockSkus",
                 column: "SkuId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockSku_StockId",
-                table: "StockSku",
+                name: "IX_StockSkus_StockId",
+                table: "StockSkus",
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Supplier_Id",
-                table: "Supplier",
+                name: "IX_Suppliers_Id",
+                table: "Suppliers",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
@@ -1412,35 +1426,36 @@ namespace Ucms.Infrastructure.Migrations
                 name: "ClientPayments");
 
             migrationBuilder.DropTable(
-                name: "IncomeItem");
+                name: "IncomeItems");
 
             migrationBuilder.DropTable(
-                name: "IncomeOutcome");
+                name: "IncomeOutcomes");
 
             migrationBuilder.DropTable(
-                name: "OrganizationMeasurementUnit");
+                name: "OrganizationMeasurementUnits");
 
             migrationBuilder.DropTable(
-                name: "OrganizationSku");
+                name: "OrganizationSkus");
 
             migrationBuilder.DropTable(
-                name: "OutcomeItem");
+                name: "OutcomeItems");
 
             migrationBuilder.DropTable(
-                name: "RefreshTokens");
+                name: "RefreshTokens",
+                schema: "Identity");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims",
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "StockBalanceRegister");
+                name: "StockBalanceRegisters");
 
             migrationBuilder.DropTable(
-                name: "StockDemandItem");
+                name: "StockDemandItems");
 
             migrationBuilder.DropTable(
-                name: "StockSku");
+                name: "StockSkus");
 
             migrationBuilder.DropTable(
                 name: "UserClaims",
@@ -1465,13 +1480,13 @@ namespace Ucms.Infrastructure.Migrations
                 name: "ClientActs");
 
             migrationBuilder.DropTable(
-                name: "Income");
+                name: "Incomes");
 
             migrationBuilder.DropTable(
-                name: "StockDemand");
+                name: "StockDemands");
 
             migrationBuilder.DropTable(
-                name: "Sku");
+                name: "Skus");
 
             migrationBuilder.DropTable(
                 name: "Roles",
@@ -1488,19 +1503,16 @@ namespace Ucms.Infrastructure.Migrations
                 name: "EstimateItems");
 
             migrationBuilder.DropTable(
-                name: "Outcome");
+                name: "Outcomes");
 
             migrationBuilder.DropTable(
-                name: "Manufacturer");
+                name: "Manufacturers");
 
             migrationBuilder.DropTable(
-                name: "MeasurementUnits");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Product");
-
-            migrationBuilder.DropTable(
-                name: "Supplier");
+                name: "Suppliers");
 
             migrationBuilder.DropTable(
                 name: "Brigades");
@@ -1509,7 +1521,10 @@ namespace Ucms.Infrastructure.Migrations
                 name: "EstimateSections");
 
             migrationBuilder.DropTable(
-                name: "Stock");
+                name: "MeasurementUnits");
+
+            migrationBuilder.DropTable(
+                name: "Stocks");
 
             migrationBuilder.DropTable(
                 name: "Projects");

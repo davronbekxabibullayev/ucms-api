@@ -125,6 +125,11 @@ Swagger UI: `https://localhost:{PORT}/swagger`
 /// </summary>
 ```
 
+### Method Style
+
+- Always use **block-bodied methods** (`{ }`).
+- Do not use **expression-bodied methods** (`=>`) for method declarations.
+
 ---
 ## ✍️ Author
 

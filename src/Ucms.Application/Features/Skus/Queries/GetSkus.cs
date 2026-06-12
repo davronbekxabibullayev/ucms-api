@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.Skus;
+namespace Ucms.Application.Features.Skus.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Skus.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetSkus

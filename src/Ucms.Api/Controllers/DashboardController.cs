@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Dashboard;
+using Ucms.Application.Features.Dashboard.DTOs;
+using Ucms.Application.Features.Dashboard.Queries;
 
 /// <summary>
 /// Bosh sahifa statistikasi va loyiha tafsilotlari.
@@ -13,7 +14,7 @@ using Ucms.Application.Features.Dashboard;
 [Tags("Dashboard")]
 [Authorize]
 public class DashboardController(
-    GetDashboard.Handler    getDashboard,
+    GetDashboard.Handler     getDashboard,
     GetProjectDetail.Handler getProjectDetail) : ControllerBase
 {
     /// <summary>
@@ -21,9 +22,11 @@ public class DashboardController(
     /// Общие данные дашборда (в контексте организации).
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(DashboardDto), 200)]
     public async Task<IActionResult> Get(CancellationToken ct)
-        => Ok(await getDashboard.HandleAsync(new(), ct));
+    {
+        return Ok(await getDashboard.HandleAsync(new(), ct));
+    }
 
     /// <summary>
     /// Bitta loyiha bo'yicha batafsil dashboard ma'lumotlari.

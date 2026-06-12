@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.DTOs;
 
 public record RequestedDemandModel : StockDemandModel
 {

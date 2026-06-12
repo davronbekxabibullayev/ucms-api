@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.Commands;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

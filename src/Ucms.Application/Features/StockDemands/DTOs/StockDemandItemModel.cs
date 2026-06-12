@@ -1,7 +1,7 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.DTOs;
 
-using Ucms.Application.Features.MeasurementUnits;
-using Ucms.Application.Features.Products;
+using Ucms.Application.Features.MeasurementUnits.DTOs;
+using Ucms.Application.Features.Products.DTOs;
 
 public record StockDemandItemModel(
     Guid Id,

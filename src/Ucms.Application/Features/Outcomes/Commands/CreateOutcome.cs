@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Outcomes.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Application.Services;
 using Ucms.Domain.Entities;

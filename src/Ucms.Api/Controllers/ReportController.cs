@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Reports;
+using Ucms.Application.Features.Reports.DTOs;
+using Ucms.Application.Features.Reports.Queries;
 
 [Route("api/reports")]
 [ApiController]
@@ -18,7 +19,9 @@ public class ReportController(
         [FromQuery] DateTime to,
         [FromQuery] Guid organizationId,
         CancellationToken ct)
-        => Ok(await getReport.HandleAsync(new(from, to, organizationId), ct));
+        {
+            return Ok(await getReport.HandleAsync(new(from, to, organizationId), ct));
+        }
 
     [HttpPost("export-product-balance")]
     [ProducesResponseType(StatusCodes.Status200OK)]

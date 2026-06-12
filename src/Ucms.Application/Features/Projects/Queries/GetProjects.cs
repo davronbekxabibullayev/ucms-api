@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Projects;
+namespace Ucms.Application.Features.Projects.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;

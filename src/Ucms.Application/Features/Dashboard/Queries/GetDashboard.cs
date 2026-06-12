@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Dashboard;
+namespace Ucms.Application.Features.Dashboard.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.Dashboard.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Enums;
 
@@ -11,14 +12,14 @@ public static class GetDashboard
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
-        public async Task<object> HandleAsync(Query _, CancellationToken ct)
+        public async Task<DashboardDto> HandleAsync(Query _, CancellationToken ct)
         {
             var orgId = ctx.OrganizationId;
 
             var projectsQuery = db.Projects.Where(p => !p.IsDeleted);
             if (orgId.HasValue) projectsQuery = projectsQuery.Where(p => p.OrganizationId == orgId.Value);
 
-            var projectStats = await projectsQuery
+            var ps = await projectsQuery
                 .GroupBy(_ => true)
                 .Select(g => new
                 {
@@ -28,17 +29,26 @@ public static class GetDashboard
                     Completed  = g.Count(p => p.Status == ProjectStatus.Completed),
                     Suspended  = g.Count(p => p.Status == ProjectStatus.Suspended),
                 })
-                .FirstOrDefaultAsync(ct)
-                ?? new { Total = 0, Planning = 0, InProgress = 0, Completed = 0, Suspended = 0 };
+                .FirstOrDefaultAsync(ct);
+
+            var projectStats = new DashboardProjectStatsDto(
+                ps?.Total      ?? 0,
+                ps?.Planning   ?? 0,
+                ps?.InProgress ?? 0,
+                ps?.Completed  ?? 0,
+                ps?.Suspended  ?? 0);
 
             var brigadesQuery = db.Brigades.Where(b => !b.IsDeleted);
             if (orgId.HasValue) brigadesQuery = brigadesQuery.Where(b => b.OrganizationId == orgId.Value);
 
-            var brigadeStats = await brigadesQuery
+            var bs = await brigadesQuery
                 .GroupBy(_ => true)
                 .Select(g => new { Total = g.Count(), Active = g.Count(b => b.IsActive) })
-                .FirstOrDefaultAsync(ct)
-                ?? new { Total = 0, Active = 0 };
+                .FirstOrDefaultAsync(ct);
+
+            var brigadeStats = new DashboardBrigadeStatsDto(
+                bs?.Total  ?? 0,
+                bs?.Active ?? 0);
 
             var activeProjectIds = await projectsQuery
                 .Where(p => p.Status == ProjectStatus.InProgress)
@@ -62,45 +72,45 @@ public static class GetDashboard
                     .SumAsync(w => w.TotalAmount, ct);
             }
 
+            var finance = new DashboardFinanceDto(
+                ClientReceived: clientReceived,
+                BrigadePaid:    brigadePaid,
+                WorkedTotal:    workedTotal,
+                BrigadeDebt:    workedTotal - brigadePaid);
+
             var recentWorkLogs = await db.WorkLogs
                 .Where(w => !orgId.HasValue || activeProjectIds.Contains(w.ProjectId))
                 .OrderByDescending(w => w.CreatedAt)
                 .Take(5)
-                .Select(w => (object)new
-                {
-                    w.Id, w.Date, w.TotalAmount, w.Status,
-                    Project      = w.Project!.Name,
-                    Brigade      = w.Brigade!.Name,
-                    EstimateItem = w.EstimateItem!.Name,
-                })
+                .Select(w => new DashboardWorkLogDto(
+                    w.Id,
+                    w.Date,
+                    w.TotalAmount,
+                    w.Status,
+                    w.Project!.Name,
+                    w.Brigade!.Name,
+                    w.EstimateItem!.Name))
                 .ToListAsync(ct);
 
             var recentPayments = await db.ClientPayments
                 .Where(p => !orgId.HasValue || activeProjectIds.Contains(p.ProjectId))
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(5)
-                .Select(p => (object)new
-                {
-                    p.Id, p.Date, p.Amount, p.PaymentMethod,
-                    Project   = p.Project!.Name,
-                    ActNumber = p.Act != null ? p.Act.ActNumber : null,
-                })
+                .Select(p => new DashboardPaymentDto(
+                    p.Id,
+                    p.Date,
+                    p.Amount,
+                    p.PaymentMethod,
+                    p.Project!.Name,
+                    p.Act != null ? p.Act.ActNumber : null))
                 .ToListAsync(ct);
 
-            return new
-            {
-                Projects = projectStats,
-                Brigades = brigadeStats,
-                Finance  = new
-                {
-                    ClientReceived = clientReceived,
-                    BrigadePaid    = brigadePaid,
-                    WorkedTotal    = workedTotal,
-                    BrigadeDebt    = workedTotal - brigadePaid,
-                },
-                RecentWorkLogs = recentWorkLogs,
-                RecentPayments = recentPayments,
-            };
+            return new DashboardDto(
+                Projects:       projectStats,
+                Brigades:       brigadeStats,
+                Finance:        finance,
+                RecentWorkLogs: recentWorkLogs,
+                RecentPayments: recentPayments);
         }
     }
 }

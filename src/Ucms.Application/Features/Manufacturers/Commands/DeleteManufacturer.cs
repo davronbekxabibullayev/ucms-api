@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Manufacturers;
+namespace Ucms.Application.Features.Manufacturers.Commands;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Persistence;

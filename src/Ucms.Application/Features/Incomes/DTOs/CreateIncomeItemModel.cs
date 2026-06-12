@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Incomes;
+namespace Ucms.Application.Features.Incomes.DTOs;
 
 public record CreateIncomeItemModel(
     Guid SkuId,

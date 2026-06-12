@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Estimates;
+using Ucms.Application.Features.Estimates.Commands;
+using Ucms.Application.Features.Estimates.Queries;
 
 /// <summary>
 /// Loyiha smeta bo'limlari va pozitsiyalarini boshqarish.
@@ -26,11 +27,11 @@ public class EstimateController(
     public record UpdateSectionRequest(string Name, int Order);
 
     public record CreateItemRequest(
-        Guid SectionId, string Name, string Unit, decimal Volume,
+        Guid SectionId, string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
     public record UpdateItemRequest(
-        string Name, string Unit, decimal Volume,
+        string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
     // ── Sections ───────────────────────────────────────────────────────────────
@@ -131,7 +132,7 @@ public class EstimateController(
         Guid projectId, [FromBody] CreateItemRequest req, CancellationToken ct)
     {
         var (data, forbidden, error) = await createItem.HandleAsync(
-            new(projectId, req.SectionId, req.Name, req.Unit, req.Volume,
+            new(projectId, req.SectionId, req.Name, req.MeasurementUnitId, req.Volume,
                 req.ClientUnitPrice, req.BrigadeUnitPrice, req.Order), ct);
         if (forbidden)         return Forbid();
         if (error is not null) return BadRequest(new { message = error });
@@ -150,7 +151,7 @@ public class EstimateController(
         Guid projectId, Guid itemId, [FromBody] UpdateItemRequest req, CancellationToken ct)
     {
         var (notFound, forbidden) = await updateItem.HandleAsync(
-            new(projectId, itemId, req.Name, req.Unit, req.Volume,
+            new(projectId, itemId, req.Name, req.MeasurementUnitId, req.Volume,
                 req.ClientUnitPrice, req.BrigadeUnitPrice, req.Order), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();

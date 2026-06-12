@@ -1,8 +1,9 @@
-namespace Ucms.Application.Features.StockSkus;
+namespace Ucms.Application.Features.StockSkus.Queries;
 
 using Ucms.Application.Persistence;
 using Ucms.Domain.Enums;
 using Ucms.Application.Abstractions.Organization;
+using Ucms.Application.Features.StockSkus.DTOs;
 
 public static class GetStockSkuStats
 {

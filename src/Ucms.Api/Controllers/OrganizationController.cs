@@ -2,7 +2,8 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.Features.Organizations;
+using Ucms.Application.Features.Organizations.Commands;
+using Ucms.Application.Features.Organizations.Queries;
 using Ucms.Domain.Enums;
 
 /// <summary>

@@ -1,4 +1,4 @@
-namespace Ucms.Application.Features.Suppliers;
+namespace Ucms.Application.Features.Suppliers.DTOs;
 
 public record SupplierModel(Guid Id,
                            string Name,

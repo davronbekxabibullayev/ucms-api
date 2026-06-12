@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.StockDemands;
+namespace Ucms.Application.Features.StockDemands.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.StockDemands.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetStockDemands

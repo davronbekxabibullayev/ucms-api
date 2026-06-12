@@ -1,8 +1,7 @@
-namespace Ucms.Application.Features.Outcomes;
+namespace Ucms.Application.Features.Outcomes.DTOs;
 
-using Ucms.Application.Features.MeasurementUnits;
-using Ucms.Application.Features.Skus;
-
+using Ucms.Application.Features.MeasurementUnits.DTOs;
+using Ucms.Application.Features.Skus.DTOs;
 using Ucms.Domain.Enums;
 
 public record OutcomeItemModel

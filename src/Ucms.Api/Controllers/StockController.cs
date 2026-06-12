@@ -2,8 +2,11 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Features.Stocks;
+using Ucms.Application.Features.Stocks.Commands;
+using Ucms.Application.Features.Stocks.DTOs;
+using Ucms.Application.Features.Stocks.Queries;
 using Ucms.Domain.Enums;
 
 [Route("api/stock")]
@@ -28,22 +31,30 @@ public class StockController(
         [FromQuery] Guid organizationId, [FromQuery] bool? unattached,
         [FromQuery] StockType? stockType, [FromQuery] StockCategory? stockCategory,
         [FromQuery] string? query, [FromQuery] bool? includeChild, CancellationToken ct = default)
-        => Ok(await getAll.HandleAsync(new(organizationId, unattached, stockType, stockCategory, query, includeChild), ct));
+        {
+            return Ok(await getAll.HandleAsync(new(organizationId, unattached, stockType, stockCategory, query, includeChild), ct));
+        }
 
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<StockModel>), 200)]
     public async Task<IActionResult> SearchStocks([FromBody] PagedRequest filter, CancellationToken ct = default)
-        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+        {
+            return Ok(await getFiltered.HandleAsync(new(filter), ct));
+        }
 
     [HttpGet("cases")]
     [ProducesResponseType(typeof(List<StockModel>), 200)]
     public async Task<IActionResult> GetCases(CancellationToken ct = default)
-        => Ok(await getCases.HandleAsync(new(), ct));
+        {
+            return Ok(await getCases.HandleAsync(new(), ct));
+        }
 
     [HttpGet("central-stock/{organizationId:guid}")]
     [ProducesResponseType(typeof(List<StockModel>), 200)]
     public async Task<IActionResult> GetCentralStocks(Guid organizationId, CancellationToken ct = default)
-        => Ok(await getCentral.HandleAsync(new(organizationId), ct));
+        {
+            return Ok(await getCentral.HandleAsync(new(organizationId), ct));
+        }
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(StockModel), 200)]
@@ -55,11 +66,15 @@ public class StockController(
 
     [HttpGet("code/{code}")]
     public async Task<IActionResult> FindByCode(string code, CancellationToken ct = default)
-        => Ok(await findByCode.HandleAsync(new(code), ct));
+        {
+            return Ok(await findByCode.HandleAsync(new(code), ct));
+        }
 
     [HttpGet("search/{query}")]
     public async Task<IActionResult> FindStocks(string query, CancellationToken ct = default)
-        => Ok(await findStocks.HandleAsync(new(query), ct));
+        {
+            return Ok(await findStocks.HandleAsync(new(query), ct));
+        }
 
     public record CreateStockRequest(string Name, string NameRu, string? NameEn, string? NameKa,
         string Code, StorageCondition StorageCondition, StockType StockType,

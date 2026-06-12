@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.WorkLogs;
+namespace Ucms.Application.Features.WorkLogs.Queries;
 
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
+using Ucms.Application.Features.WorkLogs.DTOs;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Enums;
 
@@ -16,11 +17,9 @@ public static class GetWorkLogs
         int Page,
         int Size);
 
-    public record Result(int Total, int Page, int Size, List<object> Items);
-
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
-        public async Task<(Result? Data, bool ProjectNotFound, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
+        public async Task<(WorkLogPagedResult? Data, bool ProjectNotFound, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
         {
             var orgId = await db.Projects
                 .Where(p => p.Id == q.ProjectId && !p.IsDeleted)
@@ -42,16 +41,22 @@ public static class GetWorkLogs
             var items = await query
                 .OrderByDescending(w => w.Date)
                 .Skip((q.Page - 1) * q.Size).Take(q.Size)
-                .Select(w => (object)new
-                {
-                    w.Id, w.Date, w.Volume, w.BrigadeUnitPrice, w.TotalAmount,
-                    w.Status, w.Note, w.BrigadePaymentId,
-                    Brigade      = w.Brigade!.Name,
-                    EstimateItem = new { w.EstimateItem!.Name, w.EstimateItem.Unit },
-                })
+                .Select(w => new WorkLogDto(
+                    w.Id,
+                    w.Date,
+                    w.Volume,
+                    w.BrigadeUnitPrice,
+                    w.TotalAmount,
+                    w.Status,
+                    w.Note,
+                    w.BrigadePaymentId,
+                    w.Brigade!.Name,
+                    new WorkLogEstimateItemDto(
+                        w.EstimateItem!.Name,
+                        w.EstimateItem.MeasurementUnit!.Code)))
                 .ToListAsync(ct);
 
-            return (new Result(total, q.Page, q.Size, items), false, false);
+            return (new WorkLogPagedResult(total, q.Page, q.Size, items), false, false);
         }
     }
 }

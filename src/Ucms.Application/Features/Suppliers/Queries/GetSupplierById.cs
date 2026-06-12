@@ -1,7 +1,8 @@
-namespace Ucms.Application.Features.Suppliers;
+namespace Ucms.Application.Features.Suppliers.Queries;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Features.Suppliers.DTOs;
 using Ucms.Application.Persistence;
 
 public static class GetSupplierById
