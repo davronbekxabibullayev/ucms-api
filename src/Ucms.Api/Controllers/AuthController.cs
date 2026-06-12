@@ -11,6 +11,10 @@ using Ucms.Application.Persistence;
 using Ucms.Domain.Entities.Identity;
 using Ucms.Domain.Enums;
 
+/// <summary>
+/// Autentifikatsiya va token boshqaruvi.
+/// Аутентификация и управление токенами.
+/// </summary>
 [ApiController]
 [Route("api/auth")]
 [Tags("Auth")]
@@ -20,10 +24,13 @@ public class AuthController(
     IUcmsDbContext         db) : ControllerBase
 {
     /// <summary>
-    /// Tizimga kirish (login)
+    /// Tizimga kirish (login).
+    /// Вход в систему (login).
     /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponse), 200)]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> Login([FromBody] LoginRequest req, CancellationToken ct)
     {
         var user = await userManager.FindByNameAsync(req.UserName)
@@ -39,10 +46,13 @@ public class AuthController(
     }
 
     /// <summary>
-    /// Yangi foydalanuvchi ro'yxatdan o'tkazish
+    /// Yangi foydalanuvchi ro'yxatdan o'tkazish.
+    /// Регистрация нового пользователя.
     /// </summary>
     [HttpPost("register")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponse), 200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest req, CancellationToken ct)
     {
         var user = new User
@@ -61,10 +71,14 @@ public class AuthController(
     }
 
     /// <summary>
-    /// Access tokenni yangilash (refresh)
+    /// Access tokenni yangilash (refresh).
+    /// Обновление access token (refresh).
     /// </summary>
     [HttpPost("refresh")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponse), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest req, CancellationToken ct)
     {
         var principal = tokenService.GetPrincipalFromExpiredToken(req.AccessToken);
@@ -94,10 +108,13 @@ public class AuthController(
     }
 
     /// <summary>
-    /// Refresh tokenni bekor qilish (logout)
+    /// Refresh tokenni bekor qilish (logout).
+    /// Отзыв refresh token (выход из системы).
     /// </summary>
     [HttpPost("revoke")]
     [Authorize]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Revoke(CancellationToken ct)
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -117,6 +134,10 @@ public class AuthController(
 
     // ── helpers ───────────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// JWT access va refresh tokenlarni yaratib, AuthResponse qaytaradi.
+    /// Генерирует JWT access и refresh токены, возвращает AuthResponse.
+    /// </summary>
     private async Task<AuthResponse> BuildAuthResponseAsync(User user, CancellationToken ct)
     {
         var roles = await userManager.GetRolesAsync(user);

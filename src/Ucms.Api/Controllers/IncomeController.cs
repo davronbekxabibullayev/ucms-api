@@ -7,6 +7,10 @@ using Ucms.Application.Abstractions.Storage;
 using Ucms.Application.Features.Incomes;
 using Ucms.Domain.Enums;
 
+/// <summary>
+/// Kirim operatsiyalarini boshqarish.
+/// Управление операциями прихода.
+/// </summary>
 [Route("api/income")]
 [ApiController]
 [Authorize]
@@ -23,29 +27,53 @@ public class IncomeController(
     UploadIncomeFile.Handler upload,
     IFileStorageClient storageClient) : ControllerBase
 {
+    /// <summary>
+    /// Barcha kirimlar ro'yxati (sahifalash bilan).
+    /// Список всех приходов (с пагинацией).
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(List<IncomeModel>), 200)]
-    public async Task<IActionResult> GetAll(CancellationToken ct = default)
-        => Ok(await getAll.HandleAsync(new(), ct));
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        CancellationToken ct = default)
+        => Ok(await getAll.HandleAsync(new(page, size), ct));
 
+    /// <summary>
+    /// ID bo'yicha kirimni olish.
+    /// Получить приход по ID.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(IncomeModel), 200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
         var result = await getById.HandleAsync(new(id), ct);
         return result is null ? NotFound() : Ok(result);
     }
 
+    /// <summary>
+    /// Nom bo'yicha kirimni qidirish.
+    /// Найти приход по наименованию.
+    /// </summary>
     [HttpGet("name/{name}")]
     public async Task<IActionResult> FindByName(string name, CancellationToken ct = default)
         => Ok(await findByName.HandleAsync(new(name), ct));
 
+    /// <summary>
+    /// Matn bo'yicha kirimlarni qidirish.
+    /// Поиск приходов по тексту.
+    /// </summary>
     [HttpGet("search/{query}")]
     public async Task<IActionResult> Search(string query, CancellationToken ct = default)
         => Ok(await findMany.HandleAsync(new(query), ct));
 
     public record GetIncomesRequest(PagedRequest Filter, Guid? StockId, string? Query, DateTime? From, DateTime? To);
 
+    /// <summary>
+    /// Filtrланган kirimlar jadval ro'yxati.
+    /// Фильтрованный табличный список приходов.
+    /// </summary>
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<IncomeModel>), 200)]
     public async Task<IActionResult> GetFiltered([FromBody] GetIncomesRequest req, CancellationToken ct = default)
@@ -54,6 +82,10 @@ public class IncomeController(
     public record CreateIncomeRequest(string Name, string? Note, IncomeType IncomeType, IncomeStatus IncomeStatus,
         PaymentType PaymentType, DateTimeOffset IncomeDate, Guid StockId, IEnumerable<CreateIncomeItemModel> IncomeItems);
 
+    /// <summary>
+    /// Yangi kirim yaratish.
+    /// Создать новый приход.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(Guid), 201)]
     public async Task<IActionResult> Create([FromBody] CreateIncomeRequest req, CancellationToken ct = default)
@@ -61,48 +93,76 @@ public class IncomeController(
         var id = await create.HandleAsync(
             new(req.Name, req.Note, req.IncomeType, req.IncomeStatus, req.PaymentType,
                 req.IncomeDate, req.StockId, req.IncomeItems), ct);
-        return Ok(id);
+        return StatusCode(201, id);
     }
 
     public record UpdateIncomeRequest(Guid Id, string Name, string? Note, IncomeType IncomeType, IncomeStatus IncomeStatus,
         PaymentType PaymentType, DateTimeOffset IncomeDate, Guid StockId, IEnumerable<CreateIncomeItemModel> IncomeItems);
 
+    /// <summary>
+    /// Kirim ma'lumotlarini yangilash.
+    /// Обновить данные прихода.
+    /// </summary>
     [HttpPut]
-    [ProducesResponseType(typeof(Guid), 202)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Update([FromBody] UpdateIncomeRequest req, CancellationToken ct = default)
     {
         var ok = await update.HandleAsync(
             new(req.Id, req.Name, req.Note, req.IncomeType, req.IncomeStatus, req.PaymentType,
                 req.IncomeDate, req.StockId, req.IncomeItems), ct);
-        return ok ? Ok(req.Id) : NotFound();
+        return ok ? NoContent() : NotFound();
     }
 
     public record UpdateStatusRequest(Guid Id, IncomeStatus Status);
 
+    /// <summary>
+    /// Kirim holatini yangilash.
+    /// Обновить статус прихода.
+    /// </summary>
     [HttpPut("update-status")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusRequest req, CancellationToken ct = default)
     {
         var ok = await updateStatus.HandleAsync(new(req.Id, req.Status), ct);
-        return ok ? Ok(req.Id) : NotFound();
+        return ok ? NoContent() : NotFound();
     }
 
+    /// <summary>
+    /// Kirimni o'chirish.
+    /// Удалить приход.
+    /// </summary>
     [HttpDelete("{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
     {
         var ok = await delete.HandleAsync(new(id), ct);
         return ok ? NoContent() : NotFound();
     }
 
+    /// <summary>
+    /// Kirimga fayl yuklash (maks. 10 MB).
+    /// Загрузить файл к приходу (макс. 10 МБ).
+    /// </summary>
     [HttpPost("upload/{id:guid}")]
     [RequestSizeLimit(10L * 1024L * 1024L)]
     [RequestFormLimits(MultipartBodyLengthLimit = 10L * 1024L * 1024L)]
     [ProducesResponseType(typeof(FileEntryModel), 200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Upload(Guid id, IFormFile file, CancellationToken ct = default)
     {
         var (result, error) = await upload.HandleAsync(new(id, file), ct);
         return error is not null ? BadRequest(error) : Ok(result);
     }
 
+    /// <summary>
+    /// Kirimga biriktirilgan faylni yuklab olish. Hozircha amalga oshirilmagan.
+    /// Скачать прикреплённый файл прихода. Пока не реализовано.
+    /// </summary>
     [HttpGet("download/{id:guid}")]
-    public IActionResult Download(Guid id, [FromQuery] string path) => Ok();
+    [ProducesResponseType(501)]
+    public IActionResult Download(Guid id, [FromQuery] string path)
+        => StatusCode(501, new { message = "Fayl yuklab olish hozircha amalga oshirilmagan. / Скачивание файлов ещё не реализовано." });
 }

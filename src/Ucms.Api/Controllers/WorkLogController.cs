@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Ucms.Application.Features.WorkLogs;
 using Ucms.Domain.Enums;
 
+/// <summary>
+/// Ish jurnallarini boshqarish.
+/// Управление журналами работ.
+/// </summary>
 [ApiController]
 [Route("api/projects/{projectId:guid}/worklogs")]
 [Tags("WorkLog")]
@@ -30,7 +34,13 @@ public class WorkLogController(
     public record ConfirmWorkLogRequest(Guid[] WorkLogIds);
     public record RejectWorkLogRequest(Guid[] WorkLogIds, string? Reason);
 
+    /// <summary>
+    /// Loyiha ish jurnallari ro'yxati (filtr va sahifalash bilan).
+    /// Список журналов работ проекта (с фильтром и пагинацией).
+    /// </summary>
     [HttpGet]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetAll(
         Guid projectId,
         [FromQuery] Guid? brigadeId,
@@ -48,7 +58,13 @@ public class WorkLogController(
         return Ok(data);
     }
 
+    /// <summary>
+    /// ID bo'yicha ish jurnalini olish.
+    /// Получить журнал работ по ID.
+    /// </summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid projectId, Guid id, CancellationToken ct)
     {
         var (data, notFound, forbidden) = await getById.HandleAsync(new(projectId, id), ct);
@@ -57,7 +73,13 @@ public class WorkLogController(
         return data is null ? NotFound() : Ok(data);
     }
 
+    /// <summary>
+    /// Loyiha ish jurnali xulosasi.
+    /// Сводка по журналу работ проекта.
+    /// </summary>
     [HttpGet("summary")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetSummary(Guid projectId, CancellationToken ct)
     {
         var (data, notFound, forbidden) = await getSummary.HandleAsync(new(projectId), ct);
@@ -66,22 +88,36 @@ public class WorkLogController(
         return Ok(data);
     }
 
+    /// <summary>
+    /// Yangi ish jurnali yozuvi yaratish. Admin, Manager yoki Brigadir uchun.
+    /// Создать новую запись журнала работ. Для Admin, Manager или Brigadir.
+    /// </summary>
     [HttpPost]
     [Authorize(Roles = "Admin,Manager,Brigadir")]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Create(
         Guid projectId, [FromBody] CreateWorkLogRequest req, CancellationToken ct)
     {
         var (data, notFound, forbidden, error) = await create.HandleAsync(
             new(projectId, req.BrigadeId, req.EstimateItemId, req.Date,
                 req.Volume, req.BrigadeUnitPrice, req.Note), ct);
-        if (notFound)      return NotFound();
-        if (forbidden)     return Forbid();
+        if (notFound)          return NotFound();
+        if (forbidden)         return Forbid();
         if (error is not null) return BadRequest(new { message = error });
-        return Ok(data);
+        return StatusCode(201, data);
     }
 
+    /// <summary>
+    /// Ish jurnali yozuvini yangilash. Admin, Manager yoki Brigadir uchun.
+    /// Обновить запись журнала работ. Для Admin, Manager или Brigadir.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin,Manager,Brigadir")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Update(
         Guid projectId, Guid id, [FromBody] UpdateWorkLogRequest req, CancellationToken ct)
     {
@@ -93,8 +129,14 @@ public class WorkLogController(
         return NoContent();
     }
 
+    /// <summary>
+    /// Ish jurnali yozuvlarini tasdiqlash. Admin yoki Manager uchun.
+    /// Подтвердить записи журнала работ. Для Admin или Manager.
+    /// </summary>
     [HttpPost("confirm")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Confirm(
         Guid projectId, [FromBody] ConfirmWorkLogRequest req, CancellationToken ct)
     {
@@ -105,8 +147,14 @@ public class WorkLogController(
         return Ok(new { confirmed });
     }
 
+    /// <summary>
+    /// Ish jurnali yozuvlarini rad etish. Admin yoki Manager uchun.
+    /// Отклонить записи журнала работ. Для Admin или Manager.
+    /// </summary>
     [HttpPost("reject")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Reject(
         Guid projectId, [FromBody] RejectWorkLogRequest req, CancellationToken ct)
     {
@@ -117,8 +165,15 @@ public class WorkLogController(
         return Ok(new { rejected });
     }
 
+    /// <summary>
+    /// Ish jurnali yozuvini o'chirish. Admin yoki Manager uchun.
+    /// Удалить запись журнала работ. Для Admin или Manager.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid projectId, Guid id, CancellationToken ct)
     {
         var (notFound, error) = await delete.HandleAsync(new(projectId, id), ct);

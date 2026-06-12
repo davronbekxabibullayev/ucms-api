@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ucms.Application.Features.Users;
 
+/// <summary>
+/// Foydalanuvchilarni boshqarish.
+/// Управление пользователями.
+/// </summary>
 [ApiController]
 [Route("api/users")]
 [Tags("User")]
@@ -26,7 +30,12 @@ public class UserController(
 
     public record SetRolesRequest(List<string> Roles);
 
+    /// <summary>
+    /// Foydalanuvchilar ro'yxati (filtr va sahifalash bilan).
+    /// Список пользователей (с фильтром и пагинацией).
+    /// </summary>
     [HttpGet]
+    [ProducesResponseType(200)]
     public async Task<IActionResult> GetAll(
         [FromQuery] Guid? organizationId,
         [FromQuery] string? search,
@@ -40,7 +49,13 @@ public class UserController(
         return Ok(data);
     }
 
+    /// <summary>
+    /// ID bo'yicha foydalanuvchini olish.
+    /// Получить пользователя по ID.
+    /// </summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
         var (data, forbidden) = await getById.HandleAsync(new(id), ct);
@@ -48,19 +63,32 @@ public class UserController(
         return data is null ? NotFound() : Ok(data);
     }
 
+    /// <summary>
+    /// Yangi foydalanuvchi yaratish. Admin yoki Manager uchun.
+    /// Создать нового пользователя. Для Admin или Manager.
+    /// </summary>
     [HttpPost]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest req, CancellationToken ct)
     {
         var (data, forbidden, errors) = await create.HandleAsync(
             new(req.UserName, req.Email, req.Password, req.FullName, req.PhoneNumber, req.Roles), ct);
-        if (forbidden)      return BadRequest(new { message = "Foydalanuvchiga tashkilot biriktirilmagan" });
+        if (forbidden)          return BadRequest(new { message = "Foydalanuvchiga tashkilot biriktirilmagan. / Пользователю не привязана организация." });
         if (errors is not null) return BadRequest(new { errors });
-        return Ok(data);
+        return StatusCode(201, data);
     }
 
+    /// <summary>
+    /// Foydalanuvchi ma'lumotlarini yangilash. Admin yoki Manager uchun.
+    /// Обновить данные пользователя. Для Admin или Manager.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest req, CancellationToken ct)
     {
         var (notFound, forbidden, errors) = await update.HandleAsync(
@@ -71,8 +99,14 @@ public class UserController(
         return NoContent();
     }
 
+    /// <summary>
+    /// Foydalanuvchiga rollarni belgilash. Admin yoki Manager uchun.
+    /// Назначить роли пользователю. Для Admin или Manager.
+    /// </summary>
     [HttpPatch("{id:guid}/roles")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> SetRoles(Guid id, [FromBody] SetRolesRequest req, CancellationToken ct)
     {
         var (notFound, forbidden) = await setRoles.HandleAsync(new(id, req.Roles), ct);
@@ -81,8 +115,14 @@ public class UserController(
         return Ok(new { roles = req.Roles });
     }
 
+    /// <summary>
+    /// Foydalanuvchi faolligini yoqish/o'chirish. Admin yoki Manager uchun.
+    /// Включить/отключить активность пользователя. Для Admin или Manager.
+    /// </summary>
     [HttpPatch("{id:guid}/toggle-active")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> ToggleActive(Guid id, CancellationToken ct)
     {
         var (data, notFound, forbidden) = await toggleActive.HandleAsync(new(id), ct);
@@ -91,8 +131,15 @@ public class UserController(
         return Ok(data);
     }
 
+    /// <summary>
+    /// Foydalanuvchini o'chirish. Admin yoki Manager uchun.
+    /// Удалить пользователя. Для Admin или Manager.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var (notFound, forbidden, error) = await delete.HandleAsync(new(id), ct);
@@ -102,8 +149,14 @@ public class UserController(
         return NoContent();
     }
 
+    /// <summary>
+    /// Tizimda mavjud barcha rollar ro'yxati.
+    /// Список всех доступных ролей в системе.
+    /// </summary>
     [HttpGet("roles")]
+    [ProducesResponseType(200)]
     public async Task<IActionResult> GetRoles(CancellationToken ct)
-        => Ok(await getRoles.HandleAsync(new(), ct));
+    {
+        return Ok(await getRoles.HandleAsync(new(), ct));
+    }
 }
-
