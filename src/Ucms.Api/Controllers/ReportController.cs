@@ -2,7 +2,6 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ucms.Application.DTOs.Models;
 using Ucms.Application.Features.Reports;
 
 [Route("api/reports")]

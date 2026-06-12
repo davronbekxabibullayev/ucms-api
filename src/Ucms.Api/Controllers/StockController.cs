@@ -3,7 +3,6 @@ namespace Ucms.Api.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QueryForge.Models;
-using Ucms.Application.DTOs.Models;
 using Ucms.Application.Features.Stocks;
 using Ucms.Domain.Enums;
 

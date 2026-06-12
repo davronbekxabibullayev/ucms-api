@@ -1,11 +1,12 @@
 namespace Ucms.Api.Extensions;
 
+using Ucms.Application.Features.MeasurementUnits;
+
 using System.Text.Json;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ucms.Application.Features;
-using Ucms.Application.MappingProfiles;
 using Ucms.Api.Middlewares;
 
 public static class WebApplicationExtensions

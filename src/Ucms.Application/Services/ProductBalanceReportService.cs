@@ -1,8 +1,8 @@
 namespace Ucms.Application.Services;
 
+using Ucms.Application.Features.Reports;
+
 using ClosedXML.Excel;
-using Ucms.Application.DTOs.Models;
-using Ucms.Domain.Enums;
 
 public class ProductBalanceReportService : IProductBalanceReportService
 {
@@ -31,7 +31,7 @@ public class ProductBalanceReportService : IProductBalanceReportService
         headerRow.Style.Font.Bold = true;
         headerRow.Style.Fill.BackgroundColor = XLColor.LightBlue;
 
-        int row = 2;
+        var row = 2;
         foreach (var productType in data.ProductTypes)
         {
             var typeName = productType.ProductType.ToString();

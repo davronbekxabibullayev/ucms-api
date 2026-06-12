@@ -1,16 +1,17 @@
 namespace Ucms.Application.Services;
 
-using Ucms.Application.DTOs.Models;
+using Ucms.Application.Features.Outcomes;
+
 using Ucms.Domain.Entities;
 
 public interface IOutcomeService
 {
-    Task UpdateBalanceAsync(Outcome outcome, CancellationToken cancellationToken);
-    Task UpdateIncomeOutcome(Guid incomeId, CancellationToken cancellationToken);
-    Task CancelIncomeOutcome(Guid incomeId, CancellationToken cancellationToken);
-    IncomeOutcome CreateIncomeOutcome(Outcome outcome, Guid incomeStockId);
-    Income CreateIncome(Outcome outcome, Guid incomeStockId);
-    IEnumerable<OrganizationSku> CreateOrganizationSkus(Outcome outcome, Guid incomeStockId);
-    Task ValidateOutcomeItems(IEnumerable<CreateOutcomeItemModel> outcomeItems, Guid stockId, CancellationToken cancellationToken);
-    Task ValidateOutcomeItems(IEnumerable<OutcomeItem> outcomeItems, Guid stockId, CancellationToken cancellationToken);
+    public Task UpdateBalanceAsync(Outcome outcome, CancellationToken cancellationToken);
+    public Task UpdateIncomeOutcome(Guid incomeId, CancellationToken cancellationToken);
+    public Task CancelIncomeOutcome(Guid incomeId, CancellationToken cancellationToken);
+    public IncomeOutcome CreateIncomeOutcome(Outcome outcome, Guid incomeStockId);
+    public Income CreateIncome(Outcome outcome, Guid incomeStockId);
+    public IEnumerable<OrganizationSku> CreateOrganizationSkus(Outcome outcome, Guid incomeStockId);
+    public Task ValidateOutcomeItems(IEnumerable<CreateOutcomeItemModel> outcomeItems, Guid stockId, CancellationToken cancellationToken);
+    public Task ValidateOutcomeItems(IEnumerable<OutcomeItem> outcomeItems, Guid stockId, CancellationToken cancellationToken);
 }

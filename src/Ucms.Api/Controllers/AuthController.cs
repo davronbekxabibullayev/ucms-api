@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions.Auth;
-using Ucms.Application.DTOs.Auth;
+using Ucms.Application.Features.Auth.DTOs;
+using Ucms.Application.Features.Auth.Queries;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities.Identity;
 using Ucms.Domain.Enums;
@@ -154,7 +155,7 @@ public class AuthController(
             UserId:       user.Id,
             UserName:     user.UserName!,
             FullName:     user.FullName,
-            Roles:        roles.ToList()
+            Roles:        [.. roles]
         );
     }
 }

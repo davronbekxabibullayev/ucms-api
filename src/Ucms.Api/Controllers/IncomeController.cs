@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QueryForge.Models;
 using Ucms.Application.Abstractions.Storage;
-using Ucms.Application.DTOs.Models;
 using Ucms.Application.Features.Incomes;
 using Ucms.Domain.Enums;
 
