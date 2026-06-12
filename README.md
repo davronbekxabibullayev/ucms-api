@@ -116,7 +116,16 @@ Tashkent · `info@demo-qurilish.uz`
 Swagger UI: `https://localhost:{PORT}/swagger`
 
 ---
+## Comment style
 
+```
+/// <summary>
+/// Ball yig'ish. 
+/// Начислить баллы.
+/// </summary>
+```
+
+---
 ## ✍️ Author
 
 **Xabibullayev Davronbek**  
