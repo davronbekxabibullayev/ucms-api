@@ -1,5 +1,6 @@
 namespace Ucms.Application.Features.Outcomes;
 
+using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
 using Ucms.Application.DTOs.Models;
 using Ucms.Application.Persistence;
@@ -33,10 +34,10 @@ public static class CreateOutcome
                         OutcomeDate = cmd.OutcomeDate, StockId = cmd.StockId, ExecutionId = cmd.ExecutionId,
                         EmployeeId = workContext.EmployeeId,
                         EmployeeName = await organizationService.GetEmployeeName(workContext.EmployeeId),
-                        OutcomeItems = cmd.OutcomeItems.Select(s => new OutcomeItem
+                        OutcomeItems = [.. cmd.OutcomeItems.Select(s => new OutcomeItem
                         {
                             SkuId = s.SkuId, Amount = s.Amount, MeasurementUnitId = s.MeasurementUnitId
-                        }).ToArray()
+                        })]
                     };
                     db.Outcomes.Add(outcome);
                     await db.SaveChangesAsync(ct);

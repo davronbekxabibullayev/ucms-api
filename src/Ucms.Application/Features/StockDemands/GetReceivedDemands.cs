@@ -1,6 +1,7 @@
 namespace Ucms.Application.Features.StockDemands;
 
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using QueryForge.Abstractions;
 using QueryForge.Extensions;
 using QueryForge.Models;

@@ -1,6 +1,7 @@
 namespace Ucms.Application.Features.OrganizationMeasurementUnits;
 
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using QueryForge.Abstractions;
 using QueryForge.Extensions;
 using QueryForge.Models;
@@ -17,9 +18,10 @@ public static class GetFilteredOrganizationMeasurementUnits
     {
         public async Task<PagedResult<OrganizationMeasurementUnitModel>> HandleAsync(Query q, CancellationToken ct)
         {
-            return await db.OrganizationMeasurementUnits.Include(i => i.MeasurementUnit)
-                        .Where(w => w.OrganizationId == workContext.TenantId)
-                        .ToPagedResultAsync<OrganizationMeasurementUnit, OrganizationMeasurementUnitModel>(q.Paging, mapper, ct);
+            return await db.OrganizationMeasurementUnits
+                .Include(i => i.MeasurementUnit)
+                .Where(w => w.OrganizationId == workContext.TenantId)
+                .ToPagedResultAsync<OrganizationMeasurementUnit, OrganizationMeasurementUnitModel>(q.Paging, mapper, ct);
         }
     }
 }

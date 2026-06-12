@@ -11,7 +11,7 @@ public static class DeleteSuppliers
     {
         public async Task<(int Deleted, string? Error)> HandleAsync(Command cmd, CancellationToken ct)
         {
-            if (db.Skus.Any(s => cmd.Ids.Contains(s.SupplierId)))
+            if (db.Skus.Any(s => s.SupplierId != null && cmd.Ids.Contains(s.SupplierId.Value)))
                 return (0, "Ta'minotchilar SKUlarda ishlatilmoqda");
             var entities = await db.Suppliers.AsTracking()
                 .Where(f => cmd.Ids.Contains(f.Id)).ToListAsync(ct);

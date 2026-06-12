@@ -26,7 +26,9 @@ public class OrganizationController(
 
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken ct)
-        => Ok(await getAll.HandleAsync(new(), ct));
+    {
+        return Ok(await getAll.HandleAsync(new(), ct));
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
