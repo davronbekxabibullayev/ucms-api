@@ -18,6 +18,6 @@ public class UcmsDbContextFactory : IDesignTimeDbContextFactory<UcmsDbContext>
             .UseNpgsql(config.GetConnectionString("DefaultConnection"))
             .Options;
 
-        return new UcmsDbContext(options, null!, null!); // design-time only
+        return new UcmsDbContext(options, null!); // design-time only
     }
 }

@@ -1,7 +1,6 @@
 namespace Ucms.Infrastructure.Persistence;
 
 using System.Reflection;
-using MassTransit.Mediator;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -13,8 +12,7 @@ using Ucms.Domain.Entities.Identity;
 
 public class UcmsDbContext(
     DbContextOptions<UcmsDbContext> options,
-    ICurrentContext context,
-    IMediator? bus)
+    ICurrentContext context)
     : IdentityDbContext<
         User, Role, Guid,
         UserClaim, UserRole, UserLogin,
@@ -252,9 +250,10 @@ public class UcmsDbContext(
 
     // ── Domain events ──────────────────────────────────────────────────────
     /// <summary>
-    /// Barcha entity lardagi domain eventlarni MassTransit orqali publish qiladi
+    /// Entity lardagi domain eventlarni tozalaydi.
+    /// MassTransit consumer lar tayyor bo'lgandan keyin publish qo'shiladi.
     /// </summary>
-    private async Task PublishDomainEventsAsync(CancellationToken ct)
+    private Task PublishDomainEventsAsync(CancellationToken ct)
     {
         var entities = ChangeTracker
             .Entries<Entity>()
@@ -262,15 +261,8 @@ public class UcmsDbContext(
             .Select(e => e.Entity)
             .ToList();
 
-        var events = entities
-            .SelectMany(e => e.DomainEvents)
-            .ToList();
-
         entities.ForEach(e => e.ClearDomainEvents());
 
-        if (bus is null) return;
-
-        foreach (var domainEvent in events)
-            await bus.Publish(domainEvent, domainEvent.GetType(), ct);
+        return Task.CompletedTask;
     }
 }
