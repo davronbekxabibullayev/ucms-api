@@ -1,13 +1,13 @@
 namespace Ucms.Application.Validators.Products;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.Products;
+using Ucms.Application.Features.Products;
 
-public class UpdateProductRequestValidator : AbstractValidator<UpdateProductRequest>
+public class UpdateProductRequestValidator : AbstractValidator<UpdateProduct.Command>
 {
     public UpdateProductRequestValidator()
     {
-        RuleFor(x => x.NameRu).NotEmpty();
         RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.NameRu).NotEmpty();
     }
 }

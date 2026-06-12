@@ -1,15 +1,14 @@
 namespace Ucms.Application.Validators.MeasurementUnits;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.MeasurementUnits;
+using Ucms.Application.Features.MeasurementUnits;
 
-public class UpdateMeasurementUnitRequestValidator : AbstractValidator<UpdateMeasurementUnitRequest>
+public class UpdateMeasurementUnitRequestValidator : AbstractValidator<UpdateMeasurementUnit.Command>
 {
     public UpdateMeasurementUnitRequestValidator()
     {
         RuleFor(x => x.Name).NotEmpty();
         RuleFor(x => x.NameRu).NotEmpty();
-        RuleFor(x => x.Code).NotEmpty();
         RuleFor(x => x.Multiplier).GreaterThan(0);
     }
 }

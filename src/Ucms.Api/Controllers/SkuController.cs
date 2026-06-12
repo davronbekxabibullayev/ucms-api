@@ -3,153 +3,123 @@ namespace Ucms.Api.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QueryForge.Models;
-using Ucms.Application.Handlers.Sku;
 using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.Skus;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.Features.Skus;
+using Ucms.Domain.Enums;
 
 [Route("api/sku")]
 [ApiController]
 [Authorize]
-public class SkuController : ControllerBase
+public class SkuController(
+    GetSkus.Handler getAll,
+    GetFilteredSkus.Handler getFiltered,
+    GetSkuById.Handler getById,
+    GetProductSkus.Handler getProductSkus,
+    GetProductStockSkus.Handler getProductStockSkus,
+    FindSkuBySerial.Handler findBySerial,
+    FindSkus.Handler findSkus,
+    CheckSkuForUsed.Handler checkUsed,
+    CreateSku.Handler create,
+    UpdateSku.Handler update,
+    DeleteSku.Handler delete,
+    DeleteSkus.Handler deleteRange) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediatorWrapper;
-
-    public SkuController(IMediatorWrapper mediatorWrapper)
-    {
-        _mediatorWrapper = mediatorWrapper;
-    }
-
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(SkuModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSku(Guid id)
-    {
-        var response = await _mediatorWrapper.Send(new GetSkuMessage(id));
-        return Ok(response);
-    }
-
     [HttpGet]
-    [ProducesResponseType(typeof(SkuModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSkus()
-    {
-        var response = await _mediatorWrapper.Send(new GetSkusMessage());
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(List<SkuModel>), 200)]
+    public async Task<IActionResult> GetSkus(CancellationToken ct = default)
+        => Ok(await getAll.HandleAsync(new(), ct));
 
     [HttpPost("table-list")]
-    [ProducesResponseType(typeof(PagedResult<SkuModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchSkus([FromBody] GetSkusRequest request)
-    {
-        var response = await _mediatorWrapper.Send(new GetFilteredSkusMessage(request, request.Query, request.Seria));
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(PagedResult<SkuModel>), 200)]
+    public async Task<IActionResult> SearchSkus([FromBody] GetSkusRequest req, CancellationToken ct = default)
+        => Ok(await getFiltered.HandleAsync(new(req, req.Query, req.Seria), ct));
 
-    [HttpGet("serial/{serial}")]
-    [ProducesResponseType(typeof(SkuModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSkuByCode(string serial)
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(SkuModel), 200)]
+    public async Task<IActionResult> GetSku(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(new FindSkuMessage(serial));
-        return Ok(response);
-    }
-
-    [HttpGet("search/{query}")]
-    [ProducesResponseType(typeof(SkuModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchSkuByQuery(string query)
-    {
-        var result = await _mediatorWrapper.Send(new FindSkusMessage(query));
-        return Ok(result);
-    }
-
-    [HttpGet("product-stock")]
-    [ProducesResponseType(typeof(SkuModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProductStockSkus([FromQuery] GetProductStockSkusRequest request)
-    {
-        var response = await _mediatorWrapper.Send(new GetProductStockSkusMessage(
-            request,
-            request.ProductId,
-            request.StockId,
-            request.Types,
-            request.Query));
-        return Ok(response);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpGet("product/{id:guid}")]
-    [ProducesResponseType(typeof(SkuModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProductSkus(Guid id)
-    {
-        var response = await _mediatorWrapper.Send(new GetProductSkusMessage(id));
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(List<SkuModel>), 200)]
+    public async Task<IActionResult> GetProductSkus(Guid id, CancellationToken ct = default)
+        => Ok(await getProductSkus.HandleAsync(new(id), ct));
+
+    [HttpGet("product-stock")]
+    [ProducesResponseType(typeof(List<SkuModel>), 200)]
+    public async Task<IActionResult> GetProductStockSkus(
+        [FromQuery] Guid? productId, [FromQuery] Guid? stockId,
+        [FromQuery] List<ProductType>? types, [FromQuery] string? query,
+        [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
+        => Ok(await getProductStockSkus.HandleAsync(
+            new(new PagedRequest { Page = page, PageSize = size }, productId, stockId, types, query), ct));
+
+    [HttpGet("serial/{serial}")]
+    [ProducesResponseType(typeof(SkuModel), 200)]
+    public async Task<IActionResult> FindBySerial(string serial, CancellationToken ct = default)
+        => Ok(await findBySerial.HandleAsync(new(serial), ct));
+
+    [HttpGet("search/{query}")]
+    [ProducesResponseType(typeof(List<SkuModel>), 200)]
+    public async Task<IActionResult> SearchByQuery(string query, CancellationToken ct = default)
+        => Ok(await findSkus.HandleAsync(new(query), ct));
 
     [HttpGet("check-for-used/{id:guid}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CheckForUsed(Guid id)
-    {
-        var response = await _mediatorWrapper.Send(new CheckSkuForUsedMessage(id));
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(bool), 200)]
+    public async Task<IActionResult> CheckForUsed(Guid id, CancellationToken ct = default)
+        => Ok(await checkUsed.HandleAsync(new(id), ct));
+
+    public record CreateSkuRequest(string Name, string NameRu, string? NameEn, string? NameKa,
+        string SerialNumber, Guid ProductId, Guid? ManufacturerId, Guid MeasurementUnitId,
+        Guid? SupplierId, decimal Price, decimal Amount, DateTimeOffset ExpirationDate, SkuStatus Status);
 
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    // [HasPermissions(Warehouse.AccessAddInventoryUnit)]
-    public async Task<IActionResult> CreateSku(CreateSkuRequest request)
+    [ProducesResponseType(typeof(Guid), 201)]
+    public async Task<IActionResult> CreateSku([FromBody] CreateSkuRequest req, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(new CreateSkuMessage(
-            request.Name,
-            request.NameRu,
-            request.NameEn,
-            request.NameKa,
-            request.SerialNumber,
-            request.ProductId,
-            request.ManufacturerId,
-            request.MeasurementUnitId,
-            request.SupplierId,
-            request.Price,
-            request.Amount,
-            request.ExpirationDate,
-            request.Status
-            ));
-        return Ok(response);
+        var (id, error) = await create.HandleAsync(
+            new(req.Name, req.NameRu, req.NameEn, req.NameKa, req.SerialNumber,
+                req.ProductId, req.ManufacturerId, req.MeasurementUnitId, req.SupplierId,
+                req.Price, req.Amount, req.ExpirationDate, req.Status), ct);
+        return error is not null ? Conflict(error) : Ok(id);
     }
+
+    public record UpdateSkuRequest(Guid Id, string Name, string NameRu, string? NameEn, string? NameKa,
+        string SerialNumber, Guid ProductId, Guid? ManufacturerId, Guid MeasurementUnitId,
+        Guid? SupplierId, decimal Price, decimal Amount, DateTimeOffset ExpirationDate, SkuStatus Status);
 
     [HttpPut]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    // [HasPermissions(Warehouse.AccessEditInventoryUnit)]
-    public async Task<IActionResult> UpdateSku(UpdateSkuRequest request)
+    [ProducesResponseType(typeof(Guid), 202)]
+    public async Task<IActionResult> UpdateSku([FromBody] UpdateSkuRequest req, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(new UpdateSkuMessage(
-            request.Id,
-            request.Name,
-            request.NameRu,
-            request.NameEn,
-            request.NameKa,
-            request.SerialNumber,
-            request.ProductId,
-            request.ManufacturerId,
-            request.MeasurementUnitId,
-            request.SupplierId,
-            request.Price,
-            request.Amount,
-            request.ExpirationDate,
-            request.Status));
-        return Ok(response);
+        var ok = await update.HandleAsync(
+            new(req.Id, req.Name, req.NameRu, req.NameEn, req.NameKa, req.SerialNumber,
+                req.ProductId, req.ManufacturerId, req.MeasurementUnitId, req.SupplierId,
+                req.Price, req.Amount, req.ExpirationDate, req.Status), ct);
+        return ok ? Ok(req.Id) : NotFound();
     }
 
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status204NoContent)]
-    // [HasPermissions(Warehouse.AccessDeleteInventoryUnit)]
-    public async Task<IActionResult> DeleteSku(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteSku(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(new DeleteSkuMessage(id));
-        return Ok(response);
+        var (notFound, error) = await delete.HandleAsync(new(id), ct);
+        if (notFound) return NotFound();
+        return error is not null ? Conflict(error) : NoContent();
     }
 
     [HttpPost("delete-range")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status204NoContent)]
-    // [HasPermissions(Warehouse.AccessDeleteInventoryUnit)]
-    public async Task<IActionResult> DeleteSkus(Guid[] ids)
+    public async Task<IActionResult> DeleteSkus([FromBody] Guid[] ids, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(new DeleteSkusMessage(ids));
-        return Ok(response);
+        var (_, error) = await deleteRange.HandleAsync(new(ids), ct);
+        return error is not null ? Conflict(error) : NoContent();
     }
+}
+
+// Inline request type for table-list
+public record GetSkusRequest : PagedRequest
+{
+    public string? Query { get; init; }
+    public string? Seria { get; init; }
 }

@@ -4,6 +4,7 @@ using System.Text.Json;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Ucms.Application.Features;
 using Ucms.Application.MappingProfiles;
 using Ucms.Api.Middlewares;
 
@@ -26,13 +27,14 @@ public static class WebApplicationExtensions
         builder.Services.AddUcmsDbContext(connectionString);
         builder.Services.AddAppIdentity();
         builder.Services.AddUcmsTokenService();
-        builder.Services.AddUcmsMediator();
         builder.Services.AddUcmsCors("StockCors");
         builder.Services.AddApplicationAuth(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<Application.Abstractions.ICurrentContext, Infrastructure.Services.HttpCurrentContext>();
+        builder.Services.AddUcmsInfrastructureServices();
         builder.Services.AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true);
         builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MeasurementUnitProfile).Assembly));
+        builder.Services.AddFeatureHandlers();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>

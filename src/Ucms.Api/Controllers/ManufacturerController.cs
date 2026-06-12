@@ -2,143 +2,91 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Handlers.Manufacturer;
 using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.Manufacturers;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.Features.Manufacturers;
 
 [Route("api/manufacturers")]
 [ApiController]
 [Authorize]
-public class ManufacturerController : ControllerBase
+public class ManufacturerController(
+    GetManufacturers.Handler getAll,
+    GetStockSkuManufacturers.Handler getStockSku,
+    GetFilteredManufacturers.Handler getFiltered,
+    GetManufacturerById.Handler getById,
+    FindManufacturerByCode.Handler findByCode,
+    FindManufacturerByName.Handler findByName,
+    CreateManufacturer.Handler create,
+    UpdateManufacturer.Handler update,
+    DeleteManufacturer.Handler delete,
+    DeleteManufacturers.Handler deleteRange) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediator;
-
-    public ManufacturerController(IMediatorWrapper mediatorWrapper)
-    {
-        _mediator = mediatorWrapper;
-    }
-
-    /// <summary>
-    /// Получить коллекцию производителей.
-    /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetManufacturers([FromQuery] GetManufacturersRequest request)
-    {
-        var response = await _mediator.Send(new GetManufacturersMessage(request.Query, request));
+    [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), 200)]
+    public async Task<IActionResult> GetManufacturers([FromQuery] string? query,
+        [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
+        => Ok(await getAll.HandleAsync(new(query, page, size), ct));
 
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Получить коллекцию производителей.
-    /// </summary>
     [HttpGet("stock-sku")]
-    [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStockSkuManufacturers([FromQuery] GetStockSkuManufacturersRequest request)
-    {
-        var response = await _mediator.Send(new GetStockSkuManufacturersMessage(
-            request.Query,
-            request.OrganizationId,
-            request.StockId,
-            request.ProductId,
-            request));
+    [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), 200)]
+    public async Task<IActionResult> GetStockSkuManufacturers([FromQuery] string? query,
+        [FromQuery] Guid? organizationId, [FromQuery] Guid? stockId, [FromQuery] Guid? productId,
+        [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
+        => Ok(await getStockSku.HandleAsync(new(query, organizationId, stockId, productId, page, size), ct));
 
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Получить отфильтрованную коллекцию производителей.
-    /// </summary>
     [HttpPost("table-list")]
-    [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchManufacturers([FromBody] PagedRequest filter)
+    [ProducesResponseType(typeof(PagedResult<ManufacturerModel>), 200)]
+    public async Task<IActionResult> SearchManufacturers([FromBody] PagedRequest filter, CancellationToken ct = default)
+        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ManufacturerModel), 200)]
+    public async Task<IActionResult> GetManufacturer(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new GetFilteredManufacturersMessage(filter));
-        return Ok(response);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
-    /// <summary>
-    /// Получить производитель по идентификатор
-    /// </summary>
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(ManufacturerModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetManufacturer(Guid id)
-    {
-        var response = await _mediator.Send(new GetManufacturerMessage(id));
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Получить производитель по коду
-    /// </summary>
     [HttpGet("code/{code}")]
-    [ProducesResponseType(typeof(ManufacturerModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetManufacturerByCode(string code)
-    {
-        var response = await _mediator.Send(new FindCodeManufacturerMessage(code));
-        return Ok(response);
-    }
+    public async Task<IActionResult> FindByCode(string code, CancellationToken ct = default)
+        => Ok(await findByCode.HandleAsync(new(code), ct));
 
-    /// <summary>
-    /// Получить производитель по имени
-    /// </summary>
     [HttpGet("name/{name}")]
-    [ProducesResponseType(typeof(ManufacturerModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetManufacturerByName(string name)
-    {
-        var response = await _mediator.Send(new FindNameManufacturerMessage(name));
-        return Ok(response);
-    }
+    public async Task<IActionResult> FindByName(string name, CancellationToken ct = default)
+        => Ok(await findByName.HandleAsync(new(name), ct));
 
-    /// <summary>
-    /// Создать производителя
-    /// </summary>
+    public record CreateManufacturerRequest(string Name, string NameRu, string? NameEn, string? NameKa, string? Code);
+
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    // [HasPermissions(AddDirectories)]
-    public async Task<IActionResult> CreateManufacturer(CreateManufacturerMessage command)
+    [ProducesResponseType(typeof(Guid), 201)]
+    public async Task<IActionResult> CreateManufacturer([FromBody] CreateManufacturerRequest req, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(command);
-        return Ok(response);
+        var (id, error) = await create.HandleAsync(new(req.Name, req.NameRu, req.NameEn, req.NameKa, req.Code), ct);
+        return error is not null ? Conflict(error) : Ok(id);
     }
 
-    /// <summary>
-    /// Обновить производителя
-    /// </summary>
+    public record UpdateManufacturerRequest(Guid Id, string Name, string NameRu, string? NameEn, string? NameKa, string? Code);
+
     [HttpPut]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    // [HasPermissions(EditDirectories)]
-    public async Task<IActionResult> UpdateManufacturer(UpdateManufacturerMessage command)
+    [ProducesResponseType(typeof(Guid), 202)]
+    public async Task<IActionResult> UpdateManufacturer([FromBody] UpdateManufacturerRequest req, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(command);
-        return Ok(response);
+        var ok = await update.HandleAsync(new(req.Id, req.Name, req.NameRu, req.NameEn, req.NameKa, req.Code), ct);
+        return ok ? Ok(req.Id) : NotFound();
     }
 
-    /// <summary>
-    /// Удалить производителя
-    /// </summary>
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    // [HasPermissions(DeleteDirectories)]
-    public async Task<IActionResult> DeleteManufacturer(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteManufacturer(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new DeleteManufacturerMessage(id));
-        return Ok(response);
+        var (notFound, error) = await delete.HandleAsync(new(id), ct);
+        if (notFound) return NotFound();
+        return error is not null ? Conflict(error) : NoContent();
     }
 
-    /// <summary>
-    /// Удалить коллекцию производителей
-    /// </summary>
     [HttpPost("delete-range")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    // [HasPermissions(DeleteDirectories)]
-    public async Task<IActionResult> DeleteManufacturers(Guid[] guids)
+    public async Task<IActionResult> DeleteManufacturers([FromBody] Guid[] ids, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new DeleteManufacturersMessage(guids));
-        return Ok(response);
+        var (_, error) = await deleteRange.HandleAsync(new(ids), ct);
+        return error is not null ? Conflict(error) : NoContent();
     }
 }

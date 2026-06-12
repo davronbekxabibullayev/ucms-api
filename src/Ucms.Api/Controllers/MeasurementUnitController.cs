@@ -2,93 +2,87 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Ucms.Application.Persistence;
-using Ucms.Domain.Entities;
+using Ucms.Application.Features.MeasurementUnits;
 using Ucms.Domain.Enums;
 
-/// <summary>
-/// O'lchov birliklari — spravochnik (barcha foydalanuvchilar o'qiydi, Admin yozadi)
-/// </summary>
 [ApiController]
 [Route("api/measurement-units")]
 [Tags("Lookup")]
 [Authorize]
-public class MeasurementUnitController(IUcmsDbContext db) : ControllerBase
+public class MeasurementUnitController(
+    GetMeasurementUnits.Handler     getAll,
+    GetFilteredMeasurementUnits.Handler getFiltered,
+    GetMeasurementUnitById.Handler  getById,
+    FindMeasurementUnit.Handler     findByCode,
+    CreateMeasurementUnit.Handler   create,
+    UpdateMeasurementUnit.Handler   update,
+    DeleteMeasurementUnit.Handler   deleteOne,
+    DeleteMeasurementUnits.Handler  deleteBulk) : ControllerBase
 {
-    public record CreateUnitRequest(
-        string Code,
-        string Name,
-        string NameRu,
-        string? NameEn,
-        MeasurementUnitType Type,
-        decimal Multiplier = 1);
+    public record CreateUnitRequest(string Code, string Name, string NameRu,
+        string? NameEn, string? NameKa, MeasurementUnitType Type, decimal Multiplier = 1);
+    public record UpdateUnitRequest(string Name, string NameRu, string? NameEn, string? NameKa,
+        string? Code, MeasurementUnitType Type, decimal Multiplier);
+    public record DeleteBulkRequest(Guid[] Ids);
 
-    // ── GET /api/measurement-units ─────────────────────────────────────────────
-
-    /// <summary>
-    /// Barcha o'lchov birliklari
-    /// </summary>
     [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] MeasurementUnitType? type,
-        CancellationToken ct)
+    public async Task<IActionResult> GetAll([FromQuery] MeasurementUnitType? type, CancellationToken ct)
+        => Ok(await getAll.HandleAsync(new(type), ct));
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetFiltered(
+        [FromQuery] string? search, [FromQuery] MeasurementUnitType? type,
+        [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
+        => Ok(await getFiltered.HandleAsync(new(search, type, page, size), ct));
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
-        var query = db.MeasurementUnits.Where(u => !u.IsDeleted);
-        if (type.HasValue) query = query.Where(u => u.Type == type.Value);
-
-        var list = await query
-            .OrderBy(u => u.Name)
-            .Select(u => new { u.Id, u.Code, u.Name, u.NameRu, u.NameEn, u.Type, u.Multiplier })
-            .ToListAsync(ct);
-
-        return Ok(list);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
-    // ── POST /api/measurement-units ────────────────────────────────────────────
+    [HttpGet("find/{code}")]
+    public async Task<IActionResult> FindByCode(string code, CancellationToken ct)
+    {
+        var result = await findByCode.HandleAsync(new(code), ct);
+        return result is null ? NotFound() : Ok(result);
+    }
 
-    /// <summary>
-    /// Yangi o'lchov birligi qo'shish (faqat Admin)
-    /// </summary>
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateUnitRequest req, CancellationToken ct)
     {
-        if (await db.MeasurementUnits.AnyAsync(u => u.Code == req.Code && !u.IsDeleted, ct))
-            return BadRequest(new { message = $"'{req.Code}' kodi allaqachon mavjud" });
-
-        var unit = new MeasurementUnit
-        {
-            Id         = Guid.NewGuid(),
-            Code       = req.Code,
-            Name       = req.Name,
-            NameRu     = req.NameRu,
-            NameEn     = req.NameEn,
-            Type       = req.Type,
-            Multiplier = req.Multiplier,
-            IsDeleted  = false,
-        };
-
-        await db.MeasurementUnits.AddAsync(unit, ct);
-        await db.SaveChangesAsync(ct);
-        return Ok(new { unit.Id, unit.Code, unit.Name });
+        var (id, error) = await create.HandleAsync(
+            new(req.Code, req.Name, req.NameRu, req.NameEn, req.NameKa, req.Type, req.Multiplier), ct);
+        if (error is not null) return Conflict(error);
+        return Ok(id);
     }
 
-    // ── DELETE /api/measurement-units/{id} ─────────────────────────────────────
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUnitRequest req, CancellationToken ct)
+    {
+        var (notFound, error) = await update.HandleAsync(
+            new(id, req.Name, req.NameRu, req.NameEn, req.NameKa, req.Code, req.Type, req.Multiplier), ct);
+        if (notFound) return NotFound();
+        if (error is not null) return Conflict(error);
+        return NoContent();
+    }
 
-    /// <summary>
-    /// O'lchov birligini o'chirish — soft delete (faqat Admin)
-    /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        var unit = await db.MeasurementUnits.FindAsync([id], ct);
-        if (unit is null || unit.IsDeleted) return NotFound();
+        var found = await deleteOne.HandleAsync(new(id), ct);
+        return found ? NoContent() : NotFound();
+    }
 
-        unit.IsDeleted = true;
-        db.MeasurementUnits.Update(unit);
-        await db.SaveChangesAsync(ct);
+    [HttpDelete]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteBulk([FromBody] DeleteBulkRequest req, CancellationToken ct)
+    {
+        await deleteBulk.HandleAsync(new(req.Ids), ct);
         return NoContent();
     }
 }

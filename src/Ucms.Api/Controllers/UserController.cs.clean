@@ -1,0 +1,108 @@
+namespace Ucms.Api.Controllers;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Ucms.Application.Features.Users;
+
+[ApiController]
+[Route("api/users")]
+[Tags("User")]
+[Authorize]
+public class UserController(
+    GetUsers.Handler        getAll,
+    GetUserById.Handler     getById,
+    CreateUser.Handler      create,
+    UpdateUser.Handler      update,
+    SetUserRoles.Handler    setRoles,
+    ToggleUserActive.Handler toggleActive,
+    DeleteUser.Handler      delete,
+    GetRoles.Handler        getRoles) : ControllerBase
+{
+    public record CreateUserRequest(
+        string UserName, string Email, string Password,
+        string? FullName, string? PhoneNumber, List<string> Roles);
+
+    public record UpdateUserRequest(string? FullName, string? PhoneNumber, string? Email);
+
+    public record SetRolesRequest(List<string> Roles);
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] Guid? organizationId,
+        [FromQuery] string? search,
+        [FromQuery] bool? isActive,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        CancellationToken ct = default)
+    {
+        var (data, forbidden) = await getAll.HandleAsync(new(organizationId, search, isActive, page, size), ct);
+        if (forbidden) return Forbid();
+        return Ok(data);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        var (data, forbidden) = await getById.HandleAsync(new(id), ct);
+        if (forbidden) return Forbid();
+        return data is null ? NotFound() : Ok(data);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> Create([FromBody] CreateUserRequest req, CancellationToken ct)
+    {
+        var (data, forbidden, errors) = await create.HandleAsync(
+            new(req.UserName, req.Email, req.Password, req.FullName, req.PhoneNumber, req.Roles), ct);
+        if (forbidden)      return BadRequest(new { message = "Foydalanuvchiga tashkilot biriktirilmagan" });
+        if (errors is not null) return BadRequest(new { errors });
+        return Ok(data);
+    }
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest req, CancellationToken ct)
+    {
+        var (notFound, forbidden, errors) = await update.HandleAsync(
+            new(id, req.FullName, req.PhoneNumber, req.Email), ct);
+        if (notFound)           return NotFound();
+        if (forbidden)          return Forbid();
+        if (errors is not null) return BadRequest(new { errors });
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/roles")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> SetRoles(Guid id, [FromBody] SetRolesRequest req, CancellationToken ct)
+    {
+        var (notFound, forbidden) = await setRoles.HandleAsync(new(id, req.Roles), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return Ok(new { roles = req.Roles });
+    }
+
+    [HttpPatch("{id:guid}/toggle-active")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> ToggleActive(Guid id, CancellationToken ct)
+    {
+        var (data, notFound, forbidden) = await toggleActive.HandleAsync(new(id), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return Ok(data);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        var (notFound, forbidden, error) = await delete.HandleAsync(new(id), ct);
+        if (notFound)          return NotFound();
+        if (forbidden)         return Forbid();
+        if (error is not null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    [HttpGet("roles")]
+    public async Task<IActionResult> GetRoles(CancellationToken ct)
+        => Ok(await getRoles.HandleAsync(new(), ct));
+}

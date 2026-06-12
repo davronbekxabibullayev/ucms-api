@@ -1,9 +1,9 @@
 namespace Ucms.Application.Validators.MeasurementUnits;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.MeasurementUnits;
+using Ucms.Application.Features.MeasurementUnits;
 
-public class CreateMeasurementUnitRequestValidator : AbstractValidator<CreateMeasurementUnitRequest>
+public class CreateMeasurementUnitRequestValidator : AbstractValidator<CreateMeasurementUnit.Command>
 {
     public CreateMeasurementUnitRequestValidator()
     {

@@ -44,7 +44,29 @@ public class UcmsDbContext(
     public DbSet<BrigadePayment> BrigadePayments { get; set; }
 
     // ── Spravochniklar ─────────────────────────────────────────────────────
-    public DbSet<MeasurementUnit> MeasurementUnits { get; set; }
+    public DbSet<MeasurementUnit>             MeasurementUnits             { get; set; }
+    public DbSet<OrganizationMeasurementUnit> OrganizationMeasurementUnits { get; set; }
+
+    // ── Mahsulotlar ────────────────────────────────────────────────────────
+    public DbSet<Product>      Products      { get; set; }
+    public DbSet<Manufacturer> Manufacturers { get; set; }
+    public DbSet<Supplier>     Suppliers     { get; set; }
+    public DbSet<Sku>          Skus          { get; set; }
+
+    // ── Ombor ──────────────────────────────────────────────────────────────
+    public DbSet<Stock>                Stocks                { get; set; }
+    public DbSet<StockSku>             StockSkus             { get; set; }
+    public DbSet<StockDemand>          StockDemands          { get; set; }
+    public DbSet<StockDemandItem>      StockDemandItems      { get; set; }
+    public DbSet<StockBalanceRegister> StockBalanceRegisters { get; set; }
+    public DbSet<OrganizationSku>      OrganizationSkus      { get; set; }
+
+    // ── Kirim va chiqim ────────────────────────────────────────────────────
+    public DbSet<Income>        Incomes        { get; set; }
+    public DbSet<IncomeItem>    IncomeItems    { get; set; }
+    public DbSet<IncomeOutcome> IncomeOutcomes { get; set; }
+    public DbSet<Outcome>       Outcomes       { get; set; }
+    public DbSet<OutcomeItem>   OutcomeItems   { get; set; }
 
     // ── Identity (override) ────────────────────────────────────────────────
     public override DbSet<User> Users { get; set; }
@@ -77,6 +99,7 @@ public class UcmsDbContext(
         builder.Entity<UserLogin>().ToTable("UserLogins", "Identity");
         builder.Entity<RoleClaim>().ToTable("RoleClaims", "Identity");
         builder.Entity<UserToken>().ToTable("UserTokens", "Identity");
+        builder.Entity<RefreshToken>().ToTable("RefreshTokens", "Identity");
 
         // User ↔ Role navigations
         builder.Entity<User>()

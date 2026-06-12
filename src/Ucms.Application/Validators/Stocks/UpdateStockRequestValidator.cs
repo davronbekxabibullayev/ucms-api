@@ -1,15 +1,14 @@
 namespace Ucms.Application.Validators.Stocks;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.Stocks;
+using Ucms.Application.Features.Stocks;
 
-public class UpdateStockRequestValidator : AbstractValidator<UpdateStockRequest>
+public class UpdateStockRequestValidator : AbstractValidator<UpdateStock.Command>
 {
     public UpdateStockRequestValidator()
     {
-        RuleFor(x => x.NameRu).NotEmpty();
         RuleFor(x => x.Name).NotEmpty();
-        RuleFor(x => x.Code).NotEmpty();
+        RuleFor(x => x.NameRu).NotEmpty();
         RuleFor(x => x.OrganizationId).NotEmpty();
     }
 }

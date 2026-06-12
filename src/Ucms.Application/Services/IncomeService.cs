@@ -22,7 +22,7 @@ public class IncomeService(IUcmsDbContext dbContext) : IIncomeService
         var newStockSkus = CalcNewSkuAmountsAsync(income, measurementUnits, skuProductIds, stockBalanceRegistry, existingStockSkus);
         dbContext.StockSkus.AddRange(newStockSkus);
 
-        dbContext.StockBalanceRegistry.AddRange(stockBalanceRegistry);
+        dbContext.StockBalanceRegisters.AddRange(stockBalanceRegistry);
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }

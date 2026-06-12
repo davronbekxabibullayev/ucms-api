@@ -3,158 +3,130 @@ namespace Ucms.Api.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QueryForge.Models;
-using Ucms.Application.Handlers.Outcome;
-using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.Outcomes;
 using Ucms.Application.Abstractions.Storage;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.DTOs.Models;
+using Ucms.Application.Features.Outcomes;
+using Ucms.Domain.Enums;
 
 [Route("api/outcome")]
 [ApiController]
 [Authorize]
-public class OutcomeController : ControllerBase
+public class OutcomeController(
+    GetOutcomes.Handler getOutcomes,
+    GetOutcomeById.Handler getById,
+    GetOutcomeByExecutionId.Handler getByExecutionId,
+    FindOutcome.Handler findOutcome,
+    FindOutcomes.Handler findOutcomes,
+    GetFilteredOutcomes.Handler getFiltered,
+    GetOutcomeStats.Handler getStats,
+    CreateOutcome.Handler create,
+    UpdateOutcome.Handler update,
+    UpdateOutcomeStatus.Handler updateStatus,
+    DeleteOutcome.Handler delete,
+    UploadOutcomeFile.Handler uploadFile,
+    IFileStorageClient storageClient) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediator;
-    private readonly IFileStorageClient _storageClient;
-
-    public OutcomeController(IMediatorWrapper mediator, IFileStorageClient storageClient)
-    {
-        _mediator = mediator;
-        _storageClient = storageClient;
-    }
+    public record GetOutcomesRequest(PagedRequest Filter, Guid? StockId, string? Query, DateTime? From, DateTime? To);
+    public record GetOutcomeStatsRequest(Guid OrganizationId, DateTime From, DateTime To, DateTime PreviousFrom, DateTime PreviousTo);
+    public record UpdateOutcomeStatusRequest(Guid Id, OutcomeStatus Status);
+    public record CreateOutcomeRequest(string Name, string? Note, OutcomeType OutcomeType, OutcomeStatus OutcomeStatus,
+        PaymentType PaymentType, DateTimeOffset OutcomeDate, Guid StockId, Guid? IncomeStockId,
+        Guid? ExecutionId, IEnumerable<CreateOutcomeItemModel> OutcomeItems);
+    public record UpdateOutcomeRequest(Guid Id, string Name, string? Note, OutcomeType OutcomeType, OutcomeStatus OutcomeStatus,
+        PaymentType PaymentType, DateTimeOffset OutcomeDate, Guid StockId, Guid? IncomeStockId,
+        Guid? ExecutionId, IEnumerable<CreateOutcomeItemModel> OutcomeItems);
 
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(OutcomeModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOutcome(Guid id)
+    public async Task<IActionResult> GetOutcome(Guid id, CancellationToken ct)
     {
-        var response = await _mediator.Send(new GetOutcomeMessage(id));
-        return Ok(response);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpGet("execution/{executionId}")]
     [ProducesResponseType(typeof(OutcomeModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetExecutionOutcome(Guid executionId)
+    public async Task<IActionResult> GetExecutionOutcome(Guid executionId, CancellationToken ct)
     {
-        var response = await _mediator.Send(new GetExecutionOutcomeMessage(executionId));
-        return Ok(response);
+        var result = await getByExecutionId.HandleAsync(new(executionId), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(OutcomeModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOutcomes()
-    {
-        var response = await _mediator.Send(new GetOutcomesMessage());
-        return Ok(response);
-    }
+    public async Task<IActionResult> GetOutcomes(CancellationToken ct)
+        => Ok(await getOutcomes.HandleAsync(new(), ct));
 
     [HttpPost("table-list")]
     [ProducesResponseType(typeof(PagedResult<OutcomeModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetFilteredOutcomes([FromBody] GetOutcomesRequest request)
-    {
-        var response = await _mediator.Send(new GetFilteredOutcomesMessage(
-            request.Filter,
-            request.StockId,
-            request.Query,
-            request.From,
-            request.To));
-        return Ok(response);
-    }
+    public async Task<IActionResult> GetFilteredOutcomes([FromBody] GetOutcomesRequest request, CancellationToken ct)
+        => Ok(await getFiltered.HandleAsync(new(request.Filter, request.StockId, request.Query, request.From, request.To), ct));
 
     [HttpGet("name")]
     [ProducesResponseType(typeof(OutcomeModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOutcomeByName([FromQuery] string name)
-    {
-        var response = await _mediator.Send(new FindOutcomeMessage(name));
-        return Ok(response);
-    }
+    public async Task<IActionResult> GetOutcomeByName([FromQuery] string name, CancellationToken ct)
+        => Ok(await findOutcome.HandleAsync(new(name), ct));
 
     [HttpGet("search/{query}")]
     [ProducesResponseType(typeof(OutcomeModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchOutcomeByQuery(string query)
-    {
-        var result = await _mediator.Send(new FindOutcomesMessage(query));
-        return Ok(result);
-    }
+    public async Task<IActionResult> SearchOutcomes(string query, CancellationToken ct)
+        => Ok(await findOutcomes.HandleAsync(new(query), ct));
 
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    // [HasPermissions(Warehouse.AccessGenerateExpense)]
-    public async Task<IActionResult> CreateOutcome(CreateOutcomeMessage command)
+    public async Task<IActionResult> CreateOutcome([FromBody] CreateOutcomeRequest request, CancellationToken ct)
     {
-        var response = await _mediator.Send(command);
-        return Ok(response);
+        var id = await create.HandleAsync(new(request.Name, request.Note, request.OutcomeType, request.OutcomeStatus,
+            request.PaymentType, request.OutcomeDate, request.StockId, request.IncomeStockId, request.ExecutionId,
+            request.OutcomeItems), ct);
+        return Ok(id);
     }
 
     [HttpPut]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> UpdateOutcome(UpdateOutcomeMessage command)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateOutcome([FromBody] UpdateOutcomeRequest request, CancellationToken ct)
     {
-        var response = await _mediator.Send(command);
-        return Ok(response);
+        var found = await update.HandleAsync(new(request.Id, request.Name, request.Note, request.OutcomeType,
+            request.OutcomeStatus, request.PaymentType, request.OutcomeDate, request.StockId, request.IncomeStockId,
+            request.ExecutionId, request.OutcomeItems), ct);
+        return found ? NoContent() : NotFound();
     }
 
     [HttpPut("update-status")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    // [HasPermissions(Warehouse.AccessApproveOrRejectExpense)]
-    public async Task<IActionResult> UpdateOutcomeStatus(UpdateOutcomeStatusMessage command)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateOutcomeStatus([FromBody] UpdateOutcomeStatusRequest request, CancellationToken ct)
     {
-        var response = await _mediator.Send(command);
-        return Ok(response);
+        var (notFound, error) = await updateStatus.HandleAsync(new(request.Id, request.Status), ct);
+        if (notFound) return NotFound();
+        if (error is not null) return Conflict(error);
+        return NoContent();
     }
 
     [HttpGet("stats")]
     [ProducesResponseType(typeof(OutcomeStatsModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOutcomeStats([FromQuery] GetOutcomeStatsRequest request)
-    {
-        var response = await _mediator.Send(new GetOutcomeStatsMessage(
-            request.OrganizationId,
-            request.From,
-            request.To,
-            request.PreviousFrom,
-            request.PreviousTo));
-
-        return Ok(response);
-    }
+    public async Task<IActionResult> GetOutcomeStats([FromQuery] GetOutcomeStatsRequest request, CancellationToken ct)
+        => Ok(await getStats.HandleAsync(new(request.OrganizationId, request.From, request.To, request.PreviousFrom, request.PreviousTo), ct));
 
     [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteOutcome(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteOutcome(Guid id, CancellationToken ct)
     {
-        var response = await _mediator.Send(new DeleteOutcomeMessage(id));
-        return Ok(response);
+        var found = await delete.HandleAsync(new(id), ct);
+        return found ? NoContent() : NotFound();
     }
 
-    /// <summary>
-    /// Uploads a fire object file
-    /// </summary>
     [HttpPost("upload/{id}")]
     [RequestSizeLimit(10L * 1024L * 1024L)]
     [RequestFormLimits(MultipartBodyLengthLimit = 10L * 1024L * 1024L)]
     [ProducesResponseType(typeof(FileEntryModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Upload(Guid id, IFormFile file)
+    public async Task<IActionResult> Upload(Guid id, IFormFile file, CancellationToken ct)
     {
-        var response = await _mediator.Send(new UploadOutcomeFileMessage(id, file));
-
-        return Ok(response);
+        var (result, error) = await uploadFile.HandleAsync(new(id, file), ct);
+        if (error is not null) return BadRequest(error);
+        return Ok(result);
     }
 
-    /// <summary>
-    /// Downloads a specific file
-    /// </summary>
     [HttpGet("download/{id}")]
     [ProducesResponseType(typeof(FileEntryModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Download(Guid id, [FromQuery] string path)
-    {
-        try
-        {
-            /*var response = await _storageClient.DownloadAsync($"{path}/{id}.pdf");
-            return File(response, "application/octet-stream");*/
-
-            return Ok();
-        }
-        catch
-        {
-            return BadRequest("File not found");
-        }
-    }
+    public IActionResult Download(Guid id, [FromQuery] string path) => Ok();
 }

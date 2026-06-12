@@ -1,9 +1,9 @@
 namespace Ucms.Application.Validators.Manufacturers;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.Manufacturers;
+using Ucms.Application.Features.Manufacturers;
 
-public class UpdateManufacturerRequestValidator : AbstractValidator<UpdateManufacturerRequest>
+public class UpdateManufacturerRequestValidator : AbstractValidator<UpdateManufacturer.Command>
 {
     public UpdateManufacturerRequestValidator()
     {

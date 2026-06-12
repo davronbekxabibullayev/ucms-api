@@ -47,7 +47,7 @@ public class OutcomeService(IUcmsDbContext dbContext, IMapper mapper) : IOutcome
         }
 
         dbContext.StockSkus.UpdateRange(stockSkus);
-        dbContext.StockBalanceRegistry.AddRange(stockBalanceRegistry);
+        dbContext.StockBalanceRegisters.AddRange(stockBalanceRegistry);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 

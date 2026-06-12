@@ -1,9 +1,9 @@
 namespace Ucms.Application.Validators.Skus;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.Skus;
+using Ucms.Application.Features.Skus;
 
-public class UpdateSkuRequestValidator : AbstractValidator<UpdateSkuRequest>
+public class UpdateSkuRequestValidator : AbstractValidator<UpdateSku.Command>
 {
     public UpdateSkuRequestValidator()
     {

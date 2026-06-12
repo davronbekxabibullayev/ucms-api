@@ -1,9 +1,9 @@
 namespace Ucms.Application.Validators.Manufacturers;
 
 using FluentValidation;
-using Ucms.Application.DTOs.Requests.Manufacturers;
+using Ucms.Application.Features.Manufacturers;
 
-public class CreateManufacturerRequestValidator : AbstractValidator<CreateManufacturerRequest>
+public class CreateManufacturerRequestValidator : AbstractValidator<CreateManufacturer.Command>
 {
     public CreateManufacturerRequestValidator()
     {
