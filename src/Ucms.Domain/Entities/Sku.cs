@@ -26,17 +26,17 @@ public class Sku : LocalizableEntity, IDeletable
     /// <summary>
     /// Идентификатор продукта
     /// </summary>
-    public Guid ProductId { get; set; } = default!;
+    public required Guid ProductId { get; set; }
 
     /// <summary>
     /// Идентификатор производителя
     /// </summary>
-    public Guid? ManufacturerId { get; set; } = default!;
+    public Guid? ManufacturerId { get; set; }
 
     /// <summary>
     /// Идентификатор единицы измерение
     /// </summary>
-    public Guid MeasurementUnitId { get; set; } = default!;
+    public required Guid MeasurementUnitId { get; set; }
 
     /// <summary>
     /// Идентификатор поставщика

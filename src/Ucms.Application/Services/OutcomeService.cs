@@ -1,10 +1,11 @@
 namespace Ucms.Application.Services;
 
+using Ucms.Application.Features.Outcomes;
+
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Ucms.Domain.Enums;
 using Ucms.Domain.Exceptions;
-using Ucms.Application.DTOs.Models;
 using Ucms.Domain.Entities;
 using Ucms.Application.Persistence;
 
@@ -47,7 +48,7 @@ public class OutcomeService(IUcmsDbContext dbContext, IMapper mapper) : IOutcome
         }
 
         dbContext.StockSkus.UpdateRange(stockSkus);
-        dbContext.StockBalanceRegistry.AddRange(stockBalanceRegistry);
+        dbContext.StockBalanceRegisters.AddRange(stockBalanceRegistry);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -104,12 +105,12 @@ public class OutcomeService(IUcmsDbContext dbContext, IMapper mapper) : IOutcome
             IncomeTransferStatus = IncomeTransferStatus.Received,
             IncomeType = outcome.OutcomeType == OutcomeType.Broadcast ? IncomeType.Internal : IncomeType.Return,
             StockId = incomeStockId,
-            IncomeItems = outcome.OutcomeItems.Select(s => new IncomeItem
+            IncomeItems = [.. outcome.OutcomeItems.Select(s => new IncomeItem
             {
                 SkuId = s.SkuId,
                 Amount = s.Amount,
                 MeasurementUnitId = s.MeasurementUnitId
-            }).ToArray()
+            })]
         };
     }
 

@@ -1,33 +1,21 @@
 namespace Ucms.Api.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Ucms.Application.DTOs.Requests.Stats;
-using Ucms.Application.Handlers.Stats;
+using Microsoft.AspNetCore.Mvc;
 using Ucms.Application.Abstractions.Dashboards;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.Features.Stats;
 
 [Route("api/stats")]
 [ApiController]
 [Authorize]
-public class StockStatsController : ControllerBase
+public class StockStatsController(GetAmbulanceStocksStats.Handler getStats) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediator;
-
-    public StockStatsController(IMediatorWrapper mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet("stock-skues")]
     [ProducesResponseType(typeof(DashboardWidgetModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStockSkuesStats([FromQuery] GetStocksStatisticsRequest request)
-    {
-        var response = await _mediator.Send(new GetAmbulanceStockStatsMessage(
-            request.OrganizationId,
-            request.RegionId,
-            request.CityId));
-
-        return Ok(response);
-    }
+    public async Task<IActionResult> GetStockSkuesStats(
+        [FromQuery] Guid? organizationId,
+        [FromQuery] Guid? regionId,
+        [FromQuery] Guid? cityId,
+        CancellationToken ct)
+        => Ok(await getStats.HandleAsync(new(organizationId, regionId, cityId), ct));
 }

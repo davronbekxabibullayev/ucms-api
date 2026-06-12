@@ -2,156 +2,91 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QueryForge.Abstractions;
 using QueryForge.Models;
-using Ucms.Application.Handlers.Product;
-using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.Products;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.Features.Products;
+using Ucms.Domain.Enums;
 
 [Route("api/products")]
 [ApiController]
 [Authorize]
-public class ProductController : ControllerBase
+public class ProductController(
+    GetProducts.Handler getProducts,
+    GetFilteredProducts.Handler getFiltered,
+    GetProductById.Handler getById,
+    FindProductByCode.Handler findByCode,
+    FindProductByName.Handler findByName,
+    CreateProduct.Handler create,
+    UpdateProduct.Handler update,
+    DeleteProduct.Handler delete,
+    DeleteProducts.Handler deleteRange) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediator;
-
-    public ProductController(IMediatorWrapper mediatorWrapper)
-    {
-        _mediator = mediatorWrapper;
-    }
-
-    /// <summary>
-    /// Получить коллекцию всех продуктов
-    /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResult<ProductModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProducts([FromQuery] GetProductsRequest request)
-    {
-        var response = await _mediator.Send(new GetProductsMessage(request.Query, request.Type, request));
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(PagedResult<ProductModel>), 200)]
+    public async Task<IActionResult> GetProducts([FromQuery] string? query, [FromQuery] List<ProductType>? type,
+        [FromQuery] int page = 1, [FromQuery] int size = 20, CancellationToken ct = default)
+        => Ok(await getProducts.HandleAsync(new(query, type, page, size), ct));
 
-    /// <summary>
-    /// Получить коллекцию всех продуктов по организацию
-    /// </summary>
-    [HttpGet("organization")]
-    [ProducesResponseType(typeof(PagedResult<ProductModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetOrganizationProducts([FromQuery] GetOrganizationProductsRequest request)
-    {
-        /*var response = await _mediator.Send(new GetOrganizationProductsMessage(request.OrganizationId, request.StockId, request));
-        return Ok(response);*/
-        return Ok();
-    }
-
-    /// <summary>
-    /// Получить коллекцию продуктов фильтруется
-    /// </summary>
     [HttpPost("table-list")]
-    [ProducesResponseType(typeof(PagedResult<ProductModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchProducts([FromBody] PagedRequest filter)
+    [ProducesResponseType(typeof(PagedResult<ProductModel>), 200)]
+    public async Task<IActionResult> SearchProducts([FromBody] PagedRequest filter, CancellationToken ct = default)
+        => Ok(await getFiltered.HandleAsync(new(filter), ct));
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ProductModel), 200)]
+    public async Task<IActionResult> GetProduct(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new GetFilteredProductsMessage(filter));
-        return Ok(response);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
-    /// <summary>
-    /// Получить продукт по id
-    /// </summary>
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(ProductModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProduct(Guid id)
-    {
-        var response = await _mediator.Send(new GetProductMessage(id));
-        return Ok(response);
-    }
-
-    /// <summary>
-    /// Получить продукт по коду
-    /// </summary>
     [HttpGet("code/{code}")]
-    [ProducesResponseType(typeof(ProductModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProductsByCode(string code)
-    {
-        var response = await _mediator.Send(new FindCodeProductMessage(code));
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(ProductModel), 200)]
+    public async Task<IActionResult> GetProductByCode(string code, CancellationToken ct = default)
+        => Ok(await findByCode.HandleAsync(new(code), ct));
 
-    /// <summary>
-    /// Найдите продукт по названию
-    /// </summary>
     [HttpGet("name/{name}")]
-    [ProducesResponseType(typeof(ProductModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProductByName(string name)
-    {
-        var response = await _mediator.Send(new FindNameProductMessage(name));
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(ProductModel), 200)]
+    public async Task<IActionResult> GetProductByName(string name, CancellationToken ct = default)
+        => Ok(await findByName.HandleAsync(new(name), ct));
 
-    /// <summary>
-    /// Создать продукт
-    /// </summary>
+    public record CreateProductRequest(string Name, string NameRu, string? NameEn, string? NameKa,
+        string? Code, string? InternationalCode, string? InternationalName, string? AlternativeName, ProductType Type);
+
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    // [HasPermissions(AddDirectories)]
-    public async Task<IActionResult> CreateProduct(CreateProductRequest request)
+    [ProducesResponseType(typeof(Guid), 201)]
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest req, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new CreateProductMessage(
-            request.Name,
-            request.NameRu,
-            request.NameEn,
-            request.NameKa,
-            request.Code,
-            request.InternationalCode,
-            request.InternationalName,
-            request.AlternativeName,
-            request.Type));
-        return Ok(response);
+        var (id, error) = await create.HandleAsync(
+            new(req.Name, req.NameRu, req.NameEn, req.NameKa, req.Code,
+                req.InternationalCode, req.InternationalName, req.AlternativeName, req.Type), ct);
+        return error is not null ? Conflict(error) : Ok(id);
     }
 
-    /// <summary>
-    /// Обновить продукт
-    /// </summary>
+    public record UpdateProductRequest(Guid Id, string Name, string NameRu, string? NameEn, string? NameKa,
+        string? Code, string? InternationalCode, string? InternationalName, string? AlternativeName, ProductType Type);
+
     [HttpPut]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    // [HasPermissions(EditDirectories)]
-    public async Task<IActionResult> UpdateProduct(UpdateProductRequest request)
+    [ProducesResponseType(typeof(Guid), 202)]
+    public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductRequest req, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new UpdateProductMessage(
-            request.Id,
-            request.Name,
-            request.NameRu,
-            request.NameEn,
-            request.NameKa,
-            request.Code,
-            request.InternationalCode,
-            request.InternationalName,
-            request.AlternativeName,
-            request.Type));
-        return Ok(response);
+        var ok = await update.HandleAsync(
+            new(req.Id, req.Name, req.NameRu, req.NameEn, req.NameKa, req.Code,
+                req.InternationalCode, req.InternationalName, req.AlternativeName, req.Type), ct);
+        return ok ? Ok(req.Id) : NotFound();
     }
 
-    /// <summary>
-    /// Удалить продукт по id
-    /// </summary>
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status204NoContent)]
-    // [HasPermissions(DeleteDirectories)]
-    public async Task<IActionResult> DeleteProduct(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteProduct(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new DeleteProductMessage(id));
-        return Ok(response);
+        var (notFound, error) = await delete.HandleAsync(new(id), ct);
+        if (notFound) return NotFound();
+        return error is not null ? Conflict(error) : NoContent();
     }
 
-    /// <summary>
-    /// Удалить коллекцию товаров
-    /// </summary>
     [HttpPost("delete-range")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status204NoContent)]
-    // [HasPermissions(DeleteDirectories)]
-    public async Task<IActionResult> DeleteProducts(Guid[] guids)
+    public async Task<IActionResult> DeleteProducts([FromBody] Guid[] ids, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new DeleteProductsMessage(guids));
-        return Ok(response);
+        var (_, error) = await deleteRange.HandleAsync(new(ids), ct);
+        return error is not null ? Conflict(error) : NoContent();
     }
 }

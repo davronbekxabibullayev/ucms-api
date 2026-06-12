@@ -1,0 +1,42 @@
+namespace Ucms.Application.Features.StockDemands;
+
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using QueryForge.Abstractions;
+using QueryForge.Extensions;
+using QueryForge.Models;
+using Ucms.Application.Abstractions;
+using Ucms.Application.Abstractions.Authorization;
+using Ucms.Application.Abstractions.Constants;
+using Ucms.Application.Persistence;
+using Ucms.Domain.Entities;
+
+public static class GetRequestedDemands
+{
+    public record Query(PagedRequest Paging, DateTime? From, DateTime? To, string? Name);
+
+    public sealed class Handler(IUcmsDbContext db, IMapper mapper, IWorkContext workContext, IPermissionProvider permissionProvider)
+    {
+        public async Task<PagedResult<RequestedDemandModel>> HandleAsync(Query q, CancellationToken ct)
+        {
+            var query = db.StockDemands
+                .Include(i => i.Sender)
+                .Where(w => w.Sender!.OrganizationId == workContext.TenantId);
+
+            if (!await permissionProvider.HasPermissionAsync(Permissions.Warehouse.AccessSettingMinimumBalanceWarehouse, ct))
+                query = query.Where(w => w.Sender!.EmployeeIds.Contains(workContext.EmployeeId ?? Guid.Empty));
+
+            if (q.From != null && q.To != null)
+                query = query.Where(w => w.DemandDate.Date >= q.From.Value.Date && w.DemandDate.Date <= q.To.Value.Date);
+
+            if (!string.IsNullOrEmpty(q.Name))
+            {
+                var n = q.Name.ToLower();
+                query = query.Where(w => w.Name.ToLower().Contains(n));
+            }
+
+            return await query.OrderBy(c => c.Name)
+                .ToPagedResultAsync<StockDemand, RequestedDemandModel>(q.Paging, mapper, ct);
+        }
+    }
+}

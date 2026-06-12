@@ -1,7 +1,6 @@
 namespace Ucms.Infrastructure.Persistence;
 
 using System.Reflection;
-using MassTransit.Mediator;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -13,8 +12,7 @@ using Ucms.Domain.Entities.Identity;
 
 public class UcmsDbContext(
     DbContextOptions<UcmsDbContext> options,
-    ICurrentContext context,
-    IMediator? bus)
+    ICurrentContext context)
     : IdentityDbContext<
         User, Role, Guid,
         UserClaim, UserRole, UserLogin,
@@ -44,7 +42,29 @@ public class UcmsDbContext(
     public DbSet<BrigadePayment> BrigadePayments { get; set; }
 
     // ── Spravochniklar ─────────────────────────────────────────────────────
-    public DbSet<MeasurementUnit> MeasurementUnits { get; set; }
+    public DbSet<MeasurementUnit>             MeasurementUnits             { get; set; }
+    public DbSet<OrganizationMeasurementUnit> OrganizationMeasurementUnits { get; set; }
+
+    // ── Mahsulotlar ────────────────────────────────────────────────────────
+    public DbSet<Product>      Products      { get; set; }
+    public DbSet<Manufacturer> Manufacturers { get; set; }
+    public DbSet<Supplier>     Suppliers     { get; set; }
+    public DbSet<Sku>          Skus          { get; set; }
+
+    // ── Ombor ──────────────────────────────────────────────────────────────
+    public DbSet<Stock>                Stocks                { get; set; }
+    public DbSet<StockSku>             StockSkus             { get; set; }
+    public DbSet<StockDemand>          StockDemands          { get; set; }
+    public DbSet<StockDemandItem>      StockDemandItems      { get; set; }
+    public DbSet<StockBalanceRegister> StockBalanceRegisters { get; set; }
+    public DbSet<OrganizationSku>      OrganizationSkus      { get; set; }
+
+    // ── Kirim va chiqim ────────────────────────────────────────────────────
+    public DbSet<Income>        Incomes        { get; set; }
+    public DbSet<IncomeItem>    IncomeItems    { get; set; }
+    public DbSet<IncomeOutcome> IncomeOutcomes { get; set; }
+    public DbSet<Outcome>       Outcomes       { get; set; }
+    public DbSet<OutcomeItem>   OutcomeItems   { get; set; }
 
     // ── Identity (override) ────────────────────────────────────────────────
     public override DbSet<User> Users { get; set; }
@@ -77,6 +97,7 @@ public class UcmsDbContext(
         builder.Entity<UserLogin>().ToTable("UserLogins", "Identity");
         builder.Entity<RoleClaim>().ToTable("RoleClaims", "Identity");
         builder.Entity<UserToken>().ToTable("UserTokens", "Identity");
+        builder.Entity<RefreshToken>().ToTable("RefreshTokens", "Identity");
 
         // User ↔ Role navigations
         builder.Entity<User>()
@@ -229,9 +250,10 @@ public class UcmsDbContext(
 
     // ── Domain events ──────────────────────────────────────────────────────
     /// <summary>
-    /// Barcha entity lardagi domain eventlarni MassTransit orqali publish qiladi
+    /// Entity lardagi domain eventlarni tozalaydi.
+    /// MassTransit consumer lar tayyor bo'lgandan keyin publish qo'shiladi.
     /// </summary>
-    private async Task PublishDomainEventsAsync(CancellationToken ct)
+    private Task PublishDomainEventsAsync(CancellationToken ct)
     {
         var entities = ChangeTracker
             .Entries<Entity>()
@@ -239,15 +261,8 @@ public class UcmsDbContext(
             .Select(e => e.Entity)
             .ToList();
 
-        var events = entities
-            .SelectMany(e => e.DomainEvents)
-            .ToList();
-
         entities.ForEach(e => e.ClearDomainEvents());
 
-        if (bus is null) return;
-
-        foreach (var domainEvent in events)
-            await bus.Publish(domainEvent, domainEvent.GetType(), ct);
+        return Task.CompletedTask;
     }
 }

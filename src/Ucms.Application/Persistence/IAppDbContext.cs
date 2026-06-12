@@ -33,11 +33,33 @@ public interface IUcmsDbContext
 
     // O'lchov birliklari (spravochnik)
     DbSet<MeasurementUnit> MeasurementUnits { get; set; }
+    DbSet<OrganizationMeasurementUnit> OrganizationMeasurementUnits { get; set; }
+
+    // Mahsulotlar va ishlab chiqaruvchilar
+    DbSet<Product>      Products      { get; set; }
+    DbSet<Manufacturer> Manufacturers { get; set; }
+    DbSet<Supplier>     Suppliers     { get; set; }
+    DbSet<Sku>          Skus          { get; set; }
+
+    // Ombor
+    DbSet<Stock>                Stocks                { get; set; }
+    DbSet<StockSku>             StockSkus             { get; set; }
+    DbSet<StockDemand>          StockDemands          { get; set; }
+    DbSet<StockDemandItem>      StockDemandItems      { get; set; }
+    DbSet<StockBalanceRegister> StockBalanceRegisters { get; set; }
+    DbSet<OrganizationSku>      OrganizationSkus      { get; set; }
+
+    // Kirim va chiqim
+    DbSet<Income>        Incomes        { get; set; }
+    DbSet<IncomeItem>    IncomeItems    { get; set; }
+    DbSet<IncomeOutcome> IncomeOutcomes { get; set; }
+    DbSet<Outcome>       Outcomes       { get; set; }
+    DbSet<OutcomeItem>   OutcomeItems   { get; set; }
 
     // Identity
-    DbSet<User>      Users         { get; set; }
-    DbSet<Role>      Roles         { get; set; }
-    DbSet<UserRole>  UserRoles     { get; set; }
+    DbSet<User>         Users         { get; set; }
+    DbSet<Role>         Roles         { get; set; }
+    DbSet<UserRole>     UserRoles     { get; set; }
     DbSet<RefreshToken> RefreshTokens { get; set; }
 
     int SaveChanges();

@@ -1,10 +1,12 @@
 namespace Ucms.Api.Extensions;
 
-using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Abstractions;
 using Ucms.Application.Abstractions.Auth;
-using Ucms.Application.Handlers;
+using Ucms.Application.Abstractions.Authorization;
+using Ucms.Application.Abstractions.Organization;
+using Ucms.Application.Abstractions.Storage;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities.Identity;
 using Ucms.Infrastructure.Persistence;
@@ -62,12 +64,12 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddUcmsMediator(this IServiceCollection services)
+    public static IServiceCollection AddUcmsInfrastructureServices(this IServiceCollection services)
     {
-        services.AddMediator(cfg =>
-        {
-            cfg.AddConsumers(typeof(IApplicationAssemblyMarker).Assembly);
-        });
+        services.AddScoped<IWorkContext, HttpWorkContext>();
+        services.AddScoped<IOrganizationClient, StubOrganizationClient>();
+        services.AddScoped<IPermissionProvider, StubPermissionProvider>();
+        services.AddScoped<IFileStorageClient, StubFileStorageClient>();
         return services;
     }
 

@@ -3,136 +3,166 @@ namespace Ucms.Api.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QueryForge.Models;
-using Ucms.Application.Handlers.Income;
-using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.Incomes;
 using Ucms.Application.Abstractions.Storage;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.Features.Incomes;
+using Ucms.Domain.Enums;
 
+/// <summary>
+/// Kirim operatsiyalarini boshqarish.
+/// Управление операциями прихода.
+/// </summary>
 [Route("api/income")]
 [ApiController]
 [Authorize]
-public class IncomeController : ControllerBase
+public class IncomeController(
+    GetIncomes.Handler getAll,
+    GetIncomeById.Handler getById,
+    FindIncome.Handler findByName,
+    FindIncomes.Handler findMany,
+    GetFilteredIncomes.Handler getFiltered,
+    CreateIncome.Handler create,
+    UpdateIncome.Handler update,
+    UpdateIncomeStatus.Handler updateStatus,
+    DeleteIncome.Handler delete,
+    UploadIncomeFile.Handler upload,
+    IFileStorageClient storageClient) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediator;
-    private readonly IFileStorageClient _storageClient;
-
-    public IncomeController(IMediatorWrapper mediator, IFileStorageClient storageClient)
-    {
-        _mediator = mediator;
-        _storageClient = storageClient;
-    }
-
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(IncomeModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetIncome(Guid id)
-    {
-        var response = await _mediator.Send(new GetIncomeMessage(id));
-        return Ok(response);
-    }
-
-    [HttpGet("name/{name}")]
-    [ProducesResponseType(typeof(IncomeModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetIncomeByName(string name)
-    {
-        var response = await _mediator.Send(new FindIncomeMessage(name));
-        return Ok(response);
-    }
-
+    /// <summary>
+    /// Barcha kirimlar ro'yxati (sahifalash bilan).
+    /// Список всех приходов (с пагинацией).
+    /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(IncomeModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetIncomes()
-    {
-        var response = await _mediator.Send(new GetIncomesMessage());
-        return Ok(response);
-    }
+    [ProducesResponseType(typeof(List<IncomeModel>), 200)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        CancellationToken ct = default)
+        => Ok(await getAll.HandleAsync(new(page, size), ct));
 
-    [HttpPost("table-list")]
-    [ProducesResponseType(typeof(PagedResult<IncomeModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetFilteredIncomes([FromBody] GetIncomesRequest request)
+    /// <summary>
+    /// ID bo'yicha kirimni olish.
+    /// Получить приход по ID.
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(IncomeModel), 200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new GetFilteredIncomesMessage(
-            request.Filter,
-            request.StockId,
-            request.Query,
-            request.From,
-            request.To));
-        return Ok(response);
-    }
-
-    [HttpGet("search/{query}")]
-    [ProducesResponseType(typeof(IncomeModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchIncome(string query)
-    {
-        var result = await _mediator.Send(new FindIncomesMessage(query));
-        return Ok(result);
-    }
-
-    [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    // [HasPermissions([Warehouse.AccessGenerateIncome])]
-    public async Task<IActionResult> CreateIncome(CreateIncomeMessage command)
-    {
-        var response = await _mediator.Send(command);
-        return Ok(response);
-    }
-
-    [HttpPut]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> UpdateIncome(UpdateIncomeMessage command)
-    {
-        var response = await _mediator.Send(command);
-        return Ok(response);
-    }
-
-    [HttpPut("update-status")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    // [HasPermissions(Warehouse.AccessApproveOrRejectIncome)]
-    public async Task<IActionResult> UpdateStatusOfIncome(UpdateIncomeStatusMessage command)
-    {
-        var response = await _mediator.Send(command);
-        return Ok(response);
-    }
-
-    [HttpDelete("{id}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteIncome(Guid id)
-    {
-        var response = await _mediator.Send(new DeleteIncomeMessage(id));
-        return Ok(response);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     /// <summary>
-    /// Uploads a fire object file
+    /// Nom bo'yicha kirimni qidirish.
+    /// Найти приход по наименованию.
     /// </summary>
-    [HttpPost("upload/{id}")]
+    [HttpGet("name/{name}")]
+    public async Task<IActionResult> FindByName(string name, CancellationToken ct = default)
+        => Ok(await findByName.HandleAsync(new(name), ct));
+
+    /// <summary>
+    /// Matn bo'yicha kirimlarni qidirish.
+    /// Поиск приходов по тексту.
+    /// </summary>
+    [HttpGet("search/{query}")]
+    public async Task<IActionResult> Search(string query, CancellationToken ct = default)
+        => Ok(await findMany.HandleAsync(new(query), ct));
+
+    public record GetIncomesRequest(PagedRequest Filter, Guid? StockId, string? Query, DateTime? From, DateTime? To);
+
+    /// <summary>
+    /// Filtrланган kirimlar jadval ro'yxati.
+    /// Фильтрованный табличный список приходов.
+    /// </summary>
+    [HttpPost("table-list")]
+    [ProducesResponseType(typeof(PagedResult<IncomeModel>), 200)]
+    public async Task<IActionResult> GetFiltered([FromBody] GetIncomesRequest req, CancellationToken ct = default)
+        => Ok(await getFiltered.HandleAsync(new(req.Filter, req.StockId, req.Query, req.From, req.To), ct));
+
+    public record CreateIncomeRequest(string Name, string? Note, IncomeType IncomeType, IncomeStatus IncomeStatus,
+        PaymentType PaymentType, DateTimeOffset IncomeDate, Guid StockId, IEnumerable<CreateIncomeItemModel> IncomeItems);
+
+    /// <summary>
+    /// Yangi kirim yaratish.
+    /// Создать новый приход.
+    /// </summary>
+    [HttpPost]
+    [ProducesResponseType(typeof(Guid), 201)]
+    public async Task<IActionResult> Create([FromBody] CreateIncomeRequest req, CancellationToken ct = default)
+    {
+        var id = await create.HandleAsync(
+            new(req.Name, req.Note, req.IncomeType, req.IncomeStatus, req.PaymentType,
+                req.IncomeDate, req.StockId, req.IncomeItems), ct);
+        return StatusCode(201, id);
+    }
+
+    public record UpdateIncomeRequest(Guid Id, string Name, string? Note, IncomeType IncomeType, IncomeStatus IncomeStatus,
+        PaymentType PaymentType, DateTimeOffset IncomeDate, Guid StockId, IEnumerable<CreateIncomeItemModel> IncomeItems);
+
+    /// <summary>
+    /// Kirim ma'lumotlarini yangilash.
+    /// Обновить данные прихода.
+    /// </summary>
+    [HttpPut]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Update([FromBody] UpdateIncomeRequest req, CancellationToken ct = default)
+    {
+        var ok = await update.HandleAsync(
+            new(req.Id, req.Name, req.Note, req.IncomeType, req.IncomeStatus, req.PaymentType,
+                req.IncomeDate, req.StockId, req.IncomeItems), ct);
+        return ok ? NoContent() : NotFound();
+    }
+
+    public record UpdateStatusRequest(Guid Id, IncomeStatus Status);
+
+    /// <summary>
+    /// Kirim holatini yangilash.
+    /// Обновить статус прихода.
+    /// </summary>
+    [HttpPut("update-status")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusRequest req, CancellationToken ct = default)
+    {
+        var ok = await updateStatus.HandleAsync(new(req.Id, req.Status), ct);
+        return ok ? NoContent() : NotFound();
+    }
+
+    /// <summary>
+    /// Kirimni o'chirish.
+    /// Удалить приход.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct = default)
+    {
+        var ok = await delete.HandleAsync(new(id), ct);
+        return ok ? NoContent() : NotFound();
+    }
+
+    /// <summary>
+    /// Kirimga fayl yuklash (maks. 10 MB).
+    /// Загрузить файл к приходу (макс. 10 МБ).
+    /// </summary>
+    [HttpPost("upload/{id:guid}")]
     [RequestSizeLimit(10L * 1024L * 1024L)]
     [RequestFormLimits(MultipartBodyLengthLimit = 10L * 1024L * 1024L)]
-    [ProducesResponseType(typeof(FileEntryModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Upload(Guid id, IFormFile file)
+    [ProducesResponseType(typeof(FileEntryModel), 200)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> Upload(Guid id, IFormFile file, CancellationToken ct = default)
     {
-        var response = await _mediator.Send(new UploadIncomeFileMessage(id, file));
-
-        return Ok(response);
+        var (result, error) = await upload.HandleAsync(new(id, file), ct);
+        return error is not null ? BadRequest(error) : Ok(result);
     }
 
     /// <summary>
-    /// Downloads a specific file
+    /// Kirimga biriktirilgan faylni yuklab olish. Hozircha amalga oshirilmagan.
+    /// Скачать прикреплённый файл прихода. Пока не реализовано.
     /// </summary>
-    [HttpGet("download/{id}")]
-    [ProducesResponseType(typeof(FileEntryModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Download(Guid id, [FromQuery] string path)
-    {
-        try
-        {
-            /*var response = await _storageClient.DownloadAsync($"{path}/{id}.pdf");
-            return File(response, "application/octet-stream");*/
-
-            return Ok();
-        }
-        catch
-        {
-            return BadRequest("File not found");
-        }
-    }
+    [HttpGet("download/{id:guid}")]
+    [ProducesResponseType(501)]
+    public IActionResult Download(Guid id, [FromQuery] string path)
+        => StatusCode(501, new { message = "Fayl yuklab olish hozircha amalga oshirilmagan. / Скачивание файлов ещё не реализовано." });
 }

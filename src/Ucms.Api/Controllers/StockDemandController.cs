@@ -3,110 +3,99 @@ namespace Ucms.Api.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QueryForge.Models;
-using Ucms.Application.Handlers.StockDemand;
-using Ucms.Application.DTOs.Models;
-using Ucms.Application.DTOs.Requests.StockDemands;
-using Ucms.Application.Abstractions.Mediator;
+using Ucms.Application.Features.StockDemands;
+using Ucms.Domain.Enums;
 
 [Route("api/stock-demand")]
 [ApiController]
 [Authorize]
-public class StockDemandController : ControllerBase
+public class StockDemandController(
+    GetStockDemands.Handler getAll,
+    GetStockDemandById.Handler getById,
+    FindStockDemand.Handler findByName,
+    FindStockDemands.Handler findMany,
+    GetRequestedDemands.Handler getRequested,
+    GetReceivedDemands.Handler getReceived,
+    CreateStockDemand.Handler create,
+    UpdateStockDemand.Handler update,
+    UpdateStockDemandStatus.Handler updateStatus,
+    UpdateStockDemandBroadcastStatus.Handler updateBroadcastStatus) : ControllerBase
 {
-    private readonly IMediatorWrapper _mediatorWrapper;
+    [HttpGet]
+    [ProducesResponseType(typeof(List<StockDemandModel>), 200)]
+    public async Task<IActionResult> GetAll(CancellationToken ct = default)
+        => Ok(await getAll.HandleAsync(new(), ct));
 
-    public StockDemandController(IMediatorWrapper mediatorWrapper)
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(StockDemandModel), 200)]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
     {
-        _mediatorWrapper = mediatorWrapper;
-    }
-
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(StockDemandModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStockDemand(Guid id)
-    {
-        var response = await _mediatorWrapper.Send(new GetStockDemandMessage(id));
-        return Ok(response);
+        var result = await getById.HandleAsync(new(id), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpGet("name/{name}")]
-    [ProducesResponseType(typeof(StockDemandModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStockDemandByName(string name)
-    {
-        var response = await _mediatorWrapper.Send(new FindStockDemandMessage(name));
-        return Ok(response);
-    }
-
-    [HttpGet]
-    [ProducesResponseType(typeof(StockDemandModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStockDemands()
-    {
-        var response = await _mediatorWrapper.Send(new GetStockDemandsMessage());
-        return Ok(response);
-    }
-
-    [HttpPost("requested-demands")]
-    [ProducesResponseType(typeof(PagedResult<RequestedDemandModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> RequestedDemands([FromBody] GetRequestedDemandsRequest request)
-    {
-        var response = await _mediatorWrapper.Send(new GetRequestedDemandsMessage(
-            request.Filter,
-            request.From,
-            request.To,
-            request.Name));
-        return Ok(response);
-    }
-
-    [HttpPost("received-demands")]
-    [ProducesResponseType(typeof(PagedResult<ReceivedDemandModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ReceivedDemands([FromBody] GetReceivedDemandsRequest request)
-    {
-        var response = await _mediatorWrapper.Send(new GetReceivedDemandsMessage(
-            request.Filter,
-            request.From,
-            request.To,
-            request.Name));
-        return Ok(response);
-    }
+    public async Task<IActionResult> FindByName(string name, CancellationToken ct = default)
+        => Ok(await findByName.HandleAsync(new(name), ct));
 
     [HttpGet("search/{query}")]
-    [ProducesResponseType(typeof(StockDemandModel[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(string query)
-    {
-        var result = await _mediatorWrapper.Send(new FindStockDemandsMessage(query));
-        return Ok(result);
-    }
+    public async Task<IActionResult> Search(string query, CancellationToken ct = default)
+        => Ok(await findMany.HandleAsync(new(query), ct));
+
+    public record DemandsRequest(PagedRequest Filter, DateTime? From, DateTime? To, string? Name);
+
+    [HttpPost("requested-demands")]
+    [ProducesResponseType(typeof(PagedResult<RequestedDemandModel>), 200)]
+    public async Task<IActionResult> GetRequestedDemands([FromBody] DemandsRequest req, CancellationToken ct = default)
+        => Ok(await getRequested.HandleAsync(new(req.Filter, req.From, req.To, req.Name), ct));
+
+    [HttpPost("received-demands")]
+    [ProducesResponseType(typeof(PagedResult<ReceivedDemandModel>), 200)]
+    public async Task<IActionResult> GetReceivedDemands([FromBody] DemandsRequest req, CancellationToken ct = default)
+        => Ok(await getReceived.HandleAsync(new(req.Filter, req.From, req.To, req.Name), ct));
+
+    public record CreateStockDemandRequest(string Name, string? Note, DateTimeOffset DemandDate,
+        StockDemandStatus DemandStatus, Guid SenderId, Guid RecipientId, IEnumerable<StockDemandItemModel> Items);
 
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    // [HasPermissions(Warehouse.AccessGenerateNeedsRequest)]
-    public async Task<IActionResult> CreateStockDemand(CreateStockDemandMessage command)
+    [ProducesResponseType(typeof(Guid), 201)]
+    public async Task<IActionResult> Create([FromBody] CreateStockDemandRequest req, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(command);
-        return Ok(response);
+        var (id, error) = await create.HandleAsync(
+            new(req.Name, req.Note, req.DemandDate, req.DemandStatus, req.SenderId, req.RecipientId, req.Items), ct);
+        return error is not null ? Conflict(error) : Ok(id);
     }
+
+    public record UpdateStockDemandRequest(Guid Id, string Name, string? Note, DateTimeOffset DemandDate,
+        StockDemandStatus DemandStatus, Guid SenderId, Guid RecipientId, IEnumerable<StockDemandItemModel> Items);
 
     [HttpPut]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> UpdateStockDemand(UpdateStockDemandMessage command)
+    [ProducesResponseType(typeof(Guid), 202)]
+    public async Task<IActionResult> Update([FromBody] UpdateStockDemandRequest req, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(command);
-        return Ok(response);
+        var (notFound, error) = await update.HandleAsync(
+            new(req.Id, req.Name, req.Note, req.DemandDate, req.DemandStatus, req.SenderId, req.RecipientId, req.Items), ct);
+        if (notFound) return NotFound();
+        return error is not null ? Conflict(error) : Ok(req.Id);
     }
+
+    public record UpdateStatusRequest(Guid Id, StockDemandStatus Status);
 
     [HttpPut("update-status")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    // [HasPermissions(Warehouse.AccessApproveOrRejectReceivedNeeds)]
-    public async Task<IActionResult> UpdateDemandStatus(UpdateStockDemandStatusMessage command)
+    public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusRequest req, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(command);
-        return Ok(response);
+        var (notFound, error) = await updateStatus.HandleAsync(new(req.Id, req.Status), ct);
+        if (notFound) return NotFound();
+        return error is not null ? Conflict(error) : Ok(req.Id);
     }
 
+    public record UpdateBroadcastStatusRequest(Guid Id, Guid OutcomeId, StockDemandBroadcastStatus Status);
+
     [HttpPut("update-broadcast-status")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> UpdateDemandBroadcastStatus(UpdateStockDemandBroadcastStatusMessage command)
+    public async Task<IActionResult> UpdateBroadcastStatus([FromBody] UpdateBroadcastStatusRequest req, CancellationToken ct = default)
     {
-        var response = await _mediatorWrapper.Send(command);
-        return Ok(response);
+        var (notFound, error) = await updateBroadcastStatus.HandleAsync(new(req.Id, req.OutcomeId, req.Status), ct);
+        if (notFound) return NotFound();
+        return error is not null ? Conflict(error) : Ok(req.Id);
     }
 }

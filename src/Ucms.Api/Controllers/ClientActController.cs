@@ -2,219 +2,122 @@ namespace Ucms.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Ucms.Application.Abstractions;
-using Ucms.Application.Persistence;
-using Ucms.Domain.Entities;
+using Ucms.Application.Features.ClientActs;
 using Ucms.Domain.Enums;
 
+/// <summary>
+/// Loyiha aktlarini boshqarish.
+/// Управление актами проекта.
+/// </summary>
 [ApiController]
 [Route("api/projects/{projectId:guid}/acts")]
 [Tags("ClientAct")]
 [Authorize]
 public class ClientActController(
-    IUcmsDbContext db,
-    ICurrentContext ctx) : ControllerBase
+    GetClientActs.Handler       getAll,
+    GetClientActById.Handler    getById,
+    CreateClientAct.Handler     create,
+    UpdateClientActStatus.Handler updateStatus,
+    DeleteClientAct.Handler     delete) : ControllerBase
 {
-    // ── Requests ───────────────────────────────────────────────────────────────
-
     public record ActItemDto(Guid EstimateItemId, decimal Volume, decimal UnitPrice);
 
     public record CreateActRequest(
-        string ActNumber,
-        DateTimeOffset ActDate,
-        List<ActItemDto> Items,
-        string? Note);
+        string ActNumber, DateTimeOffset ActDate,
+        List<ActItemDto> Items, string? Note);
 
     public record UpdateActStatusRequest(ActStatus Status);
 
-    // ── Helpers ────────────────────────────────────────────────────────────────
-
-    private async Task<Guid?> GetProjectOrgAsync(Guid projectId, CancellationToken ct) =>
-        await db.Projects
-            .Where(p => p.Id == projectId && !p.IsDeleted)
-            .Select(p => (Guid?)p.OrganizationId)
-            .FirstOrDefaultAsync(ct);
-
-    private bool CanAccess(Guid orgId) =>
-        ctx.IsOwner || ctx.OrganizationId == orgId;
-
-    // ── GET /api/projects/{projectId}/acts ─────────────────────────────────────
-
     /// <summary>
-    /// Loyiha aktlari ro'yxati
+    /// Loyiha aktlari ro'yxati.
+    /// Список актов проекта.
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetAll(
-        Guid projectId,
-        [FromQuery] ActStatus? status,
-        CancellationToken ct)
+        Guid projectId, [FromQuery] ActStatus? status, CancellationToken ct)
     {
-        var orgId = await GetProjectOrgAsync(projectId, ct);
-        if (orgId is null) return NotFound();
-        if (!CanAccess(orgId.Value)) return Forbid();
-
-        var query = db.ClientActs.Where(a => a.ProjectId == projectId);
-        if (status.HasValue) query = query.Where(a => a.Status == status.Value);
-
-        var list = await query
-            .OrderByDescending(a => a.ActDate)
-            .Select(a => new
-            {
-                a.Id, a.ActNumber, a.ActDate, a.TotalAmount, a.Status, a.Note,
-                PaidAmount  = a.Payments.Sum(p => p.Amount),
-                ItemCount   = a.Items.Count,
-            })
-            .ToListAsync(ct);
-
-        return Ok(list);
+        var (data, notFound, forbidden) = await getAll.HandleAsync(new(projectId, status), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return Ok(data);
     }
 
-    // ── GET /api/projects/{projectId}/acts/{id} ────────────────────────────────
-
     /// <summary>
-    /// Akt tafsilotlari (qatorlar va to'lovlar bilan)
+    /// ID bo'yicha aktni olish.
+    /// Получить акт по ID.
     /// </summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid projectId, Guid id, CancellationToken ct)
     {
-        var orgId = await GetProjectOrgAsync(projectId, ct);
-        if (orgId is null) return NotFound();
-        if (!CanAccess(orgId.Value)) return Forbid();
-
-        var act = await db.ClientActs
-            .Where(a => a.Id == id && a.ProjectId == projectId)
-            .Select(a => new
-            {
-                a.Id, a.ActNumber, a.ActDate, a.TotalAmount, a.Status, a.Note,
-                a.CreatedAt, a.UpdatedAt,
-                Items = a.Items.Select(i => new
-                {
-                    i.Id, i.EstimateItemId,
-                    ItemName  = i.EstimateItem!.Name,
-                    Unit      = i.EstimateItem.Unit,
-                    i.Volume, i.UnitPrice, i.TotalAmount,
-                }),
-                Payments = a.Payments.Select(p => new
-                {
-                    p.Id, p.Date, p.Amount, p.PaymentMethod, p.Note,
-                }),
-                PaidAmount = a.Payments.Sum(p => p.Amount),
-            })
-            .FirstOrDefaultAsync(ct);
-
-        return act is null ? NotFound() : Ok(act);
+        var (data, notFound, forbidden) = await getById.HandleAsync(new(projectId, id), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return data is null ? NotFound() : Ok(data);
     }
 
-    // ── POST /api/projects/{projectId}/acts ────────────────────────────────────
-
     /// <summary>
-    /// Yangi akt yaratish
+    /// Yangi akt yaratish. Admin, Manager yoki Accountant uchun.
+    /// Создать новый акт. Для Admin, Manager или Accountant.
     /// </summary>
     [HttpPost]
     [Authorize(Roles = "Admin,Manager,Accountant")]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Create(
-        Guid projectId,
-        [FromBody] CreateActRequest req,
-        CancellationToken ct)
+        Guid projectId, [FromBody] CreateActRequest req, CancellationToken ct)
     {
-        var orgId = await GetProjectOrgAsync(projectId, ct);
-        if (orgId is null) return NotFound();
-        if (!CanAccess(orgId.Value)) return Forbid();
+        var items = req.Items.Select(i =>
+            new CreateClientAct.ActItemDto(i.EstimateItemId, i.Volume, i.UnitPrice)).ToList();
 
-        var actId      = Guid.NewGuid();
-        var totalAmount = req.Items.Sum(i => i.Volume * i.UnitPrice);
-        var now         = DateTimeOffset.UtcNow;
-        var userId      = ctx.UserId ?? Guid.Empty;
+        var (data, notFound, forbidden) = await create.HandleAsync(
+            new(projectId, req.ActNumber, req.ActDate, items, req.Note), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
 
-        var act = new ClientAct
-        {
-            Id          = actId,
-            ProjectId   = projectId,
-            ActNumber   = req.ActNumber,
-            ActDate     = req.ActDate,
-            TotalAmount = totalAmount,
-            Status      = ActStatus.Draft,
-            Note        = req.Note,
-            CreatedAt   = now, UpdatedAt = now,
-            CreatedBy   = userId, UpdatedBy = userId,
-        };
-
-        var items = req.Items.Select(i => new ClientActItem
-        {
-            Id             = Guid.NewGuid(),
-            ActId          = actId,
-            EstimateItemId = i.EstimateItemId,
-            Volume         = i.Volume,
-            UnitPrice      = i.UnitPrice,
-            TotalAmount    = i.Volume * i.UnitPrice,
-        }).ToList();
-
-        await db.ClientActs.AddAsync(act, ct);
-        await db.ClientActItems.AddRangeAsync(items, ct);
-        await db.SaveChangesAsync(ct);
-
-        return CreatedAtAction(nameof(GetById), new { projectId, id = actId },
-            new { id = actId, act.ActNumber, act.TotalAmount });
+        // data handler tomonidan kafolatlanadi — notFound va forbidden false bo'lsa null kelmasligi kerak
+        if (data is null) return StatusCode(500, new { message = "Akt yaratishda kutilmagan xato. / Непредвиденная ошибка при создании акта." });
+        return CreatedAtAction(nameof(GetById), new { projectId, id = data.Id }, data);
     }
 
-    // ── PATCH /api/projects/{projectId}/acts/{id}/status ──────────────────────
-
     /// <summary>
-    /// Akt holatini yangilash
+    /// Akt holatini yangilash. Admin, Manager yoki Accountant uchun.
+    /// Обновить статус акта. Для Admin, Manager или Accountant.
     /// </summary>
     [HttpPatch("{id:guid}/status")]
     [Authorize(Roles = "Admin,Manager,Accountant")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateStatus(
-        Guid projectId,
-        Guid id,
-        [FromBody] UpdateActStatusRequest req,
-        CancellationToken ct)
+        Guid projectId, Guid id, [FromBody] UpdateActStatusRequest req, CancellationToken ct)
     {
-        var orgId = await GetProjectOrgAsync(projectId, ct);
-        if (orgId is null) return NotFound();
-        if (!CanAccess(orgId.Value)) return Forbid();
-
-        var act = await db.ClientActs
-            .FirstOrDefaultAsync(a => a.Id == id && a.ProjectId == projectId, ct);
-
-        if (act is null) return NotFound();
-
-        act.Status    = req.Status;
-        act.UpdatedAt = DateTimeOffset.UtcNow;
-        act.UpdatedBy = ctx.UserId ?? Guid.Empty;
-
-        db.ClientActs.Update(act);
-        await db.SaveChangesAsync(ct);
-
+        var (notFound, projectNotFound, forbidden) = await updateStatus.HandleAsync(
+            new(projectId, id, req.Status), ct);
+        if (projectNotFound) return NotFound();
+        if (notFound)        return NotFound();
+        if (forbidden)       return Forbid();
         return NoContent();
     }
 
-    // ── DELETE /api/projects/{projectId}/acts/{id} ────────────────────────────
-
     /// <summary>
-    /// Aktni o'chirish (faqat Draft holatida)
+    /// Aktni o'chirish. Admin yoki Manager uchun.
+    /// Удалить акт. Для Admin или Manager.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid projectId, Guid id, CancellationToken ct)
     {
-        var orgId = await GetProjectOrgAsync(projectId, ct);
-        if (orgId is null) return NotFound();
-        if (!CanAccess(orgId.Value)) return Forbid();
-
-        var act = await db.ClientActs
-            .FirstOrDefaultAsync(a => a.Id == id && a.ProjectId == projectId, ct);
-
-        if (act is null) return NotFound();
-
-        if (act.Status != ActStatus.Draft)
-            return BadRequest(new { message = "Faqat Draft holatidagi aktni o'chirish mumkin" });
-
-        // Cascade: items va payments ham o'chadi (EF configuration bo'yicha)
-        db.ClientActs.Remove(act);
-        await db.SaveChangesAsync(ct);
-
+        var (notFound, projectNotFound, forbidden, error) = await delete.HandleAsync(new(projectId, id), ct);
+        if (projectNotFound)   return NotFound();
+        if (notFound)          return NotFound();
+        if (forbidden)         return Forbid();
+        if (error is not null) return BadRequest(new { message = error });
         return NoContent();
     }
 }
