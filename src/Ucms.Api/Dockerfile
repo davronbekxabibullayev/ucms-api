@@ -1,22 +1,38 @@
+# ─── Stage 1: Build ───────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# CPM va NuGet config (layer cache — bu fayllar kamdan-kam o'zgaradi)
+COPY Directory.Build.props Directory.Packages.props NuGet.Config ./
+
+# Solution va har bir csproj alohida (restore cache uchun)
+COPY ucms-api.sln ./
+COPY src/Ucms.Domain/Ucms.Domain.csproj            src/Ucms.Domain/
+COPY src/Ucms.Application/Ucms.Application.csproj  src/Ucms.Application/
+COPY src/Ucms.Infrastructure/Ucms.Infrastructure.csproj src/Ucms.Infrastructure/
+COPY src/Ucms.Api/Ucms.Api.csproj                  src/Ucms.Api/
+
+RUN dotnet restore
+
+# Manba kodini ko'chirish va publish
+COPY src/ src/
+RUN dotnet publish src/Ucms.Api/Ucms.Api.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+# ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-#Copy resources to docket layer
-COPY . .
-
-#Build artifact
-RUN cd ./src/Services/Stock/Ucms.Stock.Api && \
-    dotnet restore && \
-    dotnet build "Ucms.Stock.Api.csproj" -c Release -o /app/build && \
-    dotnet publish "Ucms.Stock.Api.csproj" -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS app
-
-WORKDIR /app
+# Non-root user (xavfsizlik)
+RUN adduser --disabled-password --gecos "" appuser
+USER appuser
 
 COPY --from=build /app/publish .
 
-EXPOSE 80/tcp
-EXPOSE 443/tcp
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
 
-ENTRYPOINT ["dotnet", "Ucms.Stock.Api.dll"]
+ENTRYPOINT ["dotnet", "Ucms.Api.dll"]
