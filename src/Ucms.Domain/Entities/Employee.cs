@@ -3,9 +3,10 @@ namespace Ucms.Domain.Entities;
 using Ucms.Domain.Common;
 
 /// <summary>
-/// Ishchi brigada
+/// Tashkilot xodimi
+/// Сотрудник организации
 /// </summary>
-public class Brigade : AuditableEntity, IDeletable
+public class Employee : AuditableEntity, IDeletable
 {
     /// <summary>
     /// Tashkilot ID
@@ -13,14 +14,14 @@ public class Brigade : AuditableEntity, IDeletable
     public Guid OrganizationId { get; set; }
 
     /// <summary>
-    /// Brigada nomi
+    /// Xodim to'liq ismi
     /// </summary>
     public string Name { get; set; } = default!;
 
     /// <summary>
-    /// Brigada boshlig'i ismi
+    /// Lavozimi
     /// </summary>
-    public string? ForemanName { get; set; }
+    public string? Position { get; set; }
 
     /// <summary>
     /// Telefon raqami
@@ -33,6 +34,16 @@ public class Brigade : AuditableEntity, IDeletable
     public string? Notes { get; set; }
 
     /// <summary>
+    /// Bog'liq tizim foydalanuvchisi ID (ixtiyoriy)
+    /// </summary>
+    public Guid? UserId { get; set; }
+
+    /// <summary>
+    /// Tegishli brigada ID (ixtiyoriy)
+    /// </summary>
+    public Guid? BrigadeId { get; set; }
+
+    /// <summary>
     /// Faol yoki yo'q
     /// </summary>
     public bool IsActive { get; set; } = true;
@@ -43,7 +54,6 @@ public class Brigade : AuditableEntity, IDeletable
     public bool IsDeleted { get; set; }
 
     public virtual Organization? Organization { get; set; }
-    public virtual ICollection<Employee> Employees { get; set; } = [];
-    public virtual ICollection<WorkLog> WorkLogs { get; set; } = [];
-    public virtual ICollection<BrigadePayment> Payments { get; set; } = [];
+    public virtual Brigade? Brigade { get; set; }
+    public virtual ICollection<Salary> Salaries { get; set; } = [];
 }

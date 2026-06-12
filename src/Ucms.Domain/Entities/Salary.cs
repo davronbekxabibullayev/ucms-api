@@ -14,14 +14,9 @@ public class Salary : AuditableEntity, IDeletable
     public Guid OrganizationId { get; set; }
 
     /// <summary>
-    /// Xodim ismi
+    /// Xodim ID (Employee jadvaliga FK)
     /// </summary>
-    public string EmployeeName { get; set; } = default!;
-
-    /// <summary>
-    /// Lavozim
-    /// </summary>
-    public string? Position { get; set; }
+    public Guid EmployeeId { get; set; }
 
     /// <summary>
     /// Oy (format: "2026-06")
@@ -42,4 +37,6 @@ public class Salary : AuditableEntity, IDeletable
     /// O'chirilgan yoki yo'q
     /// </summary>
     public bool IsDeleted { get; set; }
+
+    public virtual Employee? Employee { get; set; }
 }

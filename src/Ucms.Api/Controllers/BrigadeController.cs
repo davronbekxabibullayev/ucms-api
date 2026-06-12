@@ -14,15 +14,19 @@ using Ucms.Application.Features.Brigades.Queries;
 [Tags("Brigade")]
 [Authorize]
 public class BrigadeController(
-    GetBrigades.Handler    getAll,
-    GetBrigadeById.Handler getById,
-    CreateBrigade.Handler  create,
-    UpdateBrigade.Handler  update,
-    DeleteBrigade.Handler  delete) : ControllerBase
+    GetBrigades.Handler              getAll,
+    GetBrigadeById.Handler           getById,
+    CreateBrigade.Handler            create,
+    UpdateBrigade.Handler            update,
+    DeleteBrigade.Handler            delete,
+    AssignBrigadeEmployees.Handler   assignEmployees,
+    RemoveBrigadeEmployee.Handler    removeEmployee) : ControllerBase
 {
     public record CreateBrigadeRequest(string Name, string? ForemanName, string? Phone, string? Notes);
 
     public record UpdateBrigadeRequest(string Name, string? ForemanName, string? Phone, bool IsActive, string? Notes);
+
+    public record AssignEmployeesRequest(Guid[] EmployeeIds);
 
     /// <summary>
     /// Brigadalar ro'yxati.
@@ -39,8 +43,8 @@ public class BrigadeController(
     }
 
     /// <summary>
-    /// ID bo'yicha brigadani olish.
-    /// Получить бригаду по ID.
+    /// ID bo'yicha brigadani olish (xodimlar ro'yxati bilan).
+    /// Получить бригаду по ID (со списком сотрудников).
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(200)]
@@ -94,6 +98,38 @@ public class BrigadeController(
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var (notFound, forbidden) = await delete.HandleAsync(new(id), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Xodimlarni brigadaga biriktirish. Admin yoki Manager uchun.
+    /// Назначить сотрудников в бригаду. Для Admin или Manager.
+    /// </summary>
+    [HttpPost("{id:guid}/employees")]
+    [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> AssignEmployees(Guid id, [FromBody] AssignEmployeesRequest req, CancellationToken ct)
+    {
+        var (notFound, forbidden, assigned) = await assignEmployees.HandleAsync(new(id, req.EmployeeIds), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return Ok(new { assigned });
+    }
+
+    /// <summary>
+    /// Xodimni brigadadan chiqarish. Admin yoki Manager uchun.
+    /// Убрать сотрудника из бригады. Для Admin или Manager.
+    /// </summary>
+    [HttpDelete("{id:guid}/employees/{employeeId:guid}")]
+    [Authorize(Roles = "Admin,Manager")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> RemoveEmployee(Guid id, Guid employeeId, CancellationToken ct)
+    {
+        var (notFound, forbidden) = await removeEmployee.HandleAsync(new(id, employeeId), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
         return NoContent();

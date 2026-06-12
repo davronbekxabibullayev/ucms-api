@@ -1,23 +1,27 @@
 namespace Ucms.Application.Features.Salaries.Commands;
 
+using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 
 public static class CreateSalary
 {
-    public record Command(
-        string EmployeeName, string? Position,
-        string Month, decimal Amount, string? Notes);
+    public record Command(Guid EmployeeId, string Month, decimal Amount, string? Notes);
 
     public record Result(Guid Id, string EmployeeName, decimal Amount);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
-        public async Task<Result?> HandleAsync(Command cmd, CancellationToken ct)
+        public async Task<(Result? Data, bool EmployeeNotFound, bool Forbidden)> HandleAsync(Command cmd, CancellationToken ct)
         {
-            var orgId = ctx.OrganizationId;
-            if (!orgId.HasValue) return null;
+            var employee = await db.Employees
+                .Where(e => e.Id == cmd.EmployeeId && !e.IsDeleted)
+                .Select(e => new { e.Id, e.Name, e.OrganizationId })
+                .FirstOrDefaultAsync(ct);
+
+            if (employee is null) return (null, true, false);
+            if (!ctx.IsOwner && ctx.OrganizationId != employee.OrganizationId) return (null, false, true);
 
             var now    = DateTimeOffset.UtcNow;
             var userId = ctx.UserId ?? Guid.Empty;
@@ -25,9 +29,8 @@ public static class CreateSalary
             var salary = new Salary
             {
                 Id             = Guid.NewGuid(),
-                OrganizationId = orgId.Value,
-                EmployeeName   = cmd.EmployeeName,
-                Position       = cmd.Position,
+                OrganizationId = employee.OrganizationId,
+                EmployeeId     = cmd.EmployeeId,
                 Month          = cmd.Month,
                 Amount         = cmd.Amount,
                 Notes          = cmd.Notes,
@@ -38,7 +41,7 @@ public static class CreateSalary
 
             await db.Salaries.AddAsync(salary, ct);
             await db.SaveChangesAsync(ct);
-            return new Result(salary.Id, salary.EmployeeName, salary.Amount);
+            return (new Result(salary.Id, employee.Name, salary.Amount), false, false);
         }
     }
 }

@@ -44,6 +44,9 @@ public class UcmsDbContext(
     // ── Loyiha xarajatlari ─────────────────────────────────────────────────
     public DbSet<ProjectExpense> ProjectExpenses { get; set; }
 
+    // ── Xodimlar ───────────────────────────────────────────────────────────
+    public DbSet<Employee> Employees { get; set; }
+
     // ── Maoshlar ───────────────────────────────────────────────────────────
     public DbSet<Salary> Salaries { get; set; }
 
@@ -117,6 +120,13 @@ public class UcmsDbContext(
             .WithOne(ur => ur.Role)
             .HasForeignKey(ur => ur.RoleId)
             .IsRequired();
+
+        // User ↔ Employee (1:1, optional)
+        builder.Entity<User>()
+            .HasOne<Employee>()
+            .WithOne()
+            .HasForeignKey<User>(u => u.EmployeeId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // RefreshToken
         builder.Entity<RefreshToken>()
