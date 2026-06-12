@@ -20,9 +20,9 @@ public class BrigadeController(
     UpdateBrigade.Handler  update,
     DeleteBrigade.Handler  delete) : ControllerBase
 {
-    public record CreateBrigadeRequest(string Name, string? ForemanName, string? Phone);
+    public record CreateBrigadeRequest(string Name, string? ForemanName, string? Phone, string? Notes);
 
-    public record UpdateBrigadeRequest(string Name, string? ForemanName, string? Phone, bool IsActive);
+    public record UpdateBrigadeRequest(string Name, string? ForemanName, string? Phone, bool IsActive, string? Notes);
 
     /// <summary>
     /// Brigadalar ro'yxati.
@@ -30,9 +30,12 @@ public class BrigadeController(
     /// </summary>
     [HttpGet]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isActive, CancellationToken ct)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] bool? isActive,
+        [FromQuery] string? status,
+        CancellationToken ct = default)
     {
-        return Ok(await getAll.HandleAsync(new(isActive), ct));
+        return Ok(await getAll.HandleAsync(new(isActive, status), ct));
     }
 
     /// <summary>
@@ -59,7 +62,7 @@ public class BrigadeController(
     [ProducesResponseType(400)]
     public async Task<IActionResult> Create([FromBody] CreateBrigadeRequest req, CancellationToken ct)
     {
-        var result = await create.HandleAsync(new(req.Name, req.ForemanName, req.Phone), ct);
+        var result = await create.HandleAsync(new(req.Name, req.ForemanName, req.Phone, req.Notes), ct);
         if (result is null) return BadRequest(new { message = "Foydalanuvchiga tashkilot biriktirilmagan. / Пользователю не привязана организация." });
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
@@ -74,7 +77,7 @@ public class BrigadeController(
     [ProducesResponseType(404)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateBrigadeRequest req, CancellationToken ct)
     {
-        var (notFound, forbidden) = await update.HandleAsync(new(id, req.Name, req.ForemanName, req.Phone, req.IsActive), ct);
+        var (notFound, forbidden) = await update.HandleAsync(new(id, req.Name, req.ForemanName, req.Phone, req.IsActive, req.Notes), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
         return NoContent();

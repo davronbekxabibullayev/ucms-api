@@ -44,6 +44,21 @@ public class WorkLog : AuditableEntity
     public decimal TotalAmount { get; set; }
 
     /// <summary>
+    /// Qavat
+    /// </summary>
+    public string? Floor { get; set; }
+
+    /// <summary>
+    /// Zona / blok
+    /// </summary>
+    public string? Zone { get; set; }
+
+    /// <summary>
+    /// Xona / bo'lim
+    /// </summary>
+    public string? Room { get; set; }
+
+    /// <summary>
     /// Izoh
     /// </summary>
     public string? Note { get; set; }

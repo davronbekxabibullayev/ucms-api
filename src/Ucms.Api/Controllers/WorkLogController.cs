@@ -28,10 +28,14 @@ public class WorkLogController(
     public record CreateWorkLogRequest(
         Guid BrigadeId, Guid EstimateItemId,
         DateTimeOffset Date, decimal Volume,
-        decimal? BrigadeUnitPrice, string? Note);
+        decimal? BrigadeUnitPrice,
+        string? Floor, string? Zone, string? Room,
+        string? Note);
 
     public record UpdateWorkLogRequest(
-        DateTimeOffset Date, decimal Volume, decimal BrigadeUnitPrice, string? Note);
+        DateTimeOffset Date, decimal Volume, decimal BrigadeUnitPrice,
+        string? Floor, string? Zone, string? Room,
+        string? Note);
 
     public record ConfirmWorkLogRequest(Guid[] WorkLogIds);
     public record RejectWorkLogRequest(Guid[] WorkLogIds, string? Reason);
@@ -104,7 +108,7 @@ public class WorkLogController(
     {
         var (data, notFound, forbidden, error) = await create.HandleAsync(
             new(projectId, req.BrigadeId, req.EstimateItemId, req.Date,
-                req.Volume, req.BrigadeUnitPrice, req.Note), ct);
+                req.Volume, req.BrigadeUnitPrice, req.Floor, req.Zone, req.Room, req.Note), ct);
         if (notFound)          return NotFound();
         if (forbidden)         return Forbid();
         if (error is not null) return BadRequest(new { message = error });
@@ -124,7 +128,8 @@ public class WorkLogController(
         Guid projectId, Guid id, [FromBody] UpdateWorkLogRequest req, CancellationToken ct)
     {
         var (notFound, forbidden, error) = await update.HandleAsync(
-            new(projectId, id, req.Date, req.Volume, req.BrigadeUnitPrice, req.Note), ct);
+            new(projectId, id, req.Date, req.Volume, req.BrigadeUnitPrice,
+                req.Floor, req.Zone, req.Room, req.Note), ct);
         if (notFound)          return NotFound();
         if (forbidden)         return Forbid();
         if (error is not null) return BadRequest(new { message = error });

@@ -7,10 +7,10 @@ using Ucms.Domain.Enums;
 public static class UpdateProject
 {
     public record Command(
-        Guid Id, string Name, string? Address, string? Description,
+        Guid Id, string Name, string? ClientName, string? Address, string? Description,
         string? ContractNumber, DateTimeOffset? ContractDate,
         DateTimeOffset? StartDate, DateTimeOffset? EndDate,
-        ProjectStatus Status);
+        decimal? ContractValue, ProjectStatus Status);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -21,10 +21,12 @@ public static class UpdateProject
             if (!ctx.IsOwner && ctx.OrganizationId != project.OrganizationId) return (false, true);
 
             project.Name           = cmd.Name;
+            project.ClientName     = cmd.ClientName;
             project.Address        = cmd.Address;
             project.Description    = cmd.Description;
             project.ContractNumber = cmd.ContractNumber;
             project.ContractDate   = cmd.ContractDate;
+            project.ContractValue  = cmd.ContractValue;
             project.StartDate      = cmd.StartDate;
             project.EndDate        = cmd.EndDate;
             project.Status         = cmd.Status;

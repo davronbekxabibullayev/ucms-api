@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
 using Ucms.Application.Features.Projects.DTOs;
 using Ucms.Application.Persistence;
+using Ucms.Domain.Enums;
 
 public static class GetProjectById
 {
@@ -18,13 +19,16 @@ public static class GetProjectById
                 .Select(p => new ProjectDetailDto(
                     p.Id,
                     p.Name,
+                    p.ClientName,
                     p.Address,
                     p.Description,
                     p.ContractNumber,
                     p.ContractDate,
+                    p.ContractValue,
                     p.StartDate,
                     p.EndDate,
                     p.Status,
+                    MapStatusToString(p.Status),
                     p.OrganizationId,
                     p.CreatedAt,
                     p.UpdatedAt,
@@ -47,6 +51,19 @@ public static class GetProjectById
             if (project is null) return (null, false);
             if (!ctx.IsOwner && ctx.OrganizationId != project.OrganizationId) return (null, true);
             return (project, false);
+        }
+
+        private static string MapStatusToString(ProjectStatus status)
+        {
+            return status switch
+            {
+                ProjectStatus.Planning   => "planning",
+                ProjectStatus.InProgress => "active",
+                ProjectStatus.Completed  => "completed",
+                ProjectStatus.Suspended  => "suspended",
+                ProjectStatus.Cancelled  => "archived",
+                _                        => "planning",
+            };
         }
     }
 }

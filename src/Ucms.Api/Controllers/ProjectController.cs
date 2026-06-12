@@ -24,21 +24,25 @@ public class ProjectController(
 {
     public record CreateProjectRequest(
         string Name,
-        string? Address,
-        string? Description,
-        string? ContractNumber,
-        DateTimeOffset? ContractDate,
-        DateTimeOffset? StartDate,
-        DateTimeOffset? EndDate);
-
-    public record UpdateProjectRequest(
-        string Name,
+        string? ClientName,
         string? Address,
         string? Description,
         string? ContractNumber,
         DateTimeOffset? ContractDate,
         DateTimeOffset? StartDate,
         DateTimeOffset? EndDate,
+        decimal? ContractValue);
+
+    public record UpdateProjectRequest(
+        string Name,
+        string? ClientName,
+        string? Address,
+        string? Description,
+        string? ContractNumber,
+        DateTimeOffset? ContractDate,
+        DateTimeOffset? StartDate,
+        DateTimeOffset? EndDate,
+        decimal? ContractValue,
         ProjectStatus Status);
 
     /// <summary>
@@ -49,11 +53,12 @@ public class ProjectController(
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetAll(
         [FromQuery] ProjectStatus? status,
+        [FromQuery] string? statusString,
         [FromQuery] int page = 1,
         [FromQuery] int size = 20,
         CancellationToken ct = default)
     {
-        var (data, forbidden) = await getAll.HandleAsync(new(status, page, size), ct);
+        var (data, forbidden) = await getAll.HandleAsync(new(status, statusString, page, size), ct);
         if (forbidden) return Forbid();
         return Ok(data);
     }
@@ -83,8 +88,8 @@ public class ProjectController(
     public async Task<IActionResult> Create([FromBody] CreateProjectRequest req, CancellationToken ct)
     {
         var result = await create.HandleAsync(
-            new(req.Name, req.Address, req.Description, req.ContractNumber,
-                req.ContractDate, req.StartDate, req.EndDate), ct);
+            new(req.Name, req.ClientName, req.Address, req.Description, req.ContractNumber,
+                req.ContractDate, req.StartDate, req.EndDate, req.ContractValue), ct);
 
         if (result is null) return BadRequest(new { message = "Foydalanuvchiga tashkilot biriktirilmagan. / Пользователю не привязана организация." });
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
@@ -101,8 +106,8 @@ public class ProjectController(
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProjectRequest req, CancellationToken ct)
     {
         var (notFound, forbidden) = await update.HandleAsync(
-            new(id, req.Name, req.Address, req.Description, req.ContractNumber,
-                req.ContractDate, req.StartDate, req.EndDate, req.Status), ct);
+            new(id, req.Name, req.ClientName, req.Address, req.Description, req.ContractNumber,
+                req.ContractDate, req.StartDate, req.EndDate, req.ContractValue, req.Status), ct);
 
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();

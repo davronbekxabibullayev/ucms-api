@@ -49,6 +49,16 @@ public class Project : AuditableEntity, IDeletable
     public DateTimeOffset? EndDate { get; set; }
 
     /// <summary>
+    /// Buyurtmachi nomi
+    /// </summary>
+    public string? ClientName { get; set; }
+
+    /// <summary>
+    /// Shartnoma summasi
+    /// </summary>
+    public decimal? ContractValue { get; set; }
+
+    /// <summary>
     /// Loyiha holati
     /// </summary>
     public ProjectStatus Status { get; set; } = ProjectStatus.Planning;
@@ -64,4 +74,5 @@ public class Project : AuditableEntity, IDeletable
     public virtual ICollection<ClientAct> ClientActs { get; set; } = [];
     public virtual ICollection<ClientPayment> ClientPayments { get; set; } = [];
     public virtual ICollection<BrigadePayment> BrigadePayments { get; set; } = [];
+    public virtual ICollection<ProjectExpense> Expenses { get; set; } = [];
 }

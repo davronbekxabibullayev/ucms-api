@@ -112,6 +112,28 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Salaries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EmployeeName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Position = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Month = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Notes = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Salaries", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Stocks",
                 columns: table => new
                 {
@@ -219,6 +241,7 @@ namespace Ucms.Infrastructure.Migrations
                     Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     ForemanName = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
                     Phone = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Notes = table.Column<string>(type: "text", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -250,6 +273,8 @@ namespace Ucms.Infrastructure.Migrations
                     ContractDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     StartDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     EndDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    ClientName = table.Column<string>(type: "text", nullable: true),
+                    ContractValue = table.Column<decimal>(type: "numeric", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -594,6 +619,42 @@ namespace Ucms.Infrastructure.Migrations
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProjectExpenses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Category = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    PaymentMethod = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Note = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    ProjectId1 = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectExpenses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectExpenses_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProjectExpenses_Projects_ProjectId1",
+                        column: x => x.ProjectId1,
+                        principalTable: "Projects",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -977,6 +1038,9 @@ namespace Ucms.Infrastructure.Migrations
                     Volume = table.Column<decimal>(type: "numeric(18,4)", precision: 18, scale: 4, nullable: false),
                     BrigadeUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     TotalAmount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Floor = table.Column<string>(type: "text", nullable: true),
+                    Zone = table.Column<string>(type: "text", nullable: true),
+                    Room = table.Column<string>(type: "text", nullable: true),
                     Note = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     BrigadePaymentId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -1221,6 +1285,26 @@ namespace Ucms.Infrastructure.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProjectExpenses_Date",
+                table: "ProjectExpenses",
+                column: "Date");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectExpenses_OrganizationId",
+                table: "ProjectExpenses",
+                column: "OrganizationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectExpenses_ProjectId",
+                table: "ProjectExpenses",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectExpenses_ProjectId1",
+                table: "ProjectExpenses",
+                column: "ProjectId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Projects_Id",
                 table: "Projects",
                 column: "Id");
@@ -1248,6 +1332,16 @@ namespace Ucms.Infrastructure.Migrations
                 table: "Roles",
                 column: "NormalizedName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Salaries_Month",
+                table: "Salaries",
+                column: "Month");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Salaries_OrganizationId",
+                table: "Salaries",
+                column: "OrganizationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Skus_ManufacturerId",
@@ -1441,12 +1535,18 @@ namespace Ucms.Infrastructure.Migrations
                 name: "OutcomeItems");
 
             migrationBuilder.DropTable(
+                name: "ProjectExpenses");
+
+            migrationBuilder.DropTable(
                 name: "RefreshTokens",
                 schema: "Identity");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Salaries");
 
             migrationBuilder.DropTable(
                 name: "StockBalanceRegisters");

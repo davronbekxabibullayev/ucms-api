@@ -15,6 +15,9 @@ public static class CreateWorkLog
         DateTimeOffset Date,
         decimal Volume,
         decimal? BrigadeUnitPrice,
+        string? Floor,
+        string? Zone,
+        string? Room,
         string? Note);
 
     public record Result(Guid Id, decimal TotalAmount);
@@ -54,6 +57,9 @@ public static class CreateWorkLog
                 Volume           = cmd.Volume,
                 BrigadeUnitPrice = unitPrice,
                 TotalAmount      = totalAmount,
+                Floor            = cmd.Floor,
+                Zone             = cmd.Zone,
+                Room             = cmd.Room,
                 Note             = cmd.Note,
                 Status           = WorkLogStatus.Draft,
                 CreatedAt        = now, UpdatedAt = now,

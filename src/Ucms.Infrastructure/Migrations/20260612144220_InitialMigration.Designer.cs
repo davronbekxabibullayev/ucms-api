@@ -12,7 +12,7 @@ using Ucms.Infrastructure.Persistence;
 namespace Ucms.Infrastructure.Migrations
 {
     [DbContext(typeof(UcmsDbContext))]
-    [Migration("20260612121446_InitialMigration")]
+    [Migration("20260612144220_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -51,6 +51,9 @@ namespace Ucms.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid");
@@ -1040,12 +1043,18 @@ namespace Ucms.Infrastructure.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)");
 
+                    b.Property<string>("ClientName")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("ContractDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ContractNumber")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<decimal?>("ContractValue")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1090,6 +1099,128 @@ namespace Ucms.Infrastructure.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("Ucms.Domain.Entities.ProjectExpense", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ProjectId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Date");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("ProjectId1");
+
+                    b.ToTable("ProjectExpenses");
+                });
+
+            modelBuilder.Entity("Ucms.Domain.Entities.Salary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EmployeeName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Month")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Position")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Month");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("Salaries");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Sku", b =>
@@ -1458,12 +1589,18 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<Guid>("EstimateItemId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Floor")
+                        .HasColumnType("text");
+
                     b.Property<string>("Note")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Room")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -1481,6 +1618,9 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<decimal>("Volume")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Zone")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -1806,6 +1946,21 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.ProjectExpense", b =>
+                {
+                    b.HasOne("Ucms.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ucms.Domain.Entities.Project", null)
+                        .WithMany("Expenses")
+                        .HasForeignKey("ProjectId1");
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.Sku", b =>
                 {
                     b.HasOne("Ucms.Domain.Entities.Manufacturer", "Manufacturer")
@@ -2069,6 +2224,8 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("ClientPayments");
 
                     b.Navigation("EstimateSections");
+
+                    b.Navigation("Expenses");
 
                     b.Navigation("WorkLogs");
                 });

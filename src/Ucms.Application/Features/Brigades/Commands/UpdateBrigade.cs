@@ -5,7 +5,7 @@ using Ucms.Application.Persistence;
 
 public static class UpdateBrigade
 {
-    public record Command(Guid Id, string Name, string? ForemanName, string? Phone, bool IsActive);
+    public record Command(Guid Id, string Name, string? ForemanName, string? Phone, bool IsActive, string? Notes);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -19,6 +19,7 @@ public static class UpdateBrigade
             brigade.ForemanName = cmd.ForemanName;
             brigade.Phone       = cmd.Phone;
             brigade.IsActive    = cmd.IsActive;
+            brigade.Notes       = cmd.Notes;
             brigade.UpdatedAt   = DateTimeOffset.UtcNow;
             brigade.UpdatedBy   = ctx.UserId ?? Guid.Empty;
 

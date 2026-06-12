@@ -8,17 +8,21 @@ public static class GetBrigadeById
 {
     public record Query(Guid Id);
 
+    public record BrigadeDetailDto(
+        Guid Id, string Name, string? LeaderName, string? Phone,
+        bool IsActive, string Status, string? Notes,
+        Guid OrganizationId, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
+
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
-        public async Task<(object? Data, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
+        public async Task<(BrigadeDetailDto? Data, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
         {
             var brigade = await db.Brigades
                 .Where(b => b.Id == q.Id && !b.IsDeleted)
-                .Select(b => new
-                {
-                    b.Id, b.Name, b.ForemanName, b.Phone, b.IsActive,
-                    b.OrganizationId, b.CreatedAt, b.UpdatedAt,
-                })
+                .Select(b => new BrigadeDetailDto(
+                    b.Id, b.Name, b.ForemanName, b.Phone,
+                    b.IsActive, b.IsActive ? "active" : "archived", b.Notes,
+                    b.OrganizationId, b.CreatedAt, b.UpdatedAt))
                 .FirstOrDefaultAsync(ct);
 
             if (brigade is null) return (null, false);

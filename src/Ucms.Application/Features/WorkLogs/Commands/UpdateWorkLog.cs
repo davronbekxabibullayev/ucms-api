@@ -9,7 +9,8 @@ public static class UpdateWorkLog
 {
     public record Command(
         Guid ProjectId, Guid Id,
-        DateTimeOffset Date, decimal Volume, decimal BrigadeUnitPrice, string? Note);
+        DateTimeOffset Date, decimal Volume, decimal BrigadeUnitPrice,
+        string? Floor, string? Zone, string? Room, string? Note);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -34,6 +35,9 @@ public static class UpdateWorkLog
             workLog.Volume           = cmd.Volume;
             workLog.BrigadeUnitPrice = cmd.BrigadeUnitPrice;
             workLog.TotalAmount      = cmd.Volume * cmd.BrigadeUnitPrice;
+            workLog.Floor            = cmd.Floor;
+            workLog.Zone             = cmd.Zone;
+            workLog.Room             = cmd.Room;
             workLog.Note             = cmd.Note;
             workLog.UpdatedAt        = DateTimeOffset.UtcNow;
             workLog.UpdatedBy        = ctx.UserId ?? Guid.Empty;

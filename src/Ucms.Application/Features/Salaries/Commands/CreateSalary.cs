@@ -1,14 +1,16 @@
-namespace Ucms.Application.Features.Brigades.Commands;
+namespace Ucms.Application.Features.Salaries.Commands;
 
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 
-public static class CreateBrigade
+public static class CreateSalary
 {
-    public record Command(string Name, string? ForemanName, string? Phone, string? Notes);
+    public record Command(
+        string EmployeeName, string? Position,
+        string Month, decimal Amount, string? Notes);
 
-    public record Result(Guid Id, string Name);
+    public record Result(Guid Id, string EmployeeName, decimal Amount);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -20,23 +22,23 @@ public static class CreateBrigade
             var now    = DateTimeOffset.UtcNow;
             var userId = ctx.UserId ?? Guid.Empty;
 
-            var brigade = new Brigade
+            var salary = new Salary
             {
                 Id             = Guid.NewGuid(),
                 OrganizationId = orgId.Value,
-                Name           = cmd.Name,
-                ForemanName    = cmd.ForemanName,
-                Phone          = cmd.Phone,
+                EmployeeName   = cmd.EmployeeName,
+                Position       = cmd.Position,
+                Month          = cmd.Month,
+                Amount         = cmd.Amount,
                 Notes          = cmd.Notes,
-                IsActive       = true,
                 IsDeleted      = false,
                 CreatedAt      = now, UpdatedAt = now,
                 CreatedBy      = userId, UpdatedBy = userId,
             };
 
-            await db.Brigades.AddAsync(brigade, ct);
+            await db.Salaries.AddAsync(salary, ct);
             await db.SaveChangesAsync(ct);
-            return new Result(brigade.Id, brigade.Name);
+            return new Result(salary.Id, salary.EmployeeName, salary.Amount);
         }
     }
 }

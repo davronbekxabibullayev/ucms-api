@@ -31,6 +31,12 @@ public interface IUcmsDbContext
     // Brigada to'lovlari
     DbSet<BrigadePayment> BrigadePayments { get; set; }
 
+    // Loyiha xarajatlari
+    DbSet<ProjectExpense> ProjectExpenses { get; set; }
+
+    // Maoshlar
+    DbSet<Salary> Salaries { get; set; }
+
     // O'lchov birliklari (spravochnik)
     DbSet<MeasurementUnit> MeasurementUnits { get; set; }
     DbSet<OrganizationMeasurementUnit> OrganizationMeasurementUnits { get; set; }

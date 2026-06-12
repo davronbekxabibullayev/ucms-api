@@ -28,6 +28,11 @@ public class Brigade : AuditableEntity, IDeletable
     public string? Phone { get; set; }
 
     /// <summary>
+    /// Izoh / qo'shimcha ma'lumot
+    /// </summary>
+    public string? Notes { get; set; }
+
+    /// <summary>
     /// Faol yoki yo'q
     /// </summary>
     public bool IsActive { get; set; } = true;

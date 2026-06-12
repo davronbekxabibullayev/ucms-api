@@ -41,6 +41,12 @@ public class UcmsDbContext(
     // ── Brigada to'lovlari ─────────────────────────────────────────────────
     public DbSet<BrigadePayment> BrigadePayments { get; set; }
 
+    // ── Loyiha xarajatlari ─────────────────────────────────────────────────
+    public DbSet<ProjectExpense> ProjectExpenses { get; set; }
+
+    // ── Maoshlar ───────────────────────────────────────────────────────────
+    public DbSet<Salary> Salaries { get; set; }
+
     // ── Spravochniklar ─────────────────────────────────────────────────────
     public DbSet<MeasurementUnit>             MeasurementUnits             { get; set; }
     public DbSet<OrganizationMeasurementUnit> OrganizationMeasurementUnits { get; set; }
