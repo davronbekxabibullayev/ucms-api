@@ -464,19 +464,25 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EstimateSections",
+                name: "Estimates",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false)
+                    Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EstimateSections", x => x.Id);
+                    table.PrimaryKey("PK_Estimates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EstimateSections_Projects_ProjectId",
+                        name: "FK_Estimates_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
@@ -862,33 +868,23 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EstimateItems",
+                name: "EstimateSections",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SectionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EstimateId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    MeasurementUnitId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Volume = table.Column<decimal>(type: "numeric(18,4)", precision: 18, scale: 4, nullable: false),
-                    ClientUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
-                    BrigadeUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EstimateItems", x => x.Id);
+                    table.PrimaryKey("PK_EstimateSections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EstimateItems_EstimateSections_SectionId",
-                        column: x => x.SectionId,
-                        principalTable: "EstimateSections",
+                        name: "FK_EstimateSections_Estimates_EstimateId",
+                        column: x => x.EstimateId,
+                        principalTable: "Estimates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EstimateItems_MeasurementUnits_MeasurementUnitId",
-                        column: x => x.MeasurementUnitId,
-                        principalTable: "MeasurementUnits",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1044,6 +1040,36 @@ namespace Ucms.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EstimateItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SectionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    MeasurementUnitId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Volume = table.Column<decimal>(type: "numeric(18,4)", precision: 18, scale: 4, nullable: false),
+                    ClientUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    BrigadeUnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EstimateItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EstimateItems_EstimateSections_SectionId",
+                        column: x => x.SectionId,
+                        principalTable: "EstimateSections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EstimateItems_MeasurementUnits_MeasurementUnitId",
+                        column: x => x.MeasurementUnitId,
+                        principalTable: "MeasurementUnits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1217,14 +1243,24 @@ namespace Ucms.Infrastructure.Migrations
                 column: "SectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EstimateSections_Id",
-                table: "EstimateSections",
+                name: "IX_Estimates_Id",
+                table: "Estimates",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EstimateSections_ProjectId",
-                table: "EstimateSections",
+                name: "IX_Estimates_ProjectId",
+                table: "Estimates",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EstimateSections_EstimateId",
+                table: "EstimateSections",
+                column: "EstimateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EstimateSections_Id",
+                table: "EstimateSections",
+                column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomeItems_Id",
@@ -1704,6 +1740,9 @@ namespace Ucms.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Brigades");
+
+            migrationBuilder.DropTable(
+                name: "Estimates");
 
             migrationBuilder.DropTable(
                 name: "Projects");

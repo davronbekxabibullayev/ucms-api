@@ -6,7 +6,7 @@ using Ucms.Application.Persistence;
 
 public static class DeleteItem
 {
-    public record Command(Guid ProjectId, Guid ItemId);
+    public record Command(Guid ProjectId, Guid EstimateId, Guid ItemId);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -22,7 +22,7 @@ public static class DeleteItem
 
             var item = await db.EstimateItems
                 .Include(i => i.Section)
-                .FirstOrDefaultAsync(i => i.Id == cmd.ItemId && i.Section!.ProjectId == cmd.ProjectId, ct);
+                .FirstOrDefaultAsync(i => i.Id == cmd.ItemId && i.Section!.EstimateId == cmd.EstimateId, ct);
 
             if (item is null) return (true, false);
 

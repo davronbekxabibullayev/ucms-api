@@ -22,7 +22,7 @@ public static class GetProjectDetail
             if (!ctx.IsOwner && ctx.OrganizationId != project.OrganizationId) return (null, false, true);
 
             var estimateTotals = await db.EstimateItems
-                .Where(i => i.Section!.ProjectId == q.ProjectId)
+                .Where(i => i.Section!.Estimate!.ProjectId == q.ProjectId)
                 .GroupBy(_ => true)
                 .Select(g => new
                 {

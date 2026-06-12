@@ -6,7 +6,7 @@ using Ucms.Application.Persistence;
 
 public static class UpdateSection
 {
-    public record Command(Guid ProjectId, Guid SectionId, string Name, int Order);
+    public record Command(Guid ProjectId, Guid EstimateId, Guid SectionId, string Name, int Order);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -21,7 +21,7 @@ public static class UpdateSection
                 return (false, orgId is not null);
 
             var section = await db.EstimateSections
-                .FirstOrDefaultAsync(s => s.Id == cmd.SectionId && s.ProjectId == cmd.ProjectId, ct);
+                .FirstOrDefaultAsync(s => s.Id == cmd.SectionId && s.EstimateId == cmd.EstimateId, ct);
 
             if (section is null) return (true, false);
 

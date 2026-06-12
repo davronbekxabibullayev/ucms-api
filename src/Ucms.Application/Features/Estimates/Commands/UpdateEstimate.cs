@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;
 
-public static class DeleteSection
+public static class UpdateEstimate
 {
-    public record Command(Guid ProjectId, Guid EstimateId, Guid SectionId);
+    public record Command(Guid ProjectId, Guid EstimateId, string Name, string? Description, int Order);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -20,12 +20,16 @@ public static class DeleteSection
             if (orgId is null || (!ctx.IsOwner && ctx.OrganizationId != orgId))
                 return (false, orgId is not null);
 
-            var section = await db.EstimateSections
-                .FirstOrDefaultAsync(s => s.Id == cmd.SectionId && s.EstimateId == cmd.EstimateId, ct);
+            var estimate = await db.Estimates
+                .FirstOrDefaultAsync(e => e.Id == cmd.EstimateId && e.ProjectId == cmd.ProjectId, ct);
 
-            if (section is null) return (true, false);
+            if (estimate is null) return (true, false);
 
-            db.EstimateSections.Remove(section);
+            estimate.Name        = cmd.Name;
+            estimate.Description = cmd.Description;
+            estimate.Order       = cmd.Order;
+
+            db.Estimates.Update(estimate);
             await db.SaveChangesAsync(ct);
             return (false, false);
         }

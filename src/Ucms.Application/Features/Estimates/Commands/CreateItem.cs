@@ -8,7 +8,7 @@ using Ucms.Domain.Entities;
 public static class CreateItem
 {
     public record Command(
-        Guid ProjectId, Guid SectionId,
+        Guid ProjectId, Guid EstimateId, Guid SectionId,
         string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
@@ -27,10 +27,10 @@ public static class CreateItem
                 return (null, orgId is not null, null);
 
             var sectionExists = await db.EstimateSections
-                .AnyAsync(s => s.Id == cmd.SectionId && s.ProjectId == cmd.ProjectId, ct);
+                .AnyAsync(s => s.Id == cmd.SectionId && s.EstimateId == cmd.EstimateId, ct);
 
             if (!sectionExists)
-                return (null, false, "Bo'lim ushbu loyihaga tegishli emas");
+                return (null, false, "Bo'lim ushbu smetaga tegishli emas");
 
             var unitExists = await db.MeasurementUnits
                 .AnyAsync(u => u.Id == cmd.MeasurementUnitId && !u.IsDeleted, ct);

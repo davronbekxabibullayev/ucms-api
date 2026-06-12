@@ -6,7 +6,7 @@ using Ucms.Application.Persistence;
 
 public static class GetSections
 {
-    public record Query(Guid ProjectId);
+    public record Query(Guid ProjectId, Guid EstimateId);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -21,7 +21,7 @@ public static class GetSections
                 return (null, orgId is not null);
 
             var sections = await db.EstimateSections
-                .Where(s => s.ProjectId == q.ProjectId)
+                .Where(s => s.EstimateId == q.EstimateId)
                 .OrderBy(s => s.Order)
                 .Select(s => (object)new
                 {

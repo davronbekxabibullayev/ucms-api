@@ -7,7 +7,7 @@ using Ucms.Application.Persistence;
 public static class UpdateItem
 {
     public record Command(
-        Guid ProjectId, Guid ItemId,
+        Guid ProjectId, Guid EstimateId, Guid ItemId,
         string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
@@ -25,7 +25,7 @@ public static class UpdateItem
 
             var item = await db.EstimateItems
                 .Include(i => i.Section)
-                .FirstOrDefaultAsync(i => i.Id == cmd.ItemId && i.Section!.ProjectId == cmd.ProjectId, ct);
+                .FirstOrDefaultAsync(i => i.Id == cmd.ItemId && i.Section!.EstimateId == cmd.EstimateId, ct);
 
             if (item is null) return (true, false);
 

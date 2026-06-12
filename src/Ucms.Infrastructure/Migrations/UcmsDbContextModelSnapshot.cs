@@ -316,6 +316,51 @@ namespace Ucms.Infrastructure.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.Estimate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Estimates");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -365,6 +410,9 @@ namespace Ucms.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("EstimateId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
@@ -373,14 +421,11 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("EstimateId");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("Id");
 
                     b.ToTable("EstimateSections");
                 });
@@ -1793,6 +1838,17 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.Estimate", b =>
+                {
+                    b.HasOne("Ucms.Domain.Entities.Project", "Project")
+                        .WithMany("Estimates")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>
                 {
                     b.HasOne("Ucms.Domain.Entities.MeasurementUnit", "MeasurementUnit")
@@ -1814,13 +1870,13 @@ namespace Ucms.Infrastructure.Migrations
 
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateSection", b =>
                 {
-                    b.HasOne("Ucms.Domain.Entities.Project", "Project")
-                        .WithMany("EstimateSections")
-                        .HasForeignKey("ProjectId")
+                    b.HasOne("Ucms.Domain.Entities.Estimate", "Estimate")
+                        .WithMany("Sections")
+                        .HasForeignKey("EstimateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Project");
+                    b.Navigation("Estimate");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Identity.RefreshToken", b =>
@@ -2270,6 +2326,11 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("Salaries");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.Estimate", b =>
+                {
+                    b.Navigation("Sections");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>
                 {
                     b.Navigation("ClientActItems");
@@ -2328,7 +2389,7 @@ namespace Ucms.Infrastructure.Migrations
 
                     b.Navigation("ClientPayments");
 
-                    b.Navigation("EstimateSections");
+                    b.Navigation("Estimates");
 
                     b.Navigation("Expenses");
 

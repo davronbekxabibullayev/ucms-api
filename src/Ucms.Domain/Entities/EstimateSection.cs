@@ -3,14 +3,14 @@ namespace Ucms.Domain.Entities;
 using Ucms.Domain.Common;
 
 /// <summary>
-/// Smeta bo'limi (e.g. "Полы", "Потолки", "Стены")
+/// Smeta bo'limi (e.g. "Pollar", "Devorlar", "Shiftlar")
 /// </summary>
 public class EstimateSection : Entity
 {
     /// <summary>
-    /// Loyiha ID
+    /// Smeta ID (Estimate → Sections)
     /// </summary>
-    public Guid ProjectId { get; set; }
+    public Guid EstimateId { get; set; }
 
     /// <summary>
     /// Bo'lim nomi
@@ -22,6 +22,6 @@ public class EstimateSection : Entity
     /// </summary>
     public int Order { get; set; }
 
-    public virtual Project? Project { get; set; }
+    public virtual Estimate? Estimate { get; set; }
     public virtual ICollection<EstimateItem> EstimateItems { get; set; } = [];
 }

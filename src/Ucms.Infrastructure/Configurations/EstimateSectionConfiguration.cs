@@ -9,7 +9,7 @@ public class EstimateSectionConfiguration : IEntityTypeConfiguration<EstimateSec
     public void Configure(EntityTypeBuilder<EstimateSection> builder)
     {
         builder.HasIndex(e => e.Id);
-        builder.HasIndex(e => e.ProjectId);
+        builder.HasIndex(e => e.EstimateId);
         builder.Property(e => e.Name).HasMaxLength(512).IsRequired();
 
         builder.HasMany(e => e.EstimateItems)

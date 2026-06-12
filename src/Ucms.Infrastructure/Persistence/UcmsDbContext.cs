@@ -24,6 +24,7 @@ public class UcmsDbContext(
 
     // ── Loyiha va smeta ────────────────────────────────────────────────────
     public DbSet<Project> Projects { get; set; }
+    public DbSet<Estimate> Estimates { get; set; }
     public DbSet<EstimateSection> EstimateSections { get; set; }
     public DbSet<EstimateItem> EstimateItems { get; set; }
 

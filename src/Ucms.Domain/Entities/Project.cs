@@ -69,7 +69,7 @@ public class Project : AuditableEntity, IDeletable
     public bool IsDeleted { get; set; }
 
     public virtual Organization? Organization { get; set; }
-    public virtual ICollection<EstimateSection> EstimateSections { get; set; } = [];
+    public virtual ICollection<Estimate> Estimates { get; set; } = [];
     public virtual ICollection<WorkLog> WorkLogs { get; set; } = [];
     public virtual ICollection<ClientAct> ClientActs { get; set; } = [];
     public virtual ICollection<ClientPayment> ClientPayments { get; set; } = [];

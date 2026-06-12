@@ -44,6 +44,10 @@ public class UcmsDbContextSeed
     private static readonly Guid T1Brigade1Id   = new("00000000-0000-0000-0003-000000000101");
     private static readonly Guid T1Brigade2Id   = new("00000000-0000-0000-0003-000000000102");
 
+    // Estimate documents
+    private static readonly Guid T1P1Est1Id     = new("00000000-0000-0000-000B-000000000101");
+    private static readonly Guid T1P2Est1Id     = new("00000000-0000-0000-000B-000000000201");
+
     // Project 1 estimate
     private static readonly Guid T1P1Sec1Id     = new("00000000-0000-0000-0004-000000000101");
     private static readonly Guid T1P1Sec2Id     = new("00000000-0000-0000-0004-000000000102");
@@ -323,9 +327,22 @@ public class UcmsDbContextSeed
             CreatedBy      = T1AdminId, UpdatedBy = T1AdminId,
         };
 
-        // Smeta — bo'lim 1: Pol ishlari
-        var s1 = Sec(T1P1Sec1Id, T1Project1Id, "Pol ishlari", 1);
-        var s2 = Sec(T1P1Sec2Id, T1Project1Id, "Devor va shift ishlari", 2);
+        // Smeta hujjatlari
+        var est1 = new Estimate
+        {
+            Id          = T1P1Est1Id,
+            ProjectId   = T1Project1Id,
+            Name        = "Asosiy smeta",
+            Description = "Ichki bezak ishlari asosiy smeta hujjati",
+            Order       = 1,
+            IsDeleted   = false,
+            CreatedAt   = now, UpdatedAt = now,
+            CreatedBy   = T1AdminId, UpdatedBy = T1AdminId,
+        };
+
+        // Smeta — bo'limlar
+        var s1 = Sec(T1P1Sec1Id, T1P1Est1Id, "Pol ishlari", 1);
+        var s2 = Sec(T1P1Sec2Id, T1P1Est1Id, "Devor va shift ishlari", 2);
 
         var items1 = new[]
         {
@@ -359,7 +376,19 @@ public class UcmsDbContextSeed
             CreatedBy      = T1AdminId, UpdatedBy = T1AdminId,
         };
 
-        var s3    = Sec(T1P2Sec1Id, T1Project2Id, "Umumiy ta'mirlash ishlari", 1);
+        var est2 = new Estimate
+        {
+            Id          = T1P2Est1Id,
+            ProjectId   = T1Project2Id,
+            Name        = "Asosiy smeta",
+            Description = "Ofis binosi ta'mirlash asosiy smeta hujjati",
+            Order       = 1,
+            IsDeleted   = false,
+            CreatedAt   = now, UpdatedAt = now,
+            CreatedBy   = T1AdminId, UpdatedBy = T1AdminId,
+        };
+
+        var s3    = Sec(T1P2Sec1Id, T1P2Est1Id, "Umumiy ta'mirlash ishlari", 1);
         var items2 = new[]
         {
             Item(T1P2Item1Id, T1P2Sec1Id, "Derazalar almashtirish", UnitDonaId,
@@ -369,7 +398,14 @@ public class UcmsDbContextSeed
         };
 
         await db.Projects.AddRangeAsync(p1, p2);
+        await db.SaveChangesAsync();
+
+        await db.Estimates.AddRangeAsync(est1, est2);
+        await db.SaveChangesAsync();
+
         await db.EstimateSections.AddRangeAsync(s1, s2, s3);
+        await db.SaveChangesAsync();
+
         await db.EstimateItems.AddRangeAsync(items1);
         await db.EstimateItems.AddRangeAsync(items2);
         await db.SaveChangesAsync();
@@ -613,9 +649,9 @@ public class UcmsDbContextSeed
         logger?.LogInformation("[Seed] User: {User} / {Pwd} [{Role}]", user.UserName, password, role);
     }
 
-    private static EstimateSection Sec(Guid id, Guid projectId, string name, int order)
+    private static EstimateSection Sec(Guid id, Guid estimateId, string name, int order)
     {
-        return new() { Id = id, ProjectId = projectId, Name = name, Order = order };
+        return new() { Id = id, EstimateId = estimateId, Name = name, Order = order };
     }
 
     private static EstimateItem Item(

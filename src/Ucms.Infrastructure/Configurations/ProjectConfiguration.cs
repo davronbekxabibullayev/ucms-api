@@ -17,7 +17,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.HasQueryFilter(x => !x.IsDeleted);
 
-        builder.HasMany(e => e.EstimateSections)
+        builder.HasMany(e => e.Estimates)
             .WithOne(e => e.Project)
             .HasForeignKey(e => e.ProjectId);
 

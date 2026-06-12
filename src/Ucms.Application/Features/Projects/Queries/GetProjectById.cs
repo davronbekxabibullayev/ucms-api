@@ -32,7 +32,7 @@ public static class GetProjectById
                     p.OrganizationId,
                     p.CreatedAt,
                     p.UpdatedAt,
-                    p.EstimateSections.OrderBy(s => s.Order).Select(s => new ProjectSectionDto(
+                    p.Estimates.SelectMany(a => a.Sections.OrderBy(s => s.Order).Select(s => new ProjectSectionDto(
                         s.Id,
                         s.Name,
                         s.Order,
@@ -45,7 +45,7 @@ public static class GetProjectById
                             i.BrigadeUnitPrice,
                             i.Volume * i.ClientUnitPrice,
                             i.Volume * i.BrigadeUnitPrice,
-                            i.Order))))))
+                            i.Order)))))))
                 .FirstOrDefaultAsync(ct);
 
             if (project is null) return (null, false);

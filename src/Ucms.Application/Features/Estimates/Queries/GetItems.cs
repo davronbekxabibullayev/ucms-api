@@ -6,7 +6,7 @@ using Ucms.Application.Persistence;
 
 public static class GetItems
 {
-    public record Query(Guid ProjectId, Guid SectionId);
+    public record Query(Guid ProjectId, Guid EstimateId, Guid SectionId);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -21,18 +21,18 @@ public static class GetItems
                 return (null, orgId is not null);
 
             var items = await db.EstimateItems
-                .Where(i => i.SectionId == q.SectionId)
+                .Where(i => i.SectionId == q.SectionId && i.Section!.EstimateId == q.EstimateId)
                 .OrderBy(i => i.Order)
                 .Select(i => (object)new
                 {
-                    i.Id, i.Name,
+                    i.Id, i.Name, i.Order,
                     MeasurementUnitId   = i.MeasurementUnitId,
                     MeasurementUnitCode = i.MeasurementUnit!.Code,
                     i.Volume,
-                    i.ClientUnitPrice, i.BrigadeUnitPrice,
+                    i.ClientUnitPrice,
+                    i.BrigadeUnitPrice,
                     ClientTotal  = i.Volume * i.ClientUnitPrice,
                     BrigadeTotal = i.Volume * i.BrigadeUnitPrice,
-                    i.Order,
                 })
                 .ToListAsync(ct);
 

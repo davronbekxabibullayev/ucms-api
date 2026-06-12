@@ -5,10 +5,10 @@ using Ucms.Application.Abstractions;
 using Ucms.Application.Persistence;
 using Ucms.Domain.Entities;
 
-public static class CreateSection
+public static class CreateEstimate
 {
-    public record Command(Guid ProjectId, Guid EstimateId, string Name, int Order);
-    public record Result(Guid Id, string Name, int Order);
+    public record Command(Guid ProjectId, string Name, string? Description, int Order);
+    public record Result(Guid Id, string Name, string? Description, int Order);
 
     public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
     {
@@ -22,22 +22,18 @@ public static class CreateSection
             if (orgId is null || (!ctx.IsOwner && ctx.OrganizationId != orgId))
                 return (null, orgId is not null);
 
-            var estimateExists = await db.Estimates
-                .AnyAsync(e => e.Id == cmd.EstimateId && e.ProjectId == cmd.ProjectId, ct);
-
-            if (!estimateExists) return (null, false);
-
-            var section = new EstimateSection
+            var estimate = new Estimate
             {
-                Id         = Guid.NewGuid(),
-                EstimateId = cmd.EstimateId,
-                Name       = cmd.Name,
-                Order      = cmd.Order,
+                Id          = Guid.NewGuid(),
+                ProjectId   = cmd.ProjectId,
+                Name        = cmd.Name,
+                Description = cmd.Description,
+                Order       = cmd.Order,
             };
 
-            await db.EstimateSections.AddAsync(section, ct);
+            await db.Estimates.AddAsync(estimate, ct);
             await db.SaveChangesAsync(ct);
-            return (new Result(section.Id, section.Name, section.Order), false);
+            return (new Result(estimate.Id, estimate.Name, estimate.Description, estimate.Order), false);
         }
     }
 }

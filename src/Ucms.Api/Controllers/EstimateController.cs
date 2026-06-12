@@ -6,14 +6,18 @@ using Ucms.Application.Features.Estimates.Commands;
 using Ucms.Application.Features.Estimates.Queries;
 
 /// <summary>
-/// Loyiha smeta bo'limlari va pozitsiyalarini boshqarish.
-/// Управление разделами и позициями сметы проекта.
+/// Loyiha smeta hujjatlarini boshqarish.
+/// Иерархия: Project → Estimates → Sections → Items
 /// </summary>
 [ApiController]
-[Route("api/projects/{projectId:guid}/estimate")]
+[Route("api/projects/{projectId:guid}/estimates")]
 [Tags("Estimate")]
 [Authorize(Roles = "Admin,Manager")]
 public class EstimateController(
+    GetEstimates.Handler   getEstimates,
+    CreateEstimate.Handler createEstimate,
+    UpdateEstimate.Handler updateEstimate,
+    DeleteEstimate.Handler deleteEstimate,
     GetSections.Handler    getSections,
     CreateSection.Handler  createSection,
     UpdateSection.Handler  updateSection,
@@ -23,46 +27,108 @@ public class EstimateController(
     UpdateItem.Handler     updateItem,
     DeleteItem.Handler     deleteItem) : ControllerBase
 {
+    public record CreateEstimateRequest(string Name, string? Description, int Order);
+    public record UpdateEstimateRequest(string Name, string? Description, int Order);
     public record CreateSectionRequest(string Name, int Order);
     public record UpdateSectionRequest(string Name, int Order);
-
     public record CreateItemRequest(
         Guid SectionId, string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
-
     public record UpdateItemRequest(
         string Name, Guid MeasurementUnitId, decimal Volume,
         decimal ClientUnitPrice, decimal BrigadeUnitPrice, int Order);
 
-    // ── Sections ───────────────────────────────────────────────────────────────
+    // ── Estimates ──────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Loyiha smetasi bo'limlari ro'yxati.
-    /// Список разделов сметы проекта.
+    /// Loyiha smeta hujjatlari ro'yxati.
     /// </summary>
-    [HttpGet("sections")]
+    [HttpGet]
     [Authorize(Roles = "Admin,Manager,Brigadir,Accountant")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetSections(Guid projectId, CancellationToken ct)
+    public async Task<IActionResult> GetEstimates(Guid projectId, CancellationToken ct)
     {
-        var (data, forbidden) = await getSections.HandleAsync(new(projectId), ct);
+        var (data, forbidden) = await getEstimates.HandleAsync(new(projectId), ct);
         if (forbidden) return Forbid();
-        // Handler mavjud loyiha uchun bo'sh list qaytarishi kerak, null emas
+        return data is null ? NotFound() : Ok(data);
+    }
+
+    /// <summary>
+    /// Yangi smeta hujjati yaratish.
+    /// </summary>
+    [HttpPost]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> CreateEstimate(
+        Guid projectId, [FromBody] CreateEstimateRequest req, CancellationToken ct)
+    {
+        var (data, forbidden) = await createEstimate.HandleAsync(
+            new(projectId, req.Name, req.Description, req.Order), ct);
+        if (forbidden) return Forbid();
+        if (data is null) return NotFound();
+        return StatusCode(201, data);
+    }
+
+    /// <summary>
+    /// Smeta hujjatini yangilash.
+    /// </summary>
+    [HttpPut("{estimateId:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateEstimate(
+        Guid projectId, Guid estimateId, [FromBody] UpdateEstimateRequest req, CancellationToken ct)
+    {
+        var (notFound, forbidden) = await updateEstimate.HandleAsync(
+            new(projectId, estimateId, req.Name, req.Description, req.Order), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Smeta hujjatini o'chirish (soft delete).
+    /// </summary>
+    [HttpDelete("{estimateId:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleteEstimate(
+        Guid projectId, Guid estimateId, CancellationToken ct)
+    {
+        var (notFound, forbidden) = await deleteEstimate.HandleAsync(new(projectId, estimateId), ct);
+        if (notFound)  return NotFound();
+        if (forbidden) return Forbid();
+        return NoContent();
+    }
+
+    // ── Sections ───────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Smeta bo'limlari ro'yxati.
+    /// </summary>
+    [HttpGet("{estimateId:guid}/sections")]
+    [Authorize(Roles = "Admin,Manager,Brigadir,Accountant")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetSections(
+        Guid projectId, Guid estimateId, CancellationToken ct)
+    {
+        var (data, forbidden) = await getSections.HandleAsync(new(projectId, estimateId), ct);
+        if (forbidden) return Forbid();
         return data is null ? NotFound() : Ok(data);
     }
 
     /// <summary>
     /// Yangi smeta bo'limi yaratish.
-    /// Создать новый раздел сметы.
     /// </summary>
-    [HttpPost("sections")]
+    [HttpPost("{estimateId:guid}/sections")]
     [ProducesResponseType(201)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> CreateSection(
-        Guid projectId, [FromBody] CreateSectionRequest req, CancellationToken ct)
+        Guid projectId, Guid estimateId, [FromBody] CreateSectionRequest req, CancellationToken ct)
     {
-        var (data, forbidden) = await createSection.HandleAsync(new(projectId, req.Name, req.Order), ct);
+        var (data, forbidden) = await createSection.HandleAsync(
+            new(projectId, estimateId, req.Name, req.Order), ct);
         if (forbidden) return Forbid();
         if (data is null) return NotFound();
         return StatusCode(201, data);
@@ -70,16 +136,16 @@ public class EstimateController(
 
     /// <summary>
     /// Smeta bo'limini yangilash.
-    /// Обновить раздел сметы.
     /// </summary>
-    [HttpPut("sections/{sectionId:guid}")]
+    [HttpPut("{estimateId:guid}/sections/{sectionId:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateSection(
-        Guid projectId, Guid sectionId, [FromBody] UpdateSectionRequest req, CancellationToken ct)
+        Guid projectId, Guid estimateId, Guid sectionId,
+        [FromBody] UpdateSectionRequest req, CancellationToken ct)
     {
         var (notFound, forbidden) = await updateSection.HandleAsync(
-            new(projectId, sectionId, req.Name, req.Order), ct);
+            new(projectId, estimateId, sectionId, req.Name, req.Order), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
         return NoContent();
@@ -87,15 +153,15 @@ public class EstimateController(
 
     /// <summary>
     /// Smeta bo'limini o'chirish.
-    /// Удалить раздел сметы.
     /// </summary>
-    [HttpDelete("sections/{sectionId:guid}")]
+    [HttpDelete("{estimateId:guid}/sections/{sectionId:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteSection(
-        Guid projectId, Guid sectionId, CancellationToken ct)
+        Guid projectId, Guid estimateId, Guid sectionId, CancellationToken ct)
     {
-        var (notFound, forbidden) = await deleteSection.HandleAsync(new(projectId, sectionId), ct);
+        var (notFound, forbidden) = await deleteSection.HandleAsync(
+            new(projectId, estimateId, sectionId), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
         return NoContent();
@@ -104,35 +170,32 @@ public class EstimateController(
     // ── Items ──────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Bo'lim ichidagi smeta pozitsiyalari ro'yxati.
-    /// Список позиций сметы внутри раздела.
+    /// Bo'lim ichidagi pozitsiyalar ro'yxati.
     /// </summary>
-    [HttpGet("sections/{sectionId:guid}/items")]
+    [HttpGet("{estimateId:guid}/sections/{sectionId:guid}/items")]
     [Authorize(Roles = "Admin,Manager,Brigadir,Accountant")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetItems(
-        Guid projectId, Guid sectionId, CancellationToken ct)
+        Guid projectId, Guid estimateId, Guid sectionId, CancellationToken ct)
     {
-        var (data, forbidden) = await getItems.HandleAsync(new(projectId, sectionId), ct);
+        var (data, forbidden) = await getItems.HandleAsync(new(projectId, estimateId, sectionId), ct);
         if (forbidden) return Forbid();
-        // Handler mavjud bo'lim uchun bo'sh list qaytarishi kerak, null emas
         return data is null ? NotFound() : Ok(data);
     }
 
     /// <summary>
     /// Yangi smeta pozitsiyasi yaratish.
-    /// Создать новую позицию сметы.
     /// </summary>
-    [HttpPost("items")]
+    [HttpPost("{estimateId:guid}/items")]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> CreateItem(
-        Guid projectId, [FromBody] CreateItemRequest req, CancellationToken ct)
+        Guid projectId, Guid estimateId, [FromBody] CreateItemRequest req, CancellationToken ct)
     {
         var (data, forbidden, error) = await createItem.HandleAsync(
-            new(projectId, req.SectionId, req.Name, req.MeasurementUnitId, req.Volume,
+            new(projectId, estimateId, req.SectionId, req.Name, req.MeasurementUnitId, req.Volume,
                 req.ClientUnitPrice, req.BrigadeUnitPrice, req.Order), ct);
         if (forbidden)         return Forbid();
         if (error is not null) return BadRequest(new { message = error });
@@ -142,16 +205,16 @@ public class EstimateController(
 
     /// <summary>
     /// Smeta pozitsiyasini yangilash.
-    /// Обновить позицию сметы.
     /// </summary>
-    [HttpPut("items/{itemId:guid}")]
+    [HttpPut("{estimateId:guid}/items/{itemId:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateItem(
-        Guid projectId, Guid itemId, [FromBody] UpdateItemRequest req, CancellationToken ct)
+        Guid projectId, Guid estimateId, Guid itemId,
+        [FromBody] UpdateItemRequest req, CancellationToken ct)
     {
         var (notFound, forbidden) = await updateItem.HandleAsync(
-            new(projectId, itemId, req.Name, req.MeasurementUnitId, req.Volume,
+            new(projectId, estimateId, itemId, req.Name, req.MeasurementUnitId, req.Volume,
                 req.ClientUnitPrice, req.BrigadeUnitPrice, req.Order), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
@@ -160,15 +223,14 @@ public class EstimateController(
 
     /// <summary>
     /// Smeta pozitsiyasini o'chirish.
-    /// Удалить позицию сметы.
     /// </summary>
-    [HttpDelete("items/{itemId:guid}")]
+    [HttpDelete("{estimateId:guid}/items/{itemId:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteItem(
-        Guid projectId, Guid itemId, CancellationToken ct)
+        Guid projectId, Guid estimateId, Guid itemId, CancellationToken ct)
     {
-        var (notFound, forbidden) = await deleteItem.HandleAsync(new(projectId, itemId), ct);
+        var (notFound, forbidden) = await deleteItem.HandleAsync(new(projectId, estimateId, itemId), ct);
         if (notFound)  return NotFound();
         if (forbidden) return Forbid();
         return NoContent();

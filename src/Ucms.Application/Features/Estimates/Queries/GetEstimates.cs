@@ -1,0 +1,43 @@
+namespace Ucms.Application.Features.Estimates.Queries;
+
+using Microsoft.EntityFrameworkCore;
+using Ucms.Application.Abstractions;
+using Ucms.Application.Persistence;
+
+public static class GetEstimates
+{
+    public record Query(Guid ProjectId);
+
+    public sealed class Handler(IUcmsDbContext db, ICurrentContext ctx)
+    {
+        public async Task<(List<object>? Data, bool Forbidden)> HandleAsync(Query q, CancellationToken ct)
+        {
+            var orgId = await db.Projects
+                .Where(p => p.Id == q.ProjectId && !p.IsDeleted)
+                .Select(p => (Guid?)p.OrganizationId)
+                .FirstOrDefaultAsync(ct);
+
+            if (orgId is null || (!ctx.IsOwner && ctx.OrganizationId != orgId))
+                return (null, orgId is not null);
+
+            var estimates = await db.Estimates
+                .Where(e => e.ProjectId == q.ProjectId)
+                .OrderBy(e => e.Order)
+                .Select(e => (object)new
+                {
+                    e.Id, e.Name, e.Description, e.Order,
+                    SectionCount  = e.Sections.Count,
+                    ClientTotal   = e.Sections
+                        .SelectMany(s => s.EstimateItems)
+                        .Sum(i => i.Volume * i.ClientUnitPrice),
+                    BrigadeTotal  = e.Sections
+                        .SelectMany(s => s.EstimateItems)
+                        .Sum(i => i.Volume * i.BrigadeUnitPrice),
+                    CreatedAt = e.CreatedAt,
+                })
+                .ToListAsync(ct);
+
+            return (estimates, false);
+        }
+    }
+}
