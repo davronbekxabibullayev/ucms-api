@@ -9,10 +9,9 @@ public class SalaryConfiguration : IEntityTypeConfiguration<Salary>
     public void Configure(EntityTypeBuilder<Salary> builder)
     {
         builder.HasIndex(e => e.OrganizationId);
+        builder.HasIndex(e => e.EmployeeId);
         builder.HasIndex(e => e.Month);
 
-        builder.Property(e => e.EmployeeName).HasMaxLength(256).IsRequired();
-        builder.Property(e => e.Position).HasMaxLength(128);
         builder.Property(e => e.Month).HasMaxLength(7).IsRequired(); // "2026-06"
         builder.Property(e => e.Notes).HasMaxLength(1024);
         builder.Property(e => e.Amount).HasPrecision(18, 2);

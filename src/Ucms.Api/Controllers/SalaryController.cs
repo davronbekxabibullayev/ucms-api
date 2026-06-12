@@ -21,26 +21,25 @@ public class SalaryController(
     DeleteSalary.Handler   delete) : ControllerBase
 {
     public record CreateSalaryRequest(
-        string EmployeeName, string? Position,
-        string Month, decimal Amount, string? Notes);
+        Guid EmployeeId, string Month, decimal Amount, string? Notes);
 
     public record UpdateSalaryRequest(
-        string EmployeeName, string? Position,
-        string Month, decimal Amount, string? Notes);
+        Guid EmployeeId, string Month, decimal Amount, string? Notes);
 
     /// <summary>
-    /// Maoshlar ro'yxati (oy filtri va sahifalash bilan).
-    /// Список зарплат (с фильтром по месяцу и пагинацией).
+    /// Maoshlar ro'yxati (oy va xodim filtri bilan).
+    /// Список зарплат (с фильтром по месяцу и сотруднику).
     /// </summary>
     [HttpGet]
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? month,
+        [FromQuery] Guid? employeeId,
         [FromQuery] int page = 1,
         [FromQuery] int size = 50,
         CancellationToken ct = default)
     {
-        var (data, forbidden) = await getAll.HandleAsync(new(month, page, size), ct);
+        var (data, forbidden) = await getAll.HandleAsync(new(month, employeeId, page, size), ct);
         if (forbidden) return Forbid();
         return Ok(data);
     }
@@ -67,12 +66,14 @@ public class SalaryController(
     [Authorize(Roles = "Admin,Manager")]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Create([FromBody] CreateSalaryRequest req, CancellationToken ct)
     {
-        var result = await create.HandleAsync(
-            new(req.EmployeeName, req.Position, req.Month, req.Amount, req.Notes), ct);
-        if (result is null) return BadRequest(new { message = "Foydalanuvchiga tashkilot biriktirilmagan. / Пользователю не привязана организация." });
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        var (data, notFound, forbidden) = await create.HandleAsync(
+            new(req.EmployeeId, req.Month, req.Amount, req.Notes), ct);
+        if (notFound)  return NotFound(new { message = "Xodim topilmadi. / Сотрудник не найден." });
+        if (forbidden) return Forbid();
+        return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
     }
 
     /// <summary>
@@ -82,13 +83,15 @@ public class SalaryController(
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
     [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSalaryRequest req, CancellationToken ct)
     {
-        var (notFound, forbidden) = await update.HandleAsync(
-            new(id, req.EmployeeName, req.Position, req.Month, req.Amount, req.Notes), ct);
-        if (notFound)  return NotFound();
-        if (forbidden) return Forbid();
+        var (notFound, forbidden, error) = await update.HandleAsync(
+            new(id, req.EmployeeId, req.Month, req.Amount, req.Notes), ct);
+        if (notFound)          return NotFound();
+        if (forbidden)         return Forbid();
+        if (error is not null) return BadRequest(new { message = error });
         return NoContent();
     }
 

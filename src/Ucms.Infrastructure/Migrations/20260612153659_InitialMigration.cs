@@ -112,28 +112,6 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Salaries",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EmployeeName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Position = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    Month = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
-                    Notes = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Salaries", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Stocks",
                 columns: table => new
                 {
@@ -176,39 +154,6 @@ namespace Ucms.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Suppliers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                schema: "Identity",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FullName = table.Column<string>(type: "text", nullable: true),
-                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -423,120 +368,37 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RefreshTokens",
-                schema: "Identity",
+                name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Token = table.Column<string>(type: "text", nullable: false),
-                    ExpiresAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false),
+                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Position = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Notes = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    BrigadeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    DeviceInfo = table.Column<string>(type: "text", nullable: true)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RefreshTokens_Users_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "Identity",
-                        principalTable: "Users",
+                        name: "FK_Employees_Brigades_BrigadeId",
+                        column: x => x.BrigadeId,
+                        principalTable: "Brigades",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserClaims",
-                schema: "Identity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClaimType = table.Column<string>(type: "text", nullable: true),
-                    ClaimValue = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserClaims", x => x.Id);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_UserClaims_Users_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "Identity",
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserLogins",
-                schema: "Identity",
-                columns: table => new
-                {
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    ProviderKey = table.Column<string>(type: "text", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
-                        name: "FK_UserLogins_Users_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "Identity",
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserRoles",
-                schema: "Identity",
-                columns: table => new
-                {
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_UserRoles_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalSchema: "Identity",
-                        principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserRoles_Users_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "Identity",
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserTokens",
-                schema: "Identity",
-                columns: table => new
-                {
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Value = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
-                    table.ForeignKey(
-                        name: "FK_UserTokens_Users_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "Identity",
-                        principalTable: "Users",
+                        name: "FK_Employees_Organizations_OrganizationId",
+                        column: x => x.OrganizationId,
+                        principalTable: "Organizations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -901,6 +763,73 @@ namespace Ucms.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Salaries",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Month = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Notes = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Salaries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Salaries_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FullName = table.Column<string>(type: "text", nullable: true),
+                    OrganizationId = table.Column<Guid>(type: "uuid", nullable: true),
+                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClientPayments",
                 columns: table => new
                 {
@@ -994,6 +923,125 @@ namespace Ucms.Infrastructure.Migrations
                         name: "FK_StockDemandItems_StockDemands_StockDemandId",
                         column: x => x.StockDemandId,
                         principalTable: "StockDemands",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    ExpiresAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    DeviceInfo = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserClaims",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserClaims_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLogins",
+                schema: "Identity",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_UserLogins_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRoles",
+                schema: "Identity",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "Identity",
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserTokens",
+                schema: "Identity",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_UserTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Identity",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1136,6 +1184,22 @@ namespace Ucms.Infrastructure.Migrations
                 name: "IX_ClientPayments_ProjectId",
                 table: "ClientPayments",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_BrigadeId",
+                table: "Employees",
+                column: "BrigadeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_OrganizationId",
+                table: "Employees",
+                column: "OrganizationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_UserId",
+                table: "Employees",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EstimateItems_Id",
@@ -1334,6 +1398,11 @@ namespace Ucms.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Salaries_EmployeeId",
+                table: "Salaries",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Salaries_Month",
                 table: "Salaries",
                 column: "Month");
@@ -1478,6 +1547,13 @@ namespace Ucms.Infrastructure.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_EmployeeId",
+                schema: "Identity",
+                table: "Users",
+                column: "EmployeeId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 schema: "Identity",
                 table: "Users",
@@ -1615,7 +1691,7 @@ namespace Ucms.Infrastructure.Migrations
                 name: "Suppliers");
 
             migrationBuilder.DropTable(
-                name: "Brigades");
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "EstimateSections");
@@ -1625,6 +1701,9 @@ namespace Ucms.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Stocks");
+
+            migrationBuilder.DropTable(
+                name: "Brigades");
 
             migrationBuilder.DropTable(
                 name: "Projects");

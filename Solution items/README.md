@@ -129,6 +129,7 @@ Swagger UI: `https://localhost:{PORT}/swagger`
 
 - Always use **block-bodied methods** (`{ }`).
 - Do not use **expression-bodied methods** (`=>`) for method declarations.
+- Use **explicit accessibility modifiers** instead of relying on default accessibility.
 
 ---
 ## ✍️ Author

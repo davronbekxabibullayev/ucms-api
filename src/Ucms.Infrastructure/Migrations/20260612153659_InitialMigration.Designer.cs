@@ -12,7 +12,7 @@ using Ucms.Infrastructure.Persistence;
 namespace Ucms.Infrastructure.Migrations
 {
     [DbContext(typeof(UcmsDbContext))]
-    [Migration("20260612144220_InitialMigration")]
+    [Migration("20260612153659_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -257,6 +257,68 @@ namespace Ucms.Infrastructure.Migrations
                     b.ToTable("ClientPayments");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.Employee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BrigadeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Position")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrigadeId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Employees");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -438,6 +500,9 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("EmployeeId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("FullName")
                         .HasColumnType("text");
 
@@ -487,6 +552,9 @@ namespace Ucms.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -1184,10 +1252,8 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("EmployeeName")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1204,10 +1270,6 @@ namespace Ucms.Infrastructure.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Position")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1215,6 +1277,8 @@ namespace Ucms.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("Month");
 
@@ -1714,6 +1778,24 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.Employee", b =>
+                {
+                    b.HasOne("Ucms.Domain.Entities.Brigade", "Brigade")
+                        .WithMany("Employees")
+                        .HasForeignKey("BrigadeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Ucms.Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brigade");
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>
                 {
                     b.HasOne("Ucms.Domain.Entities.MeasurementUnit", "MeasurementUnit")
@@ -1762,6 +1844,14 @@ namespace Ucms.Infrastructure.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Ucms.Domain.Entities.Identity.User", b =>
+                {
+                    b.HasOne("Ucms.Domain.Entities.Employee", null)
+                        .WithOne()
+                        .HasForeignKey("Ucms.Domain.Entities.Identity.User", "EmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.Identity.UserClaim", b =>
@@ -1961,6 +2051,17 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Ucms.Domain.Entities.Salary", b =>
+                {
+                    b.HasOne("Ucms.Domain.Entities.Employee", "Employee")
+                        .WithMany("Salaries")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Ucms.Domain.Entities.Sku", b =>
                 {
                     b.HasOne("Ucms.Domain.Entities.Manufacturer", "Manufacturer")
@@ -2148,6 +2249,8 @@ namespace Ucms.Infrastructure.Migrations
 
             modelBuilder.Entity("Ucms.Domain.Entities.Brigade", b =>
                 {
+                    b.Navigation("Employees");
+
                     b.Navigation("Payments");
 
                     b.Navigation("WorkLogs");
@@ -2163,6 +2266,11 @@ namespace Ucms.Infrastructure.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Ucms.Domain.Entities.Employee", b =>
+                {
+                    b.Navigation("Salaries");
                 });
 
             modelBuilder.Entity("Ucms.Domain.Entities.EstimateItem", b =>

@@ -9,7 +9,7 @@ public static class GetSalaryById
     public record Query(Guid Id);
 
     public record SalaryDetailDto(
-        Guid Id, string EmployeeName, string? Position,
+        Guid Id, Guid EmployeeId, string EmployeeName, string? Position,
         string Month, decimal Amount, string? Notes,
         Guid OrganizationId, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
 
@@ -20,7 +20,7 @@ public static class GetSalaryById
             var salary = await db.Salaries
                 .Where(s => s.Id == q.Id && !s.IsDeleted)
                 .Select(s => new SalaryDetailDto(
-                    s.Id, s.EmployeeName, s.Position,
+                    s.Id, s.EmployeeId, s.Employee!.Name, s.Employee.Position,
                     s.Month, s.Amount, s.Notes,
                     s.OrganizationId, s.CreatedAt, s.UpdatedAt))
                 .FirstOrDefaultAsync(ct);

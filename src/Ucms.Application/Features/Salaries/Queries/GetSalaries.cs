@@ -6,10 +6,10 @@ using Ucms.Application.Persistence;
 
 public static class GetSalaries
 {
-    public record Query(string? Month, int Page, int Size);
+    public record Query(string? Month, Guid? EmployeeId, int Page, int Size);
 
     public record Item(
-        Guid Id, string EmployeeName, string? Position,
+        Guid Id, Guid EmployeeId, string EmployeeName, string? Position,
         string Month, decimal Amount, string? Notes, DateTimeOffset CreatedAt);
 
     public record Result(int Total, int Page, int Size, decimal TotalAmount, List<Item> Items);
@@ -28,15 +28,18 @@ public static class GetSalaries
             if (!string.IsNullOrEmpty(q.Month))
                 query = query.Where(s => s.Month == q.Month);
 
-            var total = await query.CountAsync(ct);
+            if (q.EmployeeId.HasValue)
+                query = query.Where(s => s.EmployeeId == q.EmployeeId.Value);
+
+            var total       = await query.CountAsync(ct);
             var totalAmount = await query.SumAsync(s => s.Amount, ct);
 
             var items = await query
                 .OrderByDescending(s => s.Month)
-                .ThenBy(s => s.EmployeeName)
+                .ThenBy(s => s.Employee!.Name)
                 .Skip((q.Page - 1) * q.Size).Take(q.Size)
                 .Select(s => new Item(
-                    s.Id, s.EmployeeName, s.Position,
+                    s.Id, s.EmployeeId, s.Employee!.Name, s.Employee.Position,
                     s.Month, s.Amount, s.Notes, s.CreatedAt))
                 .ToListAsync(ct);
 

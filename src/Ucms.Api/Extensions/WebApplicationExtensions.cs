@@ -28,7 +28,7 @@ public static class WebApplicationExtensions
         builder.Services.AddUcmsDbContext(connectionString);
         builder.Services.AddAppIdentity();
         builder.Services.AddUcmsTokenService();
-        builder.Services.AddUcmsCors("StockCors");
+        builder.Services.AddUcmsCors("UcmsCors");
         builder.Services.AddApplicationAuth(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<Application.Abstractions.ICurrentContext, Infrastructure.Services.HttpCurrentContext>();
@@ -57,7 +57,7 @@ public static class WebApplicationExtensions
         app.UseMiddleware<GlobalMiddlewareErrorHander>();
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseCors("StockCors");
+        app.UseCors("UcmsCors");
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {

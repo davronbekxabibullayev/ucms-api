@@ -19,6 +19,11 @@ public class User : IdentityUser<Guid>, IAuditableEntity, IDeletable
     public Guid? OrganizationId { get; set; }
 
     /// <summary>
+    /// Bog'liq xodim yozuvi (nullable)
+    /// </summary>
+    public Guid? EmployeeId { get; set; }
+
+    /// <summary>
     /// O'chirilgan yoki yo'q (soft delete)
     /// </summary>
     public bool IsDeleted { get; set; }
